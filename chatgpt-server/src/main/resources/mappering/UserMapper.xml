@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chatgptserver.dao.UserMapper">
+
+    <insert id="wenXinAdd">
+        insert into tb_chatgpt_user ()
+    </insert>
+
+    <select id="getUserByCode" resultType="chatgptserver.bean.po.UserPO">
+        select * from tb_chatgpt_user where user_code = #{userCode}
+    </select>
+
+</mapper>

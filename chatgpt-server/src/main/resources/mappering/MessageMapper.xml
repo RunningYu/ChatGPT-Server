@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chatgptserver.dao.MessageMapper">
+
+    <insert id="insertMessage">
+        insert into tb_chatgpt_messages(role, user_code, chat_code, username, chat_name, question, replication)
+            values (#{role}, #{userCode}, #{chatCode}, #{username}, #{chatName}, #{question}, #{replication})
+    </insert>
+
+
+    <select id="getWenXinHistory" resultType="chatgptserver.bean.po.MessagesPO">
+        select * from tb_chatgpt_messages where chat_code = #{chatCode} order by id DESC limit 0, 20
+    </select>
+
+</mapper>

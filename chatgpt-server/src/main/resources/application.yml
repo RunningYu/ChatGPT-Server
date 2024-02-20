@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    username: slx
+    password: slx_9920
+    url: jdbc:mysql://rm-j6c2k7uyo6n6o2870no.mysql.rds.aliyuncs.com/chatgpt?useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 50MB     # 设置单个文件大小
+      max-request-size: 50MB  # 设置单次请求文件的总大小
+
+
+#  jackson:
+#    date-format: yyyy-MM-dd HH:mm:ss
+#    time-zone: GMT+8
+#    default-property-inclusion: non_null
+#    property-naming-strategy: SNAKE_CASE #??fastjson????SnakeCase??(???????????)
+
+#??mapper xml?????
+mybatis-plus:
+  mapper-locations: classpath:mappering/*.xml
+
+minio:
+  endpoint: http://124.71.110.30:9000
+  accessKey: minio
+  secretKey: minio123
+  bucket: file
