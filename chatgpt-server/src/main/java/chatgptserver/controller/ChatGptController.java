@@ -7,6 +7,7 @@ import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class ChatGptController {
     @Autowired
     private UserService userService;
 
+    @ApiOperation("文心一言：文本问答")
     @GetMapping("/chat/wenXin")
     public JsonResult wenXinChat(@Param("userCode") String userCode,
                                  @Param("chatCode") String chatCode,
@@ -48,6 +50,7 @@ public class ChatGptController {
         return JsonResult.success();
     }
 
+    @ApiOperation("讯飞星火：图片理解")
     @GetMapping("/chat/xf/image/understander")
     public JsonResult xfImageUnderstand(@Param("image") String image) {
         log.info("ChatGptController xfPictureUnderstand image:[{}]", image);
