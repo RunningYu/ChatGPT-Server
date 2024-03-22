@@ -75,16 +75,14 @@ public class XunFeiXingHuoController {
 
     @ApiOperation("讯飞星火：图片理解")
     @GetMapping("/chat/xf/image/understander")
-    public SseEmitter xfImageUnderstand(@Param("image") String image) {
-        log.info("ChatGptController xfPictureUnderstand image:[{}]", image);
+    public SseEmitter xfImageUnderstand(@Param("image") String image, String question) {
+        log.info("ChatGptController xfPictureUnderstand image:[{}], question[{}]", image, question);
         //设置默认的超时时间60秒，超时之后服务端主动关闭连接。
 //        SseEmitter sseEmitter = new SseEmitter(60 * 1000L);
-//        sseEmitterThreadLocal.set(sseEmitter);
         SseEmitter sseEmitter = new SseEmitter();
         Long threadId = Thread.currentThread().getId();
         SseUtils.sseEmittersMap.put(threadId, sseEmitter);
-        SseEmitter sseEmitter1 = xunFeiService.xfImageUnderstand(threadId, image);
-        System.out.println("---------------------------end---------------------------");
+        SseEmitter sseEmitter1 = xunFeiService.xfImageUnderstand(threadId, image, question);
         return sseEmitter;
     }
 

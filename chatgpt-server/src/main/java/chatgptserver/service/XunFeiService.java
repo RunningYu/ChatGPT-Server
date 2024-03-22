@@ -8,7 +8,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  */
 public interface XunFeiService {
 
-//    JsonResult xfImageUnderstand(SseEmitter sseEmitter, String image);
-    SseEmitter xfImageUnderstand(Long threadId, String image);
+    SseEmitter xfImageUnderstand(Long threadId, String image, String question);
 
 }

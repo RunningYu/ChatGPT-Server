@@ -5,12 +5,14 @@ import chatgptserver.utils.XunFeiUtils;
 import chatgptserver.utils.xunfei.BigModelNew;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.XunFeiService;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import sun.util.locale.provider.LocaleServiceProviderPool;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,21 +28,53 @@ import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
  * @date : 2024/3/22
  */
 
+@Slf4j
 @Service
 public class XunFeiServiceImpl implements XunFeiService {
 
 
     @Override
-    public SseEmitter xfImageUnderstand(Long threadId, String image) {
+    public SseEmitter xfImageUnderstand(Long threadId, String image, String question) {
+        log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}]", threadId, image, question);
+        XunFeiUtils.imageUnderstandFlagMap.put(Thread.currentThread().getId(), false);
+        XunFeiUtils.imageUnderstandResponseMap.put(Thread.currentThread().getId(), "");
+        SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
+        String totalResponse = "";
 
-        SseEmitter sseEmitter = new SseEmitter();
         try {
-            sseEmitter = imageUnderstand(threadId);
+            // 构建鉴权url
+            String authUrl = getAuthUrl(GPTConstants.XF_XH_PICTURE_UNDERSTAND_URL,
+                    GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY),
+                    GPT_KEY_MAP.get(GPTConstants.XF_XH_API_SECRET_KEY));
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
+            Request request = new Request.Builder().url(url).build();
+            for (int i = 0; i < 1; i++) {
+                WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, question, i + "", false));
+            }
+
+            while (true) {
+                boolean closeFlag = XunFeiUtils.imageUnderstandFlagMap.get(Thread.currentThread().getId());
+                XunFeiUtils.imageUnderstandFlagMap.put(Thread.currentThread().getId(), false);
+                if (!closeFlag) {
+//                    Thread.sleep(200);
+//                    String response = XunFeiUtils.imageUnderstandResponseMap.get(threadId);
+//                    XunFeiUtils.imageUnderstandResponseMap.put(Thread.currentThread().getId(), "");
+//                    if (!response.equals("") && response != null) {
+//                        System.out.println("--->[" + response + "]");
+//                        totalResponse.append(response);
+//                        sseEmitter.send(SseEmitter.event().comment(response));
+//                    }
+                } else {
+                    totalResponse = XunFeiUtils.imageUnderstandTotalResponseMap.get(threadId);
+                    log.info("XunFeiServiceImpl xfImageUnderstand totalResponse:[{}]", totalResponse);
+                    return sseEmitter;
+                }
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
 
-        return sseEmitter;
     }
 
     /**
@@ -52,32 +86,26 @@ public class XunFeiServiceImpl implements XunFeiService {
         XunFeiUtils.imageUnderstandResponseMap.put(Thread.currentThread().getId(), "");
         SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
 
-        boolean flag = true;
-        XunFeiUtils.imageUnderstandFlagThreadLocal.set(false);
-        // 个性化参数入口，如果是并发使用，可以在这里模拟
-        while (true) {
-            if (flag) {
-                flag = false;
-                // 构建鉴权url
-                String authUrl = getAuthUrl(GPTConstants.XF_XH_PICTURE_UNDERSTAND_URL,
-                        GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY),
-                        GPT_KEY_MAP.get(GPTConstants.XF_XH_API_SECRET_KEY));
-                OkHttpClient client = new OkHttpClient.Builder().build();
-                String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
-                Request request = new Request.Builder().url(url).build();
-                for (int i = 0; i < 1; i++) {
-                    WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, "描述一下这张图片", i + "", false));
-                }
-            }
+        // 构建鉴权url
+        String authUrl = getAuthUrl(GPTConstants.XF_XH_PICTURE_UNDERSTAND_URL,
+                GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY),
+                GPT_KEY_MAP.get(GPTConstants.XF_XH_API_SECRET_KEY));
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
+        Request request = new Request.Builder().url(url).build();
+        for (int i = 0; i < 1; i++) {
+            WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, "描述一下这张图片", i + "", false));
+        }
 
+        while (true) {
             boolean closeFlag = XunFeiUtils.imageUnderstandFlagMap.get(Thread.currentThread().getId());
             XunFeiUtils.imageUnderstandFlagMap.put(Thread.currentThread().getId(), false);
             if (!closeFlag) {
                 Thread.sleep(200);
                 String response = XunFeiUtils.imageUnderstandResponseMap.get(threadId);
-                System.out.println("--->[" + response + "]");
                 XunFeiUtils.imageUnderstandResponseMap.put(Thread.currentThread().getId(), "");
                 if (!response.equals("") && response != null) {
+                    System.out.println("--->[" + response + "]");
                     sseEmitter.send(SseEmitter.event().comment(response));
                 }
             } else {

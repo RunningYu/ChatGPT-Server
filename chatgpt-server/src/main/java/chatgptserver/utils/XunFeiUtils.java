@@ -52,11 +52,9 @@ public class XunFeiUtils {
     }
 
 
-    public static final ThreadLocal<Boolean> imageUnderstandFlagThreadLocal = new ThreadLocal<>();
-
-    public static final ThreadLocal<String> imageUnderstandResponseThreadLocal = new ThreadLocal<>();
-
     public static ConcurrentHashMap<Long, String> imageUnderstandResponseMap = new ConcurrentHashMap<>();
+
+    public static ConcurrentHashMap<Long, String> imageUnderstandTotalResponseMap = new ConcurrentHashMap<>();
 
     public static ConcurrentHashMap<Long, Boolean> imageUnderstandFlagMap = new ConcurrentHashMap<>();
 

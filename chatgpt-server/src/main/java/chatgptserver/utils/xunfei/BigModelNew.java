@@ -215,6 +215,14 @@ public class BigModelNew extends WebSocketListener {
             totalAnswer = totalAnswer + temp.content;
 
             XunFeiUtils.imageUnderstandResponseMap.put(threadId, temp.content);
+            String pre = XunFeiUtils.imageUnderstandTotalResponseMap.containsKey(threadId) ? XunFeiUtils.imageUnderstandTotalResponseMap.get(threadId) : "";
+            XunFeiUtils.imageUnderstandTotalResponseMap.put(threadId, pre += temp.content);
+            sseEmitter = SseUtils.sseEmittersMap.get(threadId);
+            try {
+                sseEmitter.send(SseEmitter.event().comment(temp.content));
+            } catch (IOException e) {
+                throw new RuntimeException();
+            }
         }
         if (myJsonParse.header.status == 2) {
             // 可以关闭连接，释放资源
@@ -236,7 +244,6 @@ public class BigModelNew extends WebSocketListener {
             totalFlag = true;
             wsCloseFlag = true;
             XunFeiUtils.imageUnderstandFlagMap.put(threadId, true);
-            System.out.println(XunFeiUtils.imageUnderstandFlagThreadLocal.get());
             System.out.println("*************************************************************************************");
         }
     }
