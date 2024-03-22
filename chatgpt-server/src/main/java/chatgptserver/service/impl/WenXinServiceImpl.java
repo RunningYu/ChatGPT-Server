@@ -1,7 +1,5 @@
 package chatgptserver.service.impl;
 
-import chatgptserver.bean.ao.ChatAddRequestAO;
-import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.dto.WenXin.WXAccessTokenRspDTO;
 import chatgptserver.bean.dto.WenXin.WenXinReqMessagesDTO;
 import chatgptserver.bean.dto.WenXin.WenXinRequestBodyDTO;
@@ -12,8 +10,8 @@ import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.enums.RoleTypeEnums;
-import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
+import chatgptserver.service.WenXinService;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
 
@@ -31,7 +28,7 @@ import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
  */
 @Slf4j
 @Service
-public class MessageServiceImpl implements MessageService {
+public class WenXinServiceImpl implements WenXinService {
 
     @Autowired
     private UserMapper userMapper;
@@ -89,22 +86,7 @@ public class MessageServiceImpl implements MessageService {
 
     }
 
-    @Override
-    public Map<String, String> wenXinAdd(ChatAddRequestAO request) {
-        log.info("MessageServiceImpl getMessageFromWenXin request:[{}]", request);
-        String code = userMapper.wenXinAdd(request);
 
-
-        return null;
-    }
-
-    @Override
-    public JsonResult xfImageUnderstand(String image) {
-        log.info("MessageServiceImpl xfImageUnderstand image:[{}]", image);
-
-
-        return null;
-    }
 
     private void recordHistory(String userCode, String chatCode, String message, String result) {
 

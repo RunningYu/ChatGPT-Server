@@ -7,7 +7,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -19,7 +18,7 @@ import java.util.*;
 import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
 
 //@SpringBootTest
-class ChatgptServerApplicationTests {
+class XunFeiImageUnderstandTests {
 
     ThreadLocal<Boolean> flagLocal = new ThreadLocal<>();
 

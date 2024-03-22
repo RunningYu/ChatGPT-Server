@@ -21,25 +21,16 @@ import chatgptserver.bean.dto.WenXin.WenXinRequestBodyDTO;
 import chatgptserver.bean.dto.WenXin.WenXinRspDTO;
 import chatgptserver.bean.dto.XunFeiXingHuo.*;
 import chatgptserver.enums.GPTConstants;
-import chatgptserver.netty.Common.ImageUtil;
+import chatgptserver.Common.ImageUtil;
 import chatgptserver.service.OkHttpService;
 import com.alibaba.fastjson.JSON;
 import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.WebSocket;
-import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.swing.plaf.PanelUI;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static chatgptserver.enums.GPTConstants.*;

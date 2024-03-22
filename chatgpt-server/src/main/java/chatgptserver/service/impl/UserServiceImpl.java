@@ -1,11 +1,14 @@
 package chatgptserver.service.impl;
 
+import chatgptserver.bean.ao.ChatAddRequestAO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * @Author：chenzhenyu
@@ -24,5 +27,14 @@ public class UserServiceImpl implements UserService {
         UserPO userPO = userMapper.getUserByCode(senderCode);
         log.info("UserServiceImpl getUserByCode userPO:[{}]", userPO);
         return userPO;
+    }
+
+    @Override
+    public Map<String, String> createNewChat(ChatAddRequestAO request) {
+        log.info("MessageServiceImpl getMessageFromWenXin request:[{}]", request);
+        String code = userMapper.wenXinAdd(request);
+
+
+        return null;
     }
 }

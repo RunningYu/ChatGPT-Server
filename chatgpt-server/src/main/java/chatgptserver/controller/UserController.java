@@ -1,5 +1,6 @@
 package chatgptserver.controller;
 
+import chatgptserver.bean.ao.ChatAddRequestAO;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.UserAO;
 import chatgptserver.service.UserService;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 
 /**
@@ -26,6 +29,16 @@ public class UserController {
     @PostMapping("/user/login")
     public JsonResult login(@RequestBody UserAO request) {
         log.info("UserController login request:[{}]", request);
+
+        return JsonResult.success();
+    }
+
+
+    @ApiOperation("新建聊天")
+    @PostMapping("/chat/add")
+    public JsonResult wenXinAdd(@RequestBody ChatAddRequestAO request) {
+        log.info("ChatGptController wenXinChat request:[{}]", request);
+        Map<String, String> response = userService.createNewChat(request);
 
         return JsonResult.success();
     }

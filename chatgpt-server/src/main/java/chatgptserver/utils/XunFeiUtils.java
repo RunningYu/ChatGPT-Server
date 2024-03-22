@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -49,4 +50,15 @@ public class XunFeiUtils {
         // System.err.println(httpUrl.toString());
         return httpUrl.toString();
     }
+
+
+    public static final ThreadLocal<Boolean> imageUnderstandFlagThreadLocal = new ThreadLocal<>();
+
+    public static final ThreadLocal<String> imageUnderstandResponseThreadLocal = new ThreadLocal<>();
+
+    public static ConcurrentHashMap<Long, String> imageUnderstandResponseMap = new ConcurrentHashMap<>();
+
+    public static ConcurrentHashMap<Long, Boolean> imageUnderstandFlagMap = new ConcurrentHashMap<>();
+
+
 }

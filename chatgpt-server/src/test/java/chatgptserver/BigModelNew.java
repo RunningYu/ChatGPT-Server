@@ -1,7 +1,6 @@
 package chatgptserver;
 
-import chatgptserver.bean.dto.WenXin.ImageFlagDTO;
-import chatgptserver.netty.Common.ImageUtil;
+import chatgptserver.Common.ImageUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;

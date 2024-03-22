@@ -1,4 +1,4 @@
-package chatgptserver.netty.Common;
+package chatgptserver.Common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
