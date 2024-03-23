@@ -6,6 +6,10 @@ import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.*;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.ImageResponse;
+import chatgptserver.bean.po.ImageCreatePO;
+import chatgptserver.bean.po.MessagesPO;
+import chatgptserver.dao.MessageMapper;
+import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
 import chatgptserver.utils.MinioUtil;
 import chatgptserver.utils.XunFeiUtils;
@@ -45,6 +49,12 @@ import static chatgptserver.enums.GPTConstants.XF_XH_API_SECRET_KEY;
 @Slf4j
 @Service
 public class XunFeiServiceImpl implements XunFeiService {
+
+    @Autowired
+    private MessageService messageService;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Autowired
     private MinioUtil minioUtil;
@@ -105,18 +115,16 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：图片生成
      */
     @Override
-    public JsonResult xfImageCreate(String content) {
-        log.info("XunFeiServiceImpl xfImageCreate content:[{}]", content);
+    public JsonResult xfImageCreate(String content, String userCode, String chatCode) {
+        log.info("XunFeiServiceImpl xfImageCreate content:[{}], userCode:[{}], chatCode:[{}]", content, userCode, chatCode);
         JsonRootBean jsonRootBean = new JsonRootBean();
         jsonRootBean.setHeader(new Header(GPT_KEY_MAP.get(GPTConstants.XF_XH_APPID_KEY)));
+        String imageUrl = "";
         try {
             // 构建鉴权url
             String authUrl = getPicAuthUrl(GPTConstants.XF_XH_PICTURE_CREATE_URL, GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY), GPT_KEY_MAP.get(XF_XH_API_SECRET_KEY));
-            System.out.println("hostUrl:" + GPTConstants.XF_XH_PICTURE_UNDERSTAND_URL);
-            System.out.println("APPID:" + jsonRootBean.getHeader().getApp_id());
-            System.out.println("APPID:" + GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY));
-            System.out.println("APISecret:" + GPT_KEY_MAP.get(GPTConstants.XF_XH_API_SECRET_KEY));
-            System.out.println("authUrl:" + authUrl);
+            log.info("XunFeiServiceImpl xfImageCreate hostUrl:[{}], APPID:[{}], APPKEY:[{}], APISecret:[{}], authUrl:[{}]", GPTConstants.XF_XH_PICTURE_UNDERSTAND_URL,
+                    jsonRootBean.getHeader().getApp_id(), GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY), GPT_KEY_MAP.get(GPTConstants.XF_XH_API_SECRET_KEY), authUrl);
             Text text1 = new Text("user");
             text1.setContent(content);
             List<Text> textList = new ArrayList<>();
@@ -139,13 +147,15 @@ public class XunFeiServiceImpl implements XunFeiService {
             MultipartFile multipartFile = new MockMultipartFile("file", imageFile.getName(), "image", new FileInputStream(imageFile));
 
             UploadResponse imageUrlResponse = minioUtil.uploadFile(multipartFile, "file");
-            String imageUrl = imageUrlResponse.getMinIoUrl();
+            imageUrl = imageUrlResponse.getMinIoUrl();
             log.info("XunFeiServiceImpl pictureCreate imageUrl:[{}]", imageUrl);
-
-            return JsonResult.success(imageUrl);
         } catch (Exception e) {
             throw new RuntimeException();
         }
+        // 保存聊天记录
+        messageService.recordHistory(userCode, chatCode, content, imageUrl);
+
+        return JsonResult.success(imageUrl);
     }
 
     public static String getPicAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {

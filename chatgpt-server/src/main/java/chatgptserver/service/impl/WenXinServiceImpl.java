@@ -10,6 +10,7 @@ import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.enums.RoleTypeEnums;
+import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
 import chatgptserver.service.WenXinService;
 import com.alibaba.fastjson.JSON;
@@ -29,6 +30,9 @@ import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
 @Slf4j
 @Service
 public class WenXinServiceImpl implements WenXinService {
+
+    @Autowired
+    private MessageService messageService;
 
     @Autowired
     private UserMapper userMapper;
@@ -77,7 +81,7 @@ public class WenXinServiceImpl implements WenXinService {
             WenXinRspDTO wenXinRspDTO = JSON.parseObject(responseStr, WenXinRspDTO.class);
             log.info("MessageServiceImpl getMessageFromWenXin response:[{}]", wenXinRspDTO);
 
-            recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult());
+            messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult());
 
             return wenXinRspDTO.getResult();
         } catch (Exception e) {
@@ -88,23 +92,5 @@ public class WenXinServiceImpl implements WenXinService {
 
 
 
-    private void recordHistory(String userCode, String chatCode, String message, String result) {
 
-        UserPO sender = userMapper.getUserByCode(userCode);
-        UserPO target = userMapper.getUserByCode(chatCode);
-
-        MessagesPO messagesPO = new MessagesPO();
-        messagesPO.setRole(RoleTypeEnums.WEN_XIN_USER.getType());
-        messagesPO.setUserCode(userCode);
-        messagesPO.setChatCode(chatCode);
-        messagesPO.setUsername(sender.getUsername());
-        messagesPO.setChatName(target.getUsername());
-        messagesPO.setQuestion(message);
-        messagesPO.setReplication(result);
-
-        messageMapper.insertMessage(messagesPO);
-
-
-
-    }
 }

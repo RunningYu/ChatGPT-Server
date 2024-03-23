@@ -41,4 +41,10 @@ public class ImageCreatePO {
     private Date updateTime;
 
 
+    public ImageCreatePO(Integer userId, String chatCode, String content, String url) {
+        this.userId = userId;
+        this.chatCode = chatCode;
+        this.content = content;
+        this.url = url;
+    }
 }

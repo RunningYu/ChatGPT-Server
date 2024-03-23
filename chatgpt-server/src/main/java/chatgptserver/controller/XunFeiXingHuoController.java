@@ -86,9 +86,10 @@ public class XunFeiXingHuoController {
 
     @ApiOperation("讯飞星火：图片生成")
     @GetMapping("/chat/xf/image/create")
-    public JsonResult xfImageCreate(@Param("content") String content) {
-        log.info("ChatGptController xfImageCreate content:[{}]", content);
-        JsonResult response = xunFeiService.xfImageCreate(content);
+    public JsonResult xfImageCreate(@Param("content") String content, @Param("userCode") String userCode,
+                                    @Param("chatCode") String chatCode) {
+        log.info("ChatGptController xfImageCreate content:[{}], userCode:[{}], chatCode:[{}]", content, userCode, chatCode);
+        JsonResult response = xunFeiService.xfImageCreate(content, userCode, chatCode);
 
         return response;
     }

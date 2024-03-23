@@ -11,5 +11,5 @@ public interface XunFeiService {
 
     SseEmitter xfImageUnderstand(Long threadId, String image, String question);
 
-    JsonResult xfImageCreate(String content);
+    JsonResult xfImageCreate(String content, String userCode, String chatCode);
 }
