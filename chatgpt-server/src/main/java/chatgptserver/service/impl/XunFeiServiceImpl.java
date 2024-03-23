@@ -111,7 +111,6 @@ public class XunFeiServiceImpl implements XunFeiService {
     }
 
     /**
-     * todo: 上传到MinIO返回的url是下载url，想弄成浏览url
      * 讯飞星火：图片生成
      */
     @Override
@@ -144,7 +143,7 @@ public class XunFeiServiceImpl implements XunFeiService {
             imageResponse = JSON.parseObject(responseStr, ImageResponse.class);
             String imageBase64Str = imageResponse.getPayload().getChoices().getText().get(0).getContent();
             File imageFile = ImageUtil.convertBase64StrToImage(imageBase64Str, System.currentTimeMillis() + "AiPicture.jpg");
-            MultipartFile multipartFile = new MockMultipartFile("file", imageFile.getName(), "image", new FileInputStream(imageFile));
+            MultipartFile multipartFile = new MockMultipartFile("file", imageFile.getName(), "image/png", new FileInputStream(imageFile));
 
             UploadResponse imageUrlResponse = minioUtil.uploadFile(multipartFile, "file");
             imageUrl = imageUrlResponse.getMinIoUrl();
