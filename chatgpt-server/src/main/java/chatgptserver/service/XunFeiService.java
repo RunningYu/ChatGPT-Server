@@ -1,5 +1,6 @@
 package chatgptserver.service;
 
+import chatgptserver.bean.ao.JsonResult;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
@@ -10,4 +11,5 @@ public interface XunFeiService {
 
     SseEmitter xfImageUnderstand(Long threadId, String image, String question);
 
+    JsonResult xfImageCreate(String content);
 }

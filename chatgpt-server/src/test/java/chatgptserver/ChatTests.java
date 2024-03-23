@@ -3,6 +3,8 @@ package chatgptserver;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
@@ -15,19 +17,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.WenXin.WXAccessTokenRspDTO;
 import chatgptserver.bean.dto.WenXin.WenXinReqMessagesDTO;
 import chatgptserver.bean.dto.WenXin.WenXinRequestBodyDTO;
 import chatgptserver.bean.dto.WenXin.WenXinRspDTO;
 import chatgptserver.bean.dto.XunFeiXingHuo.*;
+import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.ImageResponse;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.Common.ImageUtil;
 import chatgptserver.service.OkHttpService;
+import chatgptserver.utils.MinioUtil;
+import chatgptserver.utils.XunFeiUtils;
 import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import okhttp3.HttpUrl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URL;
@@ -37,6 +46,11 @@ import static chatgptserver.enums.GPTConstants.*;
 
 @SpringBootTest
 class ChatTests {
+
+    @Autowired
+    private MinioUtil minioUtil;
+
+    public static final Gson gson = new Gson();
 
     @Autowired
     private OkHttpService okHttpService;
@@ -178,6 +192,7 @@ class ChatTests {
         return httpUrl.toString();
     }
 
+
     /**
      * 讯飞星火：图片生成
      */
@@ -235,7 +250,19 @@ class ChatTests {
 //                "  }\n" +
 //                "}";
         String responseStr = okHttpService.makePostRequest(authUrl, JSON.toJSONString(jsonRootBean));
-        System.out.println("responseStr:" + responseStr);
+        ImageResponse imageResponse = XunFeiUtils.buildImageResponse();
+        imageResponse = JSON.parseObject(responseStr, ImageResponse.class);
+
+        String imageBase64Str = imageResponse.getPayload().getChoices().getText().get(0).getContent();
+        File imageFile = ImageUtil.convertBase64StrToImage(imageBase64Str,  System.currentTimeMillis() + "山.jpg");
+
+        MultipartFile multipartFile = new MockMultipartFile("file", imageFile.getName(), "image", new FileInputStream(imageFile));
+        UploadResponse imageUrlResponse = minioUtil.uploadFile(multipartFile, "file");
+        String imageUrl = imageUrlResponse.getMinIoUrl();
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println("imageUrl: " + imageUrl);
+        System.out.println("-------------------------------------------------------------------");
+
     }
 
 

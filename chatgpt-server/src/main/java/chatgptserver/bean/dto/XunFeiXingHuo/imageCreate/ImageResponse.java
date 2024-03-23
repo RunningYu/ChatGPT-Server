@@ -8,42 +8,35 @@ import lombok.Data;
  * @date : 2024/2/8
  */
 @Data
-public class ImageResponse {
+public class  ImageResponse {
 
     private Header header;
 
     private Payload payload;
 
-    @Data
-    class Header {
-        private Integer code;
-        private String message;
-        private String sid;
-        private Integer status;
+//    @Data
+//    public class Payload {
+//
+//        private Choices choices;
+//
+//    }
 
-    }
+//    @Data
+//    public class Choices {
+//        private Integer status;
+//        private Integer seq;
+//        private Text text;
+//
+//    }
 
-    @Data
-    public class Payload {
-
-        private Choices choices;
-
-    }
-
-    @Data
-    public class Choices {
-        private Integer status;
-        private Integer seq;
-        private Text text;
-
-    }
-
-    @Data
-    public class Text {
-        private String content;
-        private Integer index;
-        private String role;
-
-    }
+//    @Data
+//    public class Text {
+//        private String content;
+//        private Integer index;
+//        private String role;
+//
+//    }
 
 }
+
+

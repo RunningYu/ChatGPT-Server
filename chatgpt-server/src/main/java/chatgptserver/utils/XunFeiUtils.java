@@ -1,5 +1,6 @@
 package chatgptserver.utils;
 
+import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.*;
 import okhttp3.HttpUrl;
 
 import javax.crypto.Mac;
@@ -15,6 +16,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date : 2024/2/8
  */
 public class XunFeiUtils {
+
+    /**
+     * 构建图片生成response实体
+     */
+    public static ImageResponse buildImageResponse() {
+        ImageResponse imageResponse = new ImageResponse();
+        imageResponse.setHeader(new Header());
+        Payload payload = new Payload();
+        List<Text> text = new ArrayList<>();
+        payload.setChoices(new Choices(text));
+
+        return imageResponse;
+    }
 
     /**
      * 鉴权方法

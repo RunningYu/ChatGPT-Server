@@ -27,8 +27,6 @@ import static chatgptserver.Common.SseUtils.sseEmitterThreadLocal;
 @RestController
 public class XunFeiXingHuoController {
 
-
-
     @Autowired
     private XunFeiService xunFeiService;
 
@@ -86,6 +84,14 @@ public class XunFeiXingHuoController {
         return sseEmitter;
     }
 
+    @ApiOperation("讯飞星火：图片生成")
+    @GetMapping("/chat/xf/image/create")
+    public JsonResult xfImageCreate(@Param("content") String content) {
+        log.info("ChatGptController xfImageCreate content:[{}]", content);
+        JsonResult response = xunFeiService.xfImageCreate(content);
+
+        return response;
+    }
 
 
 }

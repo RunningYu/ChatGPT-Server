@@ -66,7 +66,7 @@ public class MainApplication {
         ImageResponse imageResponse = JSONObject.parseObject(res, ImageResponse.class);
         System.out.println("--------------------------------------------------------------------------------------------");
 //        System.out.println(res);
-        System.out.println(imageResponse.getPayload().getChoices().getText().getContent());
+//        System.out.println(imageResponse.getPayload().getChoices().getText().getContent());
         System.out.println("--------------------------------------------------------------------------------------------");
 //        System.out.println(res);
     }
