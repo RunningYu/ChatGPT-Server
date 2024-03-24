@@ -16,4 +16,8 @@ public interface MessageMapper {
     List<MessagesPO> getWenXinHistory(@Param("chatCode") String chatCode);
 
     void insertMessage(MessagesPO messagesPO);
+
+    List<MessagesPO> getHistoryList(@Param("chatCode") String chatCode, @Param("startIndex") int startIndex, @Param("size") int size);
+
+    int getToalMessages(String chatCode);
 }

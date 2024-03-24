@@ -40,10 +40,6 @@ public class GPTConstants {
 
 //    ----------------------------------------讯飞星火----------------------------------------------------
 
-    /**
-     * 图片理解
-     */
-    public static final String XF_XH_PICTURE_UNDERSTAND_URL = "https://spark-api.cn-huabei-1.xf-yun.com/v2.1/image";
     public static final String XF_XH_APPID_KEY = "APPID";
     public static final String XF_XH_API_SECRET_KEY = "APISecret";
     public static final String XF_XH_API_KEY = "APIKey";
@@ -54,9 +50,22 @@ public class GPTConstants {
     }
 
     /**
+     * 图片理解
+     */
+    public static final String XF_XH_PICTURE_UNDERSTAND_URL = "https://spark-api.cn-huabei-1.xf-yun.com/v2.1/image";
+
+    /**
      * 图片生成
      */
     public static final String XF_XH_PICTURE_CREATE_URL = "https://spark-api.cn-huabei-1.xf-yun.com/v2.1/tti";
 
+    /**
+     * 文本问答
+     * 地址与鉴权信息  https://spark-api.xf-yun.com/v1.1/chat   1.5地址  domain参数为 general
+     * 地址与鉴权信息  https://spark-api.xf-yun.com/v2.1/chat   2.0地址  domain参数为 generalv2
+     * 地址与鉴权信息  https://spark-api.xf-yun.com/v3.5/chat   3.5地址  domain参数为 generalv3.5
+     */
+    public static final String XF_XH_QUESTION_URL = "https://spark-api.xf-yun.com/v3.5/chat";
+    public static final String XF_XH_QUESTION_DOMAIN = "generalv3.5";
 
 }

@@ -28,6 +28,9 @@ public class UserPO {
     @ApiModelProperty("用户名")
     private String username;
 
+    @ApiModelProperty("头像")
+    private String headshot;
+
     @ApiModelProperty("密码")
     private String password;
 

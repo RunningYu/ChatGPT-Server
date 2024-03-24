@@ -3,10 +3,10 @@ package chatgptserver.service.impl;
 import chatgptserver.Common.ImageUtil;
 import chatgptserver.Common.SseUtils;
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.*;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.ImageResponse;
-import chatgptserver.bean.po.ImageCreatePO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.service.MessageService;
@@ -16,6 +16,7 @@ import chatgptserver.utils.XunFeiUtils;
 import chatgptserver.utils.xunfei.BigModelNew;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.XunFeiService;
+import chatgptserver.utils.xunfei.XunFeiWenDaBigModelNew;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -32,7 +33,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -69,8 +69,8 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public SseEmitter xfImageUnderstand(Long threadId, String image, String question) {
         log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}]", threadId, image, question);
-        XunFeiUtils.imageUnderstandFlagMap.put(Thread.currentThread().getId(), false);
-        XunFeiUtils.imageUnderstandResponseMap.put(Thread.currentThread().getId(), "");
+        XunFeiUtils.imageUnderstandFlagMap.put(threadId, false);
+        XunFeiUtils.imageUnderstandResponseMap.put(threadId, "");
         SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
         String totalResponse = "";
 
@@ -155,6 +155,47 @@ public class XunFeiServiceImpl implements XunFeiService {
         messageService.recordHistory(userCode, chatCode, content, imageUrl);
 
         return JsonResult.success(imageUrl);
+    }
+
+    /**
+     * 讯飞星火：文本问答
+     */
+    @Override
+    public SseEmitter xfQuestion(Long threadId, QuestionRequestAO requestAO) {
+        log.info("XunFeiServiceImpl xfQuestion threadId:[{}], requestAO:[{}]", threadId, requestAO);
+        XunFeiUtils.questionFlagMap.put(threadId, false);
+        XunFeiUtils.questionTotalResponseMap.put(threadId, "");
+        boolean flag = true;
+        List<MessagesPO> historyList = messageMapper.getWenXinHistory(requestAO.getChatCode());
+
+        try {
+            // 构建鉴权url
+            String authUrl = getAuthUrl(GPTConstants.XF_XH_QUESTION_URL, GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY), GPT_KEY_MAP.get(XF_XH_API_SECRET_KEY));
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
+            Request request = new Request.Builder().url(url).build();
+            for (int i = 0; i < 1; i++) {
+                WebSocket webSocket = client.newWebSocket(request, new XunFeiWenDaBigModelNew(threadId, requestAO.getContent(), historyList, i + "",
+                        false));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+
+        while (true) {
+            boolean closeFlag = XunFeiUtils.questionFlagMap.get(threadId);
+            if (!closeFlag) {
+                // Thread.sleep(200);
+
+            } else {
+                String totalResponse = XunFeiUtils.questionTotalResponseMap.get(threadId);
+                log.info("XunFeiServiceImpl xfQuestion totalResponse:[{}]", totalResponse);
+                messageService.recordHistory(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse);
+                break;
+            }
+        }
+
+        return SseUtils.sseEmittersMap.get(threadId);
     }
 
     public static String getPicAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {

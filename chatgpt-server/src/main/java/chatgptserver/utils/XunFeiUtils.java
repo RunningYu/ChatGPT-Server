@@ -72,5 +72,9 @@ public class XunFeiUtils {
 
     public static ConcurrentHashMap<Long, Boolean> imageUnderstandFlagMap = new ConcurrentHashMap<>();
 
+    public static ConcurrentHashMap<Long, Boolean> questionFlagMap = new ConcurrentHashMap<>();
+
+    public static ConcurrentHashMap<Long, String> questionTotalResponseMap = new ConcurrentHashMap<>();
+
 
 }

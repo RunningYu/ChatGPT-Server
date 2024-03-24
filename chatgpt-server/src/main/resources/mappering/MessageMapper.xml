@@ -12,4 +12,12 @@
         select * from tb_chatgpt_messages where chat_code = #{chatCode} order by id DESC limit 0, 20
     </select>
 
+    <select id="getHistoryList" resultType="chatgptserver.bean.po.MessagesPO">
+        select * from tb_chatgpt_messages where chat_code = #{chatCode} order by id DESC limit #{startIndex}, #{size}
+    </select>
+
+    <select id="getToalMessages" resultType="java.lang.Integer">
+        select count(*) from tb_chatgpt_messages where chat_code = #{chatCode}
+    </select>
+
 </mapper>

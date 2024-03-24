@@ -2,14 +2,16 @@ package chatgptserver.controller;
 
 import chatgptserver.Common.SseUtils;
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.service.XunFeiService;
-import chatgptserver.utils.XunFeiUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -71,6 +73,9 @@ public class XunFeiXingHuoController {
         return sseEmitter;
     }
 
+    /**
+     * todo
+     */
     @ApiOperation("讯飞星火：图片理解")
     @GetMapping("/chat/xf/image/understander")
     public SseEmitter xfImageUnderstand(@Param("image") String image, String question) {
@@ -92,6 +97,18 @@ public class XunFeiXingHuoController {
         JsonResult response = xunFeiService.xfImageCreate(content, userCode, chatCode);
 
         return response;
+    }
+
+    @ApiOperation("讯飞星火：文本问答")
+    @PostMapping("/chat/xf/question")
+    public SseEmitter xfQuestion(@RequestBody QuestionRequestAO request) {
+        log.info("ChatGptController xfQuestion request:[{}]", request);
+        SseEmitter sseEmitter = new SseEmitter();
+        Long threadId = Thread.currentThread().getId();
+        SseUtils.sseEmittersMap.put(threadId, sseEmitter);
+        xunFeiService.xfQuestion(threadId, request);
+
+        return sseEmitter;
     }
 
 
