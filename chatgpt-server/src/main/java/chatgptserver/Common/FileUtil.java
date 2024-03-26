@@ -7,10 +7,12 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.*;
+import java.util.Objects;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -22,37 +24,18 @@ public class FileUtil {
      * 文件类型转换
      * File类型 转为 MultipartFile类型
      */
-//    public static MultipartFile getMultipartFile(File file) {
-//        FileItem item = new DiskFileItemFactory().createItem("file"
-//                , MediaType.MULTIPART_FORM_DATA_VALUE
-//                , true
-//                , file.getName());
-//        try (InputStream input = new FileInputStream(file);
-//             OutputStream os = item.getOutputStream()) {
-//            // 流转移
-//            IOUtils.copy(input, os);
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("Invalid file: " + e, e);
-//        }
-//
-//        return new CommonsMultipartFile(item);
-//    }
+    public static MultipartFile ConvertFileToMultipartFile(File file) {
+        if (Objects.isNull(file)) {
+            throw new RuntimeException("file不能为空");
+        }
+        try {
+            MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "image/png", new FileInputStream(file));
 
-//    public static MultipartFile getMultipartFile(File file) {
-//        DiskFileItem item = new DiskFileItem("file"
-//                , MediaType.MULTIPART_FORM_DATA_VALUE
-//                , true
-//                , file.getName()
-//                , (int)file.length()
-//                , file.getParentFile());
-//        try {
-//            OutputStream os = item.getOutputStream();
-//            os.write(FileUtils.readFileToByteArray(file));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return new CommonsMultipartFile(item);
-//    }
+            return multipartFile;
+        } catch (IOException e) {
+            throw new RuntimeException("File转换MultipartFile失败");
+        }
+    }
 
     public static FileItem createFileItem(String filePath, String fileName){
         String fieldName = "file";

@@ -30,8 +30,20 @@ public class WenXinYiYanController {
     public JsonResult wenXinChat(@Param("userCode") String userCode,
                                  @Param("chatCode") String chatCode,
                                  @Param("message") String message) {
-        log.info("ChatGptController wenXinChat userCode:[{}] chatCode:[{}] message:[{}]", userCode, chatCode, message);
+        log.info("WenXinYiYanController wenXinChat userCode:[{}] chatCode:[{}] message:[{}]", userCode, chatCode, message);
         String result = wenXinService.getMessageFromWenXin(userCode, chatCode, message);
+
+        return JsonResult.success(result);
+    }
+
+    /**
+     * todo: 开源接口欠费，未测试完
+     */
+    @ApiOperation("文心一言：图片生成")
+    @GetMapping("/chat/wenXin/image/create")
+    public JsonResult wenXinImageCreate(@Param("userCode") String userCode, @Param("chatCode") String chatCode, @Param("content") String content) {
+        log.info("WenXinYiYanController wenXinImageCreate userCode:[{}] chatCode:[{}] content:[{}]", userCode, chatCode, content);
+        String result = wenXinService.wxImageCreate(userCode, chatCode, content);
 
         return JsonResult.success(result);
     }

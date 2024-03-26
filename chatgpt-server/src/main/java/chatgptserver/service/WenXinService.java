@@ -11,4 +11,5 @@ public interface WenXinService {
     String getMessageFromWenXin(String userCode, String chatCode, String message);
 
 
+    String wxImageCreate(String userCode, String chatCode, String content);
 }
