@@ -26,7 +26,7 @@ public class WenXinYiYanController {
     private UserService userService;
 
     @ApiOperation("文心一言：文本问答")
-    @GetMapping("/chat/wenXin")
+    @GetMapping("/chat/wenXin/question")
     public JsonResult wenXinChat(@Param("userCode") String userCode,
                                  @Param("chatCode") String chatCode,
                                  @Param("message") String message) {

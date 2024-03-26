@@ -1,6 +1,8 @@
 package chatgptserver.Mapping;
 
+import chatgptserver.bean.ao.ChatAddRequestAO;
 import chatgptserver.bean.ao.MessagesAO;
+import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,5 +29,17 @@ public class ConvertMapping {
         messagesAO.setCreateTime(messagesPO.getCreateTime());
 
         return messagesAO;
+    }
+
+    public static ChatPO ChatAddRequestAO2ChatPO(ChatAddRequestAO request) {
+        if (Objects.isNull(request)) {
+            return null;
+        }
+        ChatPO chatPO = new ChatPO();
+        chatPO.setUserCode(request.getUserCode());
+        chatPO.setChatName(request.getChatName());
+        chatPO.setGptCode(request.getGptCode());
+
+        return chatPO;
     }
 }

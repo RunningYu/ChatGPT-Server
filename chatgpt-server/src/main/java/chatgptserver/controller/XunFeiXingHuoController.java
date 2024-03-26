@@ -9,10 +9,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -78,14 +76,15 @@ public class XunFeiXingHuoController {
      */
     @ApiOperation("讯飞星火：图片理解")
     @GetMapping("/chat/xf/image/understander")
-    public SseEmitter xfImageUnderstand(@Param("image") String image, String question) {
-        log.info("ChatGptController xfPictureUnderstand image:[{}], question[{}]", image, question);
+    public SseEmitter xfImageUnderstand(@RequestParam("file") MultipartFile file, @RequestParam("content") String content,
+                                        @RequestParam("userCode") String userCode, @RequestParam("chatCode") String chatCode) {
+        log.info("ChatGptController xfPictureUnderstand file:[{}], content[{}], userCode:[{}], chatCode:[{}]", file, content, userCode, chatCode);
         //设置默认的超时时间60秒，超时之后服务端主动关闭连接。
 //        SseEmitter sseEmitter = new SseEmitter(60 * 1000L);
         SseEmitter sseEmitter = new SseEmitter();
         Long threadId = Thread.currentThread().getId();
         SseUtils.sseEmittersMap.put(threadId, sseEmitter);
-        SseEmitter sseEmitter1 = xunFeiService.xfImageUnderstand(threadId, image, question);
+        SseEmitter sseEmitter1 = xunFeiService.xfImageUnderstand(threadId, file, content, userCode, chatCode);
         return sseEmitter;
     }
 

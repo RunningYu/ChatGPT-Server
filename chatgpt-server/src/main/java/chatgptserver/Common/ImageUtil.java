@@ -1,5 +1,11 @@
 package chatgptserver.Common;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import sun.misc.BASE64Encoder;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -61,6 +67,25 @@ public class ImageUtil {
         }
 
         return null;
+    }
+
+    /**
+     * 将MultipartFile 图片文件编码为base64
+     */
+    public static String imageMultipartFileToBase64(MultipartFile mFile){
+        if (mFile == null || mFile.isEmpty()) {
+            throw new RuntimeException("图片文件不能为空！");
+        }
+
+        try {
+            InputStream inputStream = mFile.getInputStream();
+            byte[] bytes = inputStream2ByteArray(inputStream);
+
+            return Base64.getEncoder().encodeToString(bytes);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+
     }
 
 }

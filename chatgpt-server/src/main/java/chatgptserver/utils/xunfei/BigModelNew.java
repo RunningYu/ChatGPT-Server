@@ -9,7 +9,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.crypto.Mac;
@@ -20,11 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 public class BigModelNew extends WebSocketListener {
 
-    public SseEmitter sseEmitter;
-
-    public Long threadId;
 
     // 地址与鉴权信息  https://spark-api.xf-yun.com/v1.1/chat   1.5地址  domain参数为general
     // 地址与鉴权信息  https://spark-api.xf-yun.com/v2.1/chat   2.0地址  domain参数为generalv2
@@ -43,6 +43,12 @@ public class BigModelNew extends WebSocketListener {
 
     public static final Gson gson = new Gson();
 
+    public SseEmitter sseEmitter;
+
+    public Long threadId;
+
+    private MultipartFile imageFile;
+
     // 个性化参数
     private String userId;
     private Boolean wsCloseFlag;
@@ -55,13 +61,15 @@ public class BigModelNew extends WebSocketListener {
         this.wsCloseFlag = wsCloseFlag;
     }
 
-    public BigModelNew(Long threadId, String question, String userId, Boolean wsCloseFlag) {
+    public BigModelNew(Long threadId, MultipartFile image, String question, String userId, Boolean wsCloseFlag) {
+        this.imageFile = image;
         this.threadId = threadId;
         sseEmitter = SseUtils.sseEmittersMap.get(threadId);
         NewQuestion = question;
         this.userId = userId;
         this.wsCloseFlag = wsCloseFlag;
     }
+
 
 
     // 主函数
@@ -154,7 +162,9 @@ public class BigModelNew extends WebSocketListener {
                 // 添加图片信息
                 if (!ImageAddFlag) {
                     roleContent.role = "user";
-                    roleContent.content = Base64.getEncoder().encodeToString(ImageUtil.read("src\\main\\resources\\images\\1.png"));
+//                    roleContent.content = Base64.getEncoder().encodeToString(ImageUtil.read("src\\main\\resources\\images\\1.png"));
+                    roleContent.content = ImageUtil.imageMultipartFileToBase64(imageFile);
+                    log.info("base64:[{}]", roleContent.content);
                     roleContent.content_type = "image";
                     text.add(JSON.toJSON(roleContent));
                     historyList.add(roleContent);
@@ -175,7 +185,7 @@ public class BigModelNew extends WebSocketListener {
                 requestJson.put("header", header);
                 requestJson.put("parameter", parameter);
                 requestJson.put("payload", payload);
-//                 System.err.println(requestJson); // 可以打印看每次的传参明细
+                 System.err.println(requestJson); // 可以打印看每次的传参明细
                 webSocket.send(requestJson.toString());
                 // 等待服务端返回完毕后关闭
                 while (true) {

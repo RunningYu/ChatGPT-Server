@@ -15,8 +15,8 @@ public class ChatAddRequestAO {
     @ApiModelProperty(value = "用户的code", required = true)
     private String userCode;
 
-    @ApiModelProperty(value = "1-文心一言 2-chatgpt", required = true)
-    private Integer chatType;
+    @ApiModelProperty(value = "大模型code", required = true)
+    private String gptCode;
 
     @ApiModelProperty(value = "新建的对话的名字", required = true)
     private String chatName;

@@ -67,8 +67,8 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：图片理解
      */
     @Override
-    public SseEmitter xfImageUnderstand(Long threadId, String image, String question) {
-        log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}]", threadId, image, question);
+    public SseEmitter xfImageUnderstand(Long threadId, MultipartFile image, String content, String userCode, String chatCode) {
+        log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}], userCode:[{}], chatCode:[{}]", threadId, image, content, userCode, chatCode);
         XunFeiUtils.imageUnderstandFlagMap.put(threadId, false);
         XunFeiUtils.imageUnderstandResponseMap.put(threadId, "");
         SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
@@ -83,24 +83,19 @@ public class XunFeiServiceImpl implements XunFeiService {
             String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
             Request request = new Request.Builder().url(url).build();
             for (int i = 0; i < 1; i++) {
-                WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, question, i + "", false));
+                WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, image, content, i + "", false));
             }
 
             while (true) {
                 boolean closeFlag = XunFeiUtils.imageUnderstandFlagMap.get(Thread.currentThread().getId());
                 XunFeiUtils.imageUnderstandFlagMap.put(Thread.currentThread().getId(), false);
                 if (!closeFlag) {
-//                    Thread.sleep(200);
-//                    String response = XunFeiUtils.imageUnderstandResponseMap.get(threadId);
-//                    XunFeiUtils.imageUnderstandResponseMap.put(Thread.currentThread().getId(), "");
-//                    if (!response.equals("") && response != null) {
-//                        System.out.println("--->[" + response + "]");
-//                        totalResponse.append(response);
-//                        sseEmitter.send(SseEmitter.event().comment(response));
-//                    }
+                    Thread.sleep(200);
                 } else {
                     totalResponse = XunFeiUtils.imageUnderstandTotalResponseMap.get(threadId);
                     log.info("XunFeiServiceImpl xfImageUnderstand totalResponse:[{}]", totalResponse);
+                    UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
+                    messageService.recordHistoryWithImage(userCode, chatCode, uploadResponse.getMinIoUrl(), content, totalResponse);
                     return sseEmitter;
                 }
             }

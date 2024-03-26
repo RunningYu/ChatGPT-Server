@@ -1,9 +1,11 @@
 package chatgptserver.controller;
 
+import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.ChatAddRequestAO;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.MessagesResponseAO;
 import chatgptserver.bean.ao.UserAO;
+import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
@@ -47,9 +49,10 @@ public class UserController {
     @PostMapping("/chat/add")
     public JsonResult wenXinAdd(@RequestBody ChatAddRequestAO request) {
         log.info("ChatGptController wenXinChat request:[{}]", request);
-        Map<String, String> response = userService.createNewChat(request);
+        ChatPO chatPO = ConvertMapping.ChatAddRequestAO2ChatPO(request);
+        Map<String, String> response = userService.createNewChat(chatPO);
 
-        return JsonResult.success();
+        return JsonResult.success(response);
     }
 
     @ApiOperation("获取聊天记录")

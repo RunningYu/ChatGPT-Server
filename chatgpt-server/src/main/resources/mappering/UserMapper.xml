@@ -2,12 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="chatgptserver.dao.UserMapper">
 
-    <insert id="wenXinAdd">
-        insert into tb_chatgpt_user ()
+    <insert id="newChat" parameterType="chatgptserver.bean.po.ChatPO" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_chatgpt_chat (user_code, chat_name, gpt_code) values(#{userCode}, #{chatName}, #{gptCode})
     </insert>
+
+    <update id="updateUserCode">
+        update tb_chatgpt_chat set chat_code = #{chatCode} where id = #{id}
+    </update>
 
     <select id="getUserByCode" resultType="chatgptserver.bean.po.UserPO">
         select * from tb_chatgpt_user where user_code = #{userCode}
+    </select>
+
+    <select id="getChatByCode" resultType="chatgptserver.bean.po.ChatPO">
+        select * from tb_chatgpt_chat where chat_code = #{chatCode}
     </select>
 
 </mapper>
