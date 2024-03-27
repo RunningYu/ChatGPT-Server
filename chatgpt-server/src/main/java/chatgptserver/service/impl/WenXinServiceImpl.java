@@ -5,11 +5,16 @@ import chatgptserver.Common.ImageUtil;
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.WenXin.*;
 import chatgptserver.bean.dto.WenXin.imageCreate.WenXinImageResponse;
+import chatgptserver.bean.dto.tongYiQianWen.Input;
+import chatgptserver.bean.dto.tongYiQianWen.TongYiImageUnderStandRequestDTO;
+import chatgptserver.bean.dto.tongYiQianWen.TongYiImageUnderstandResponseDTO;
+import chatgptserver.bean.dto.tongYiQianWen.TongYiMessages;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.enums.GPTConstants;
+import chatgptserver.enums.MinIoConstands;
 import chatgptserver.enums.RoleTypeEnums;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
@@ -18,14 +23,15 @@ import chatgptserver.utils.MinioUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.ConditionalOnRepositoryType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
 
@@ -133,6 +139,8 @@ public class WenXinServiceImpl implements WenXinService {
         }
 
     }
+
+
 
     public String getWenXinAccessToken() {
         log.info("MessageServiceImpl getWenXinAccessToken API_ID:[{}], Secret_Key:[{}]", GPT_KEY_MAP.get(GPTConstants.WEN_XIN_API_KEY_NAME), GPT_KEY_MAP.get(GPTConstants.WEN_XIN_SECRET_KEY_NAME));

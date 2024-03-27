@@ -49,6 +49,32 @@ public class OkHttpService {
         RequestBody body = RequestBody.create(requestBody, MediaType.parse("application/json"));
         Request request = new Request.Builder().url(apiUrl).post(body).build();
 
+//        okhttp3.Request request = new okhttp3.Request.Builder()
+//                .url(baseUrl)
+//                .addHeader("Content-Type", "application/json")
+//                .post(requestBody)
+//                .build();
+
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                return response.body().string();
+            }
+            else {
+                System.out.println(response.code() + " " + response.message());
+                throw new IOException("Unexpected response: " + response.code());
+            }
+        }
+    }
+
+    public String makePostRequest(String apiUrl, String requestBody, String authorization) throws IOException{
+        RequestBody body = RequestBody.create(requestBody, MediaType.parse("application/json"));
+        Request request = new Request.Builder().
+                url(apiUrl).
+                addHeader("Authorization", authorization).
+                post(body).
+                build();
+
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 return response.body().string();

@@ -84,4 +84,21 @@ public class GPTConstants {
     public static final String XF_XH_QUESTION_URL = "https://spark-api.xf-yun.com/v3.5/chat";
     public static final String XF_XH_QUESTION_DOMAIN = "generalv3.5";
 
+
+//--------------------------------------通义千问-------------------------------------------------------
+
+    public static final String TONG_YI_QIAN_WEN_API_KEY = "sk-353194803150480a97f010b150761f3a";
+
+    /**
+     * 通义千问.通义千问VL
+     */
+    public static final String TONG_YI_QIAN_WEN_IMAGE_UNDERSTAND_URL = " https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
+
+    /**
+     * 通义千问开源系列.大语言模型
+     */
+    public static final String TONG_YI_QIAN_WEN_QUESTION_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation";
+
+
+
 }

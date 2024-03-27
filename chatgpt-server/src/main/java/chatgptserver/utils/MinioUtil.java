@@ -3,6 +3,7 @@ package chatgptserver.utils;
 
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.config.MinIO.MinioProperties;
+import chatgptserver.enums.MinIoConstands;
 import cn.hutool.core.date.DateUtil;
 import io.minio.*;
 import io.minio.errors.*;
@@ -188,4 +189,12 @@ public class MinioUtil {
     }
 
 
+    public String upLoadFileToURL(MultipartFile image) {
+        try {
+            UploadResponse uploadResponse = uploadFile(image, MinIoConstands.BUCKET_NAME);
+            return uploadResponse.getMinIoUrl();
+        } catch (Exception e) {
+            throw new RuntimeException("图片上传MinIO失败，获取图片URL失败");
+        }
+    }
 }

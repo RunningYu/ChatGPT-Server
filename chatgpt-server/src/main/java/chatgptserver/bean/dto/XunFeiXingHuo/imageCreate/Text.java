@@ -13,4 +13,9 @@ public class Text {
     private Integer index;
     private String role;
 
+    public Text (String role, String content) {
+        this.role = role;
+        this.content = content;
+    }
+
 }
