@@ -1,6 +1,7 @@
 package chatgptserver.service;
 
 import chatgptserver.bean.ao.ChatAddRequestAO;
+import chatgptserver.bean.ao.UserFeedbackRequestAO;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.UserPO;
 
@@ -16,4 +17,6 @@ public interface UserService {
     UserPO getUserByCode(String senderCode);
 
     Map<String, String> createNewChat(ChatPO chatPO);
+
+    void chatUserFeedback(UserFeedbackRequestAO request);
 }

@@ -1,10 +1,7 @@
 package chatgptserver.controller;
 
 import chatgptserver.Mapping.ConvertMapping;
-import chatgptserver.bean.ao.ChatAddRequestAO;
-import chatgptserver.bean.ao.JsonResult;
-import chatgptserver.bean.ao.MessagesResponseAO;
-import chatgptserver.bean.ao.UserAO;
+import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.service.MessageService;
@@ -71,6 +68,15 @@ public class UserController {
         List<ChatPO> response = messageService.chatCreateList(userCode, gptCode);
 
         return JsonResult.success(response);
+    }
+
+    @ApiOperation("用户反馈")
+    @PostMapping("/chat/user/feedback")
+    public JsonResult chatUserFeedback(@RequestBody UserFeedbackRequestAO request) {
+        log.info("ChatGptController chatUserFeedback request:[{}]", request);
+        userService.chatUserFeedback(request);
+
+        return JsonResult.success();
     }
 
 }

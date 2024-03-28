@@ -5,6 +5,9 @@
     <insert id="newChat" parameterType="chatgptserver.bean.po.ChatPO" useGeneratedKeys="true" keyProperty="id">
         insert into tb_chatgpt_chat (user_code, chat_name, gpt_code) values(#{userCode}, #{chatName}, #{gptCode})
     </insert>
+    <insert id="chatUserFeedback">
+        insert into tb_chatgpt_user_feedback (user_code, content) values (#{userCode}, #{content})
+    </insert>
 
     <update id="updateUserCode">
         update tb_chatgpt_chat set chat_code = #{chatCode} where id = #{id}

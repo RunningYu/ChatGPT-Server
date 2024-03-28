@@ -1,6 +1,7 @@
 package chatgptserver.dao;
 
 import chatgptserver.bean.ao.ChatAddRequestAO;
+import chatgptserver.bean.ao.UserFeedbackRequestAO;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.UserPO;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,4 +21,6 @@ public interface UserMapper {
     void updateUserCode(@Param("chatCode") String chatCode, @Param("id") int id);
 
     ChatPO getChatByCode(String chatCode);
+
+    void chatUserFeedback(UserFeedbackRequestAO request);
 }

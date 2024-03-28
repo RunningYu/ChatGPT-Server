@@ -1,6 +1,7 @@
 package chatgptserver.service.impl;
 
 import chatgptserver.bean.ao.ChatAddRequestAO;
+import chatgptserver.bean.ao.UserFeedbackRequestAO;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.UserMapper;
@@ -43,5 +44,11 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl createNewChat response:[{}]", response);
 
         return response;
+    }
+
+    @Override
+    public void chatUserFeedback(UserFeedbackRequestAO request) {
+        log.info("UserServiceImpl chatUserFeedback request:[{}]", request);
+        userMapper.chatUserFeedback(request);
     }
 }
