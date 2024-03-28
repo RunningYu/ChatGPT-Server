@@ -101,6 +101,49 @@ public class TongYiServiceImpl implements TongYiService {
         return response;
     }
 
+    @Override
+    public String tyImageCreate(String userCode, String chatCode, String content) {
+        log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}]", userCode, chatCode, chatCode);
+        TongYiImageCreateRequestDTO request = TongYiImageCreateRequestDTO.buildTongYiImageCreateRequestDTO(content);
+        log.info("TongYiServiceImpl tyImageCreate request:[{}]", JSON.toJSONString(request));
+
+        String responseStr = "";
+        try {
+            responseStr = okHttpService.makePostRequest(GPTConstants.TONG_YI_QIAN_WEN_IMAGE_CREATE_POST_URL, JSON.toJSONString(request), GPTConstants.TONG_YI_QIAN_WEN_API_KEY);
+            log.info("TongYiServiceImpl tyImageCreate responseStr:[{}]", responseStr);
+        } catch (IOException e) {
+            throw new RuntimeException("调用大模型接口异常");
+        }
+        ImageCreateResultOutput resultOutput = JSON.parseObject(responseStr, ImageCreateResultOutput.class);
+        String task_id = resultOutput.getTask_id();
+        String response = "";
+        while (true) {
+            String url = String.format(GPTConstants.TONG_YI_QIAN_WEN_IMAGE_CREATE_GET_URL, task_id);
+            String res = "";
+            try {
+                res = okHttpService.makeGetRequest(url);
+            } catch (IOException e) {
+                throw new RuntimeException("获取作业结果接口异常！");
+            }
+            TongYiImageCreateResponseDTO responseDTO = JSON.parseObject(res, TongYiImageCreateResponseDTO.class);
+            if (responseDTO.getOutput().getTask_status().equals("SUCCEEDED")) {
+                log.info("TongYiServiceImpl tyImageCreate res:[{}]", res);
+                response = responseDTO.getOutput().getResults().get(0).get("url");
+                break;
+            } else {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException();
+                }
+            }
+        }
+        log.info("TongYiServiceImpl tyImageCreate response:[{}]", response);
+        messageService.recordHistory(userCode, chatCode, content, response);
+
+        return response;
+    }
+
 
     public TongYiImageUnderStandRequestDTO buildTongYiImageUnderstandRequestDTO(String chatCode, String imageUrl, String content) {
         List<TongYiMessages> list = new ArrayList<>();
@@ -126,7 +169,6 @@ public class TongYiServiceImpl implements TongYiService {
                 list.add(messagesReplication);
                 System.out.println(messagesQuestion);
                 System.out.println(messagesReplication);
-
             }
             TongYiMessages messagesNew = TongYiMessages.buildTongYiMessages("user", content);
             list.add(messagesNew);

@@ -52,4 +52,17 @@ public class TongYiQianWenController {
         return JsonResult.success(response);
     }
 
+    /**
+     * todo：模型申请ing，待审核通过再进行接口测试
+     */
+    @ApiOperation("通义千问：图片生成")
+    @GetMapping("/chat/tongYi/image/create")
+    public JsonResult tongYiImageCreate(@Param("content") String content, @Param("userCode") String userCode,
+                                        @Param("chatCode") String chatCode) {
+        log.info("WenXinYiYanController tongYiImageCreate content:[{}], userCode:[{}], chatCode:[{}]", content, userCode, chatCode);
+        String response = tongYiService.tyImageCreate(userCode, chatCode, content);
+
+        return JsonResult.success();
+    }
+
 }

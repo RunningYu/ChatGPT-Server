@@ -11,6 +11,7 @@ public interface TongYiService {
 
     String tyImageUnderstand(MultipartFile image, String content, String userCode, String chatCode);
 
-
     String tyQuestion(String userCode, String chatCode, String content);
+
+    String tyImageCreate(String userCode, String chatCode, String content);
 }
