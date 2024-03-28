@@ -1,7 +1,7 @@
 package chatgptserver.service;
 
 import chatgptserver.bean.ao.MessagesResponseAO;
-import chatgptserver.bean.po.MessagesPO;
+import chatgptserver.bean.po.ChatPO;
 
 import java.util.List;
 
@@ -16,4 +16,6 @@ public interface MessageService {
     MessagesResponseAO historyList(String chatCode, int page, int size);
 
     void recordHistoryWithImage(String userCode, String chatCode, String imageUrl, String content, String totalResponse);
+
+    List<ChatPO> chatCreateList(String userCode, String gptCode);
 }

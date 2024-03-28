@@ -71,6 +71,15 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public List<ChatPO> chatCreateList(String userCode, String gptCode) {
+        log.info("MessageServiceImpl chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
+        List<ChatPO> response = messageMapper.chatCreateList(userCode, gptCode);
+        log.info("MessageServiceImpl chatBoxList response:[{}]", response);
+
+        return response;
+    }
+
+    @Override
     public MessagesResponseAO historyList(String chatCode, int page, int size) {
         log.info("MessageServiceImpl historyList chatCode:[{}], page:[{}], size:[{}]", chatCode, page, size);
         page = (page > 0 ? page : 1);

@@ -1,5 +1,6 @@
 package chatgptserver.dao;
 
+import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,4 +28,6 @@ public interface MessageMapper {
      * 获取 通义千问：文本问答 的第一轮对话
      */
     MessagesPO getTongYiQuestionFistChat(String chatCode);
+
+    List<ChatPO> chatCreateList(@Param("userCode")String userCode, @Param("gptCode")String gptCode);
 }
