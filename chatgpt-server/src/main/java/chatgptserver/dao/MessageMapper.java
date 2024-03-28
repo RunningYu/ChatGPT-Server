@@ -20,4 +20,11 @@ public interface MessageMapper {
     List<MessagesPO> getHistoryList(@Param("chatCode") String chatCode, @Param("startIndex") int startIndex, @Param("size") int size);
 
     int getToalMessages(String chatCode);
+
+    List<MessagesPO> getTongYiMultipleQuestionHistory(@Param("chatCode") String chatCode, @Param("id") int id);
+
+    /**
+     * 获取 通义千问：文本问答 的第一轮对话
+     */
+    MessagesPO getTongYiQuestionFistChat(String chatCode);
 }

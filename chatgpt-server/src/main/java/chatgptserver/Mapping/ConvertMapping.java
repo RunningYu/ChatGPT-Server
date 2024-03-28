@@ -24,6 +24,7 @@ public class ConvertMapping {
         MessagesAO messagesAO = new MessagesAO();
         messagesAO.setChatCode(messagesPO.getChatCode());
         messagesAO.setUserCode(messagesPO.getUserCode());
+        messagesAO.setImage(messagesPO.getImage());
         messagesAO.setQuestion(messagesPO.getQuestion());
         messagesAO.setReplication(messagesPO.getReplication());
         messagesAO.setCreateTime(messagesPO.getCreateTime());

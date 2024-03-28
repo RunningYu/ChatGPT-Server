@@ -36,6 +36,9 @@ public class MessagesAO {
     @ApiModelProperty("接收方的名字")
     private String chatName;
 
+    @ApiModelProperty("图篇理解的图片url")
+    private String image;
+
     @ApiModelProperty("问题")
     private String question;
 

@@ -1,12 +1,15 @@
 package chatgptserver;
 
 import chatgptserver.bean.dto.WenXin.ImageFlagDTO;
+import chatgptserver.bean.po.MessagesPO;
+import chatgptserver.dao.MessageMapper;
 import chatgptserver.enums.GPTConstants;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.crypto.Mac;
@@ -18,10 +21,22 @@ import java.util.*;
 
 import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
 
-//@SpringBootTest
+@SpringBootTest
 class ChatgptServerApplicationTests {
 
     ThreadLocal<Boolean> flagLocal = new ThreadLocal<>();
+
+    @Autowired
+    private MessageMapper messageMapper;
+
+    @Test
+    public void test1() {
+        String chatCode = "chat_9";
+        MessagesPO messagesFistChat = messageMapper.getTongYiQuestionFistChat(chatCode);
+        System.out.println("----------------------------------------------------------");
+        System.out.println(messagesFistChat);
+        System.out.println("----------------------------------------------------------");
+    }
 
     /**
      * 讯飞星火：图片理解

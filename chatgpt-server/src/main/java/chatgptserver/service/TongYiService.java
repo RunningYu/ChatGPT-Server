@@ -1,5 +1,6 @@
 package chatgptserver.service;
 
+
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -10,5 +11,6 @@ public interface TongYiService {
 
     String tyImageUnderstand(MultipartFile image, String content, String userCode, String chatCode);
 
-    String getMessageFromWenXin(String userCode, String chatCode, String message);
+
+    String tyQuestion(String userCode, String chatCode, String content);
 }
