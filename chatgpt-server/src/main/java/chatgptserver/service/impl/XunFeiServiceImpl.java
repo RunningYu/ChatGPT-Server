@@ -144,7 +144,7 @@ public class XunFeiServiceImpl implements XunFeiService {
             imageUrl = imageUrlResponse.getMinIoUrl();
             log.info("XunFeiServiceImpl pictureCreate imageUrl:[{}]", imageUrl);
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException("条用通义千问图片生成接口异常！");
         }
         // 保存聊天记录
         messageService.recordHistory(userCode, chatCode, content, imageUrl);

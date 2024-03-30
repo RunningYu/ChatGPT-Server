@@ -99,7 +99,7 @@ public class XunFeiXingHuoController {
     }
 
     @ApiOperation("讯飞星火：文本问答")
-    @PostMapping("/chat/xf/question")
+    @PostMapping(value = "/chat/xf/question")
     public SseEmitter xfQuestion(@RequestBody QuestionRequestAO request) {
         log.info("ChatGptController xfQuestion request:[{}]", request);
         SseEmitter sseEmitter = new SseEmitter();
