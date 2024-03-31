@@ -21,4 +21,12 @@
         select * from tb_chatgpt_chat where chat_code = #{chatCode}
     </select>
 
+    <select id="chatUserFeedbackList" resultType="chatgptserver.bean.po.UserFeedbackPO">
+        select * from tb_chatgpt_user_feedback order by create_time DESC limit #{startIndex}, #{size}
+    </select>
+
+    <select id="getTotalOfchatUserFeedbackList" resultType="java.lang.Integer">
+        select count(*) from tb_chatgpt_user_feedback
+    </select>
+
 </mapper>

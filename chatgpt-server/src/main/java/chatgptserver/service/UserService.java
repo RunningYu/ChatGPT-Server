@@ -1,10 +1,13 @@
 package chatgptserver.service;
 
 import chatgptserver.bean.ao.ChatAddRequestAO;
+import chatgptserver.bean.ao.UserFeedbackListResponseAO;
 import chatgptserver.bean.ao.UserFeedbackRequestAO;
 import chatgptserver.bean.po.ChatPO;
+import chatgptserver.bean.po.UserFeedbackPO;
 import chatgptserver.bean.po.UserPO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,4 +22,6 @@ public interface UserService {
     Map<String, String> createNewChat(ChatPO chatPO);
 
     void chatUserFeedback(UserFeedbackRequestAO request);
+
+    UserFeedbackListResponseAO chatUserFeedbackList(int page, int size);
 }

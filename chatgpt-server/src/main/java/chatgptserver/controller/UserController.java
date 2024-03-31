@@ -4,6 +4,7 @@ import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
+import chatgptserver.bean.po.UserFeedbackPO;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -45,7 +46,7 @@ public class UserController {
     @ApiOperation("新建聊天")
     @PostMapping("/chat/add")
     public JsonResult wenXinAdd(@RequestBody ChatAddRequestAO request) {
-        log.info("ChatGptController wenXinChat request:[{}]", request);
+        log.info("UserController wenXinChat request:[{}]", request);
         ChatPO chatPO = ConvertMapping.ChatAddRequestAO2ChatPO(request);
         Map<String, String> response = userService.createNewChat(chatPO);
 
@@ -55,7 +56,7 @@ public class UserController {
     @ApiOperation("获取聊天记录")
     @GetMapping("/chat/history")
     public JsonResult<MessagesResponseAO> historyList(@Param("chatCode") String chatCode, @Param("page") int page, @Param("size") int size) {
-        log.info("ChatGptController historyList chatCode:[{}], page:[{}], size:[{}]", chatCode, page, size);
+        log.info("UserController historyList chatCode:[{}], page:[{}], size:[{}]", chatCode, page, size);
         MessagesResponseAO response = messageService.historyList(chatCode, page, size);
 
         return JsonResult.success(response);
@@ -64,7 +65,7 @@ public class UserController {
     @ApiOperation("获取用户创建的聊天列表")
     @GetMapping("/chat/create/list")
     public JsonResult<List<ChatPO>> chatCreateList(@Param("userCode") String userCode, @Param("gptCode") String gptCode) {
-        log.info("ChatGptController chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
+        log.info("UserController chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
         List<ChatPO> response = messageService.chatCreateList(userCode, gptCode);
 
         return JsonResult.success(response);
@@ -73,10 +74,19 @@ public class UserController {
     @ApiOperation("用户反馈")
     @PostMapping("/chat/user/feedback")
     public JsonResult chatUserFeedback(@RequestBody UserFeedbackRequestAO request) {
-        log.info("ChatGptController chatUserFeedback request:[{}]", request);
+        log.info("UserController chatUserFeedback request:[{}]", request);
         userService.chatUserFeedback(request);
 
         return JsonResult.success();
+    }
+
+    @ApiOperation("用户反馈列表")
+    @GetMapping("/chat/user/feedback/list")
+    public JsonResult<UserFeedbackListResponseAO> chatUserFeedbackList(@Param("page") int page, @Param("size") int size) {
+        log.info("UserController chatUserFeedbackList page:[{}], size:[{}]", page, size);
+        UserFeedbackListResponseAO response = userService.chatUserFeedbackList(page, size);
+
+        return JsonResult.success(response);
     }
 
 }
