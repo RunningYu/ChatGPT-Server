@@ -29,9 +29,9 @@ public class WenXinYiYanController {
     @GetMapping("/chat/wenXin/question")
     public JsonResult wenXinChat(@Param("userCode") String userCode,
                                  @Param("chatCode") String chatCode,
-                                 @Param("message") String message) {
-        log.info("WenXinYiYanController wenXinChat userCode:[{}] chatCode:[{}] message:[{}]", userCode, chatCode, message);
-        String result = wenXinService.getMessageFromWenXin(userCode, chatCode, message);
+                                 @Param("content") String content) {
+        log.info("WenXinYiYanController wenXinChat userCode:[{}] chatCode:[{}] content:[{}]", userCode, chatCode, content);
+        String result = wenXinService.getMessageFromWenXin(userCode, chatCode, content);
 
         return JsonResult.success(result);
     }

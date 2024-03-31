@@ -71,20 +71,17 @@ public class XunFeiXingHuoController {
         return sseEmitter;
     }
 
-    /**
-     * todo
-     */
     @ApiOperation("讯飞星火：图片理解")
     @GetMapping("/chat/xf/image/understander")
-    public SseEmitter xfImageUnderstand(@RequestParam("file") MultipartFile file, @RequestParam("content") String content,
+    public SseEmitter xfImageUnderstand(@RequestParam("image") MultipartFile image, @RequestParam("content") String content,
                                         @RequestParam("userCode") String userCode, @RequestParam("chatCode") String chatCode) {
-        log.info("ChatGptController xfPictureUnderstand file:[{}], content[{}], userCode:[{}], chatCode:[{}]", file, content, userCode, chatCode);
+        log.info("ChatGptController xfPictureUnderstand image:[{}], content[{}], userCode:[{}], chatCode:[{}]", image, content, userCode, chatCode);
         //设置默认的超时时间60秒，超时之后服务端主动关闭连接。
 //        SseEmitter sseEmitter = new SseEmitter(60 * 1000L);
         SseEmitter sseEmitter = new SseEmitter();
         Long threadId = Thread.currentThread().getId();
         SseUtils.sseEmittersMap.put(threadId, sseEmitter);
-        SseEmitter sseEmitter1 = xunFeiService.xfImageUnderstand(threadId, file, content, userCode, chatCode);
+        SseEmitter sseEmitter1 = xunFeiService.xfImageUnderstand(threadId, image, content, userCode, chatCode);
         return sseEmitter;
     }
 
