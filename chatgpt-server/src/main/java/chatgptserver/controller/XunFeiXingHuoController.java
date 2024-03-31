@@ -3,7 +3,13 @@ package chatgptserver.controller;
 import chatgptserver.Common.SseUtils;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.QuestionRequestAO;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ProgressResponse;
+import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.XunFeiService;
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +111,16 @@ public class XunFeiXingHuoController {
         xunFeiService.xfQuestion(threadId, request);
 
         return sseEmitter;
+    }
+
+    @ApiOperation("讯飞星火：PPT生成")
+    @GetMapping("/chat/xf/ppt/create")
+    public JsonResult xfPptCreate(@Param("content") String content, @Param("userCode") String userCode,
+                                    @Param("chatCode") String chatCode) {
+        log.info("ChatGptController xfPptCreate content:[{}], userCode:[{}], chatCode:[{}]", content, userCode, chatCode);
+        String response = xunFeiService.xfPptCreate(content, userCode, chatCode);
+
+        return JsonResult.success(response);
     }
 
 

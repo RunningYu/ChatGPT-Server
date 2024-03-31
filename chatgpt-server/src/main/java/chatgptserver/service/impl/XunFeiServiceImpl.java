@@ -6,6 +6,10 @@ import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.*;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
+import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ProgressResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.ImageResponse;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.dao.MessageMapper;
@@ -33,6 +37,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -99,6 +104,101 @@ public class XunFeiServiceImpl implements XunFeiService {
                     return sseEmitter;
                 }
             }
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+
+    }
+
+    @Override
+    public String xfPptCreate(String content, String userCode, String chatCode) {
+        log.info("XunFeiServiceImpl xfImageUnderstand content:[{}], userCode:[{}], chatCode:[{}]", content, userCode, chatCode);
+        String pptUrl = "";
+
+        // 输入个人appId
+        String appId = GPTConstants.GPT_KEY_MAP.get(GPTConstants.XF_XH_APPID_KEY);
+        String secret = GPTConstants.GPT_KEY_MAP.get(GPTConstants.XF_XH_API_SECRET_KEY);
+        long timestamp = System.currentTimeMillis() / 1000;
+        String ts = String.valueOf(timestamp);
+        // 获得鉴权信息
+        ApiAuthAlgorithm auth = new ApiAuthAlgorithm();
+        String signature = auth.getSignature(appId, secret, timestamp);
+        System.out.println(signature);
+
+        // 建立链接
+        ApiClient client = new ApiClient(GPTConstants.XF_XH_PPT_CREATE_URL);
+
+        try {
+            // 查询PPT模板信息
+            String templateResult = client.getTemplateList(appId, ts, signature);
+            System.out.println(templateResult);
+
+            // 发送生成PPT请求
+            String query = content;
+            String resp = client.createPPT(appId, ts, signature,query);
+            System.out.println(resp);
+            CreateResponse response = JSON.parseObject(resp, CreateResponse.class);
+
+            // 利用sid查询PPT生成进度
+            int progress = 0;
+            ProgressResponse progressResponse;
+            while (progress < 100) {
+                String progressResult = client.checkProgress(appId, ts, signature, response.getData().getSid());
+                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
+                progress = progressResponse.getData().getProcess();
+                System.out.println(progressResult);
+
+                if (progress < 100) {
+                    Thread.sleep(2000);
+                }
+            }
+
+            // 大纲生成
+            String outlineQuery = query;
+            String outlineResp = client.createOutline(appId, ts, signature,outlineQuery);
+            System.out.println(outlineResp);
+            CreateResponse outlineResponse = JSON.parseObject(outlineResp, CreateResponse.class);
+            System.out.println("生成的大纲如下：");
+            System.out.println(outlineResponse.getData().getOutline());
+
+            // 基于sid和大纲生成ppt
+            String sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
+            System.out.println(sidResp);
+            CreateResponse sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
+            sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
+            System.out.println(sidResp);
+            sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
+            // 利用sid查询PPT生成进度
+            progress = 0;
+            while (progress < 100) {
+                String progressResult = client.checkProgress(appId, ts, signature, sidResponse.getData().getSid());
+                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
+                progress = progressResponse.getData().getProcess();
+                System.out.println(progressResult);
+                if (progress < 100) {
+                    Thread.sleep(2000);
+                } 
+            }
+
+            // 基于大纲生成ppt
+            String pptResp = client.createPptByOutline(appId, ts, signature, outlineQuery, outlineResponse.getData().getOutline());
+            System.out.println(pptResp);
+            CreateResponse pptResponse = JSON.parseObject(pptResp, CreateResponse.class);
+            // 利用sid查询PPT生成进度
+            progress = 0;
+            while (progress < 100) {
+                String progressResult = client.checkProgress(appId, ts, signature, pptResponse.getData().getSid());
+                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
+                progress = progressResponse.getData().getProcess();
+                System.out.println(progressResult);
+                pptUrl = progressResponse.getData().getPptUrl();
+                if (progress < 100) {
+                    Thread.sleep(2000);
+                }
+            }
+            messageService.recordHistory(userCode, chatCode, content, pptUrl);
+
+            return pptUrl;
         } catch (Exception e) {
             throw new RuntimeException();
         }

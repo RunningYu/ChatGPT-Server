@@ -84,6 +84,10 @@ public class GPTConstants {
     public static final String XF_XH_QUESTION_URL = "https://spark-api.xf-yun.com/v3.5/chat";
     public static final String XF_XH_QUESTION_DOMAIN = "generalv3.5";
 
+    /**
+     * 讯飞星火：PPT生成
+     */
+    public static final String XF_XH_PPT_CREATE_URL = "https://zwapi.xfyun.cn";
 
 //--------------------------------------通义千问-------------------------------------------------------
 

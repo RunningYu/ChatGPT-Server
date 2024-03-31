@@ -50,6 +50,7 @@ public class MessageServiceImpl implements MessageService {
         messagesPO.setChatCode(chatCode);
         messagesPO.setUsername(sender.getUsername());
         messagesPO.setChatName(target.getChatName());
+        message = (message.equals("") || message == null) ? "没有生成相应的结果" : message;
         messagesPO.setQuestion(message);
         messagesPO.setReplication(result);
 
