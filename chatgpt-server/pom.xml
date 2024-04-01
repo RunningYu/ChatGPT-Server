@@ -18,6 +18,13 @@
     </properties>
     <dependencies>
 
+        <!--发送邮件-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-mock -->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework</groupId>-->

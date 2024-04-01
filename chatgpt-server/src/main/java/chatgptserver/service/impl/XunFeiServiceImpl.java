@@ -149,7 +149,7 @@ public class XunFeiServiceImpl implements XunFeiService {
                 System.out.println(progressResult);
 
                 if (progress < 100) {
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 }
             }
 
@@ -176,7 +176,7 @@ public class XunFeiServiceImpl implements XunFeiService {
                 progress = progressResponse.getData().getProcess();
                 System.out.println(progressResult);
                 if (progress < 100) {
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 } 
             }
 
@@ -193,7 +193,7 @@ public class XunFeiServiceImpl implements XunFeiService {
                 System.out.println(progressResult);
                 pptUrl = progressResponse.getData().getPptUrl();
                 if (progress < 100) {
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                 }
             }
             messageService.recordHistory(userCode, chatCode, content, pptUrl);
