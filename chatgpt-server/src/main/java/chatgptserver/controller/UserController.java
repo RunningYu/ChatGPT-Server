@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,13 +35,23 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @ApiOperation("用户注册、登录")
+    @ApiOperation("用户注册、登录（首次用QQ邮箱登录，就当是注册，创建改新用户）")
+    @Transactional(rollbackFor = Exception.class)
     @PostMapping("/user/login")
     public JsonResult login(@RequestBody UserAO request) {
         log.info("UserController login request:[{}]", request);
+        JsonResult response = userService.login(request);
 
-        return JsonResult.success();
+        return response;
     }
+
+//    @ApiOperation("通过token")
+//    @PostMapping("/getUserInfoByToken")
+//    public JsonResult getUserInfoByToken(@RequestBody TokenAO token) {
+//        log.info("userController getUserInfoByToken token:{}", token);
+//        JsonResult jsonResult = userService.getUserInfoByToken(token.getToken());
+//        return jsonResult;
+//    }
 
 
     @ApiOperation("新建聊天")

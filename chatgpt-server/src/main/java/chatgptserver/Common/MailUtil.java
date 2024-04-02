@@ -6,12 +6,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -75,4 +77,33 @@ public class MailUtil {
         }
     }
 
+    public static String createVerifyCode() {
+        String verifyCode = "";
+        for (int i = 0; i < 4; i ++) {
+            int code = 10 * (int) Math.random() - 1;
+            verifyCode += code;
+        }
+
+        return verifyCode;
+    }
+
+    public static void sendEmailMessage(String subject, String recipientEmail, String content) {
+        try {
+            Session session = MailUtil.buildSession();
+            //  3、创建一封邮件
+            content = "ChatGPT集成平台注册验证码：" + content;
+            String senderName = "gpt-developers";
+            MimeMessage message = MailUtil.createMimeMessage(session, QQEmailConstants.QQ_EMAIL_SENDER_EMAIL, recipientEmail, " ", senderName, subject, content);
+            //  4、根据session获取邮件传输对象
+            Transport transport = session.getTransport();
+            //  5、使用邮箱账号和授权码连接邮箱服务器emailAccount必须与message中的发件人邮箱一致，否则报错
+            transport.connect(QQEmailConstants.QQ_EMAIL_SENDER_EMAIL, QQEmailConstants.QQ_EMAIL_AUTHORIZATION_CODE);
+            //  6、发送邮件,发送所有收件人地址
+            transport.sendMessage(message, message.getAllRecipients());
+            //  7、关闭连接
+            transport.close();
+        } catch (Exception e) {
+            throw new RuntimeException("邮件发送失败");
+        }
+    }
 }

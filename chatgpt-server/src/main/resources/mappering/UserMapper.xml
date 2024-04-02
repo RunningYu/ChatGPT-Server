@@ -29,4 +29,8 @@
         select count(*) from tb_chatgpt_user_feedback
     </select>
 
+    <select id="getUserByEmail" resultType="chatgptserver.bean.po.UserPO">
+        select * tb_chatgpt_user where email = #{email}
+    </select>
+
 </mapper>

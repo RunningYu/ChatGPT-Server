@@ -15,8 +15,14 @@ public class UserAO {
     @ApiModelProperty("唯一code")
     private String userCode;
 
+    @ApiModelProperty("邮箱")
+    private String email;
+
     @ApiModelProperty("电话号码")
     private String phone;
+
+    @ApiModelProperty("验证码")
+    private String verifyCode;
 
     @ApiModelProperty("用户名")
     private String username;

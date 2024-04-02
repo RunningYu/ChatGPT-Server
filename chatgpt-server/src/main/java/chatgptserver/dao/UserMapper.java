@@ -30,4 +30,6 @@ public interface UserMapper {
     List<UserFeedbackPO> chatUserFeedbackList(@Param("startIndex") int startIndex, @Param("size") int size);
 
     int getTotalOfchatUserFeedbackList();
+
+    UserPO getUserByEmail(String email);
 }

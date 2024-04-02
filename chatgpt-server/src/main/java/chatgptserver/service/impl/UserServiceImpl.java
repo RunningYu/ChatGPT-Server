@@ -1,10 +1,8 @@
 package chatgptserver.service.impl;
 
+import chatgptserver.Common.MailUtil;
 import chatgptserver.Mapping.ConvertMapping;
-import chatgptserver.bean.ao.ChatAddRequestAO;
-import chatgptserver.bean.ao.UserFeedbackAO;
-import chatgptserver.bean.ao.UserFeedbackListResponseAO;
-import chatgptserver.bean.ao.UserFeedbackRequestAO;
+import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.UserFeedbackPO;
 import chatgptserver.bean.po.UserPO;
@@ -15,10 +13,7 @@ import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author：chenzhenyu
@@ -78,4 +73,61 @@ public class UserServiceImpl implements UserService {
 
         return response;
     }
+
+    @Override
+    public JsonResult login(UserAO request) {
+        log.info("UserServiceImpl login request:[{}]", request);
+        // 查询数据库是否存在该用户（有则直接登录，并生成token）
+        UserPO userPO = userMapper.getUserByEmail(request.getEmail());
+        if (Objects.isNull(userPO)) {
+            // 判断邮箱格式
+            String userEmail = request.getEmail();
+            if (userEmail != null && !userEmail.equals("") && userEmail.length() > 7
+                    && userEmail.substring(userEmail.length() - 7, userEmail.length()).equals("@qq.com")) {
+                // 发邮件
+                String verifyCode = MailUtil.createVerifyCode();
+                log.info("UserServiceImpl login verifyCode:[{}]", verifyCode);
+                MailUtil.sendEmailMessage("ChatGPT集成平台注册验证码", request.getEmail(), verifyCode);
+            }
+
+        } else {
+
+        }
+
+        // 没有，则注册
+
+        // 生成token，存token进redis
+
+        return null;
+    }
+
+//    @Override
+//    public JsonResult userLogin(UserDTO userDTO) {
+//        System.out.println( userDTO );
+//        // 先检查是否存在该学号
+//        if ( !haveThisStudentId( userDTO.getStudentId() ) ) {
+//            return JsonResult.error("There is no this studentId! Not CQUT student, can't login! ");
+//        }
+//        String mdCode = md5.encrypt(userDTO.getPassword());
+//        UserDTO user = userDao.getUserByStudentId(userDTO.getStudentId());
+//        if( ObjectUtil.isEmpty(user) ) {
+//            userDTO.setPassword(mdCode);
+//            userDao.insert(userDTO);
+//        } else {
+//            System.out.println("原密码：" + userDTO.getPassword());
+//            System.out.println( "加密后的密码 ：" + mdCode );
+//            // 判断密码是否正确
+//            if ( !user.getPassword().equals(mdCode) ) {
+//                log.info("UserServiceImpl userLogin -> result : (password is not right, can't login!)");
+//                return JsonResult.success("password is not right, can't login! ");
+//            }
+//        }
+//        UserDTO userDTO1 = userDao.getUserByStudentId(userDTO.getStudentId());
+//        UserVO userVO = serverMapper.userDTO2UserVO(userDTO1);
+//        // 登录成功后，生成token，生成 权限token
+//        String token = jwtTokenManager.createToken(userDTO1);
+//        userVO.setToken( token );
+//        userDao.updateUserToken( userDTO.getStudentId(), token );
+//        return JsonResult.success(userVO);
+//    }
 }

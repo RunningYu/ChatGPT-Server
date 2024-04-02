@@ -23,6 +23,9 @@ public class UserPO {
     @ApiModelProperty("唯一code")
     private String userCode;
 
+    @ApiModelProperty("邮箱")
+    private String email;
+
     @ApiModelProperty("电话号码")
     private String phone;
 
