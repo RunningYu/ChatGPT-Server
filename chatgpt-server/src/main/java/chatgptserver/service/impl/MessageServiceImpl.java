@@ -12,6 +12,7 @@ import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.enums.RoleTypeEnums;
 import chatgptserver.service.MessageService;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class MessageServiceImpl implements MessageService {
+
+    @Autowired
+    private Cache<String, Object> caffeineCache;
 
     @Autowired
     private GptMapper gptMapper;

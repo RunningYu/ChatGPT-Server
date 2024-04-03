@@ -10,6 +10,7 @@ import chatgptserver.dao.UserMapper;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MD5Util;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.apache.tomcat.util.security.MD5Encoder;
@@ -26,6 +27,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private Cache<String, Object> caffeineCache;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -124,8 +128,7 @@ public class UserServiceImpl implements UserService {
         String token = jwtUtils.createToken(userPO);
         UserLoginReqAO userLoginReqAO = ConvertMapping.userPO2UserLoginReqAO(userPO);
         userLoginReqAO.setToken(token);
-        UserPO jwtUser = jwtUtils.getUserFromToken(token);
-        log.info("UserServiceImpl login jwtUser:[{}]", jwtUser);
+        caffeineCache.put(token, userLoginReqAO);
 
         return JsonResult.success(userLoginReqAO);
     }
