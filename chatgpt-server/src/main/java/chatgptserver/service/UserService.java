@@ -24,4 +24,6 @@ public interface UserService {
     UserFeedbackListResponseAO chatUserFeedbackList(int page, int size);
 
     JsonResult login(UserAO request);
+
+    String sendEmailVerifyCode(String email);
 }

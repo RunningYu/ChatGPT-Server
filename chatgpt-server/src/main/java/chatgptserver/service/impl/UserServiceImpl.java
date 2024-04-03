@@ -8,10 +8,14 @@ import chatgptserver.bean.po.UserFeedbackPO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.service.UserService;
+import chatgptserver.utils.JwtUtils;
+import chatgptserver.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
+import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.security.provider.MD5;
 
 import java.util.*;
 
@@ -22,6 +26,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Autowired
     private UserMapper userMapper;
@@ -40,7 +47,7 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl createNewChat chatPO:[{}]", chatPO);
         int id = userMapper.newChat(chatPO);
         String chatCode = "chat_" + chatPO.getId();
-        userMapper.updateUserCode(chatCode, chatPO.getId());
+        userMapper.updateChatCode(chatCode, chatPO.getId());
         Map<String, String> response = new HashMap<>();
         response.put("chatCode", chatCode);
         log.info("UserServiceImpl createNewChat response:[{}]", response);
@@ -79,26 +86,65 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl login request:[{}]", request);
         // 查询数据库是否存在该用户（有则直接登录，并生成token）
         UserPO userPO = userMapper.getUserByEmail(request.getEmail());
+        // 注册
         if (Objects.isNull(userPO)) {
             // 判断邮箱格式
             String userEmail = request.getEmail();
             if (userEmail != null && !userEmail.equals("") && userEmail.length() > 7
                     && userEmail.substring(userEmail.length() - 7, userEmail.length()).equals("@qq.com")) {
-                // 发邮件
-                String verifyCode = MailUtil.createVerifyCode();
-                log.info("UserServiceImpl login verifyCode:[{}]", verifyCode);
-                MailUtil.sendEmailMessage("ChatGPT集成平台注册验证码", request.getEmail(), verifyCode);
+                if (request.getUserVerifyCode() != null && !request.getUserVerifyCode().equals("")) {
+                        if (request.getUserVerifyCode().equals(request.getVerifyCode())) {
+                            request.setPassword(MD5Util.encrypt(request.getPassword()));
+                            UserPO user = ConvertMapping.userAO2UserPO(request);
+                            int id = userMapper.userAdd(user);
+                            String userCode = "user_" + user.getId();
+                            user.setUserCode(userCode);
+                            userPO = user;
+                            log.info("UserServiceImpl login user:[{}]", user);
+                            userMapper.updateUserCode(userCode, user.getId());
+                        } else {
+                            throw new RuntimeException("输入的验证码错误");
+                        }
+
+                } else {
+                    throw new RuntimeException("请输入验证码");
+                }
+            } else {
+                throw new RuntimeException("邮箱格式不正确!");
             }
-
-        } else {
-
         }
-
-        // 没有，则注册
-
+        // 登录
+        else {
+            String md5Password = MD5Util.encrypt(request.getPassword());
+            if (!md5Password.equals(userPO.getPassword())) {
+                throw new RuntimeException("密码错误！");
+            }
+        }
         // 生成token，存token进redis
+        String token = jwtUtils.createToken(userPO);
+        UserLoginReqAO userLoginReqAO = ConvertMapping.userPO2UserLoginReqAO(userPO);
+        userLoginReqAO.setToken(token);
+        UserPO jwtUser = jwtUtils.getUserFromToken(token);
+        log.info("UserServiceImpl login jwtUser:[{}]", jwtUser);
 
-        return null;
+        return JsonResult.success(userLoginReqAO);
+    }
+
+    @Override
+    public String sendEmailVerifyCode(String email) {
+        log.info("UserServiceImpl sendEmailVerifyCode email:[{}]", email);
+        // 判断邮箱格式
+        if (email != null && !email.equals("") && email.length() > 7
+                && email.substring(email.length() - 7, email.length()).equals("@qq.com")) {
+            // 发邮件
+            String verifyCode = MailUtil.createVerifyCode();
+            log.info("UserServiceImpl sendEmailVerifyCode verifyCode:[{}]", verifyCode);
+            MailUtil.sendEmailMessage("ChatGPT集成平台注册验证码", email, verifyCode);
+
+            return verifyCode;
+        } else {
+            throw new RuntimeException("邮箱格式错误！");
+        }
     }
 
 //    @Override

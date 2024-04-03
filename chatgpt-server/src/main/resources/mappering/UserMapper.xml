@@ -8,9 +8,17 @@
     <insert id="chatUserFeedback">
         insert into tb_chatgpt_user_feedback (user_code, content) values (#{userCode}, #{content})
     </insert>
+    <insert id="userAdd" parameterType="chatgptserver.bean.po.UserPO" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_chatgpt_user(user_code, username, email, password, headshot)
+        values (#{userCode}, #{username}, #{email}, #{password}, #{headshot})
+    </insert>
+
+    <update id="updateChatCode">
+        update tb_chatgpt_chat set chat_code = #{chatCode} where id = #{id}
+    </update>
 
     <update id="updateUserCode">
-        update tb_chatgpt_chat set chat_code = #{chatCode} where id = #{id}
+        update tb_chatgpt_user set user_code = #{userCode} where id = #{id}
     </update>
 
     <select id="getUserByCode" resultType="chatgptserver.bean.po.UserPO">
@@ -30,7 +38,7 @@
     </select>
 
     <select id="getUserByEmail" resultType="chatgptserver.bean.po.UserPO">
-        select * tb_chatgpt_user where email = #{email}
+        select * from tb_chatgpt_user where email = #{email}
     </select>
 
 </mapper>

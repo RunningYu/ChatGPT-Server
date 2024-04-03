@@ -1,11 +1,10 @@
 package chatgptserver.Mapping;
 
-import chatgptserver.bean.ao.ChatAddRequestAO;
-import chatgptserver.bean.ao.MessagesAO;
-import chatgptserver.bean.ao.UserFeedbackAO;
+import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.bean.po.UserFeedbackPO;
+import chatgptserver.bean.po.UserPO;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
@@ -56,5 +55,34 @@ public class ConvertMapping {
         feedbackAO.setContent(feedbackPO.getContent());
 
         return feedbackAO;
+    }
+
+    public static UserPO userAO2UserPO(UserAO userAO) {
+        if (Objects.isNull(userAO)) {
+            return null;
+        }
+        UserPO userPO = new UserPO();
+        userPO.setUserCode(userAO.getUserCode());
+        userPO.setUsername(userAO.getUsername());
+        userPO.setEmail(userAO.getEmail());
+        userPO.setPassword(userAO.getPassword());
+        userPO.setPhone(userAO.getPhone());
+
+        return userPO;
+    }
+
+    public static UserLoginReqAO userPO2UserLoginReqAO(UserPO userPO) {
+        if (Objects.isNull(userPO)) {
+            return null;
+        }
+        UserLoginReqAO reqAO = new UserLoginReqAO();
+        reqAO.setUserCode(userPO.getUserCode());
+        reqAO.setUsername(userPO.getUsername());
+        reqAO.setEmail(userPO.getEmail());
+        reqAO.setPassword(userPO.getPassword());
+        reqAO.setHeadshot(userPO.getHeadshot());
+        reqAO.setPhone(userPO.getPhone());
+
+        return reqAO;
     }
 }

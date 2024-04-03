@@ -1,16 +1,18 @@
 package chatgptserver.bean.ao;
 
-import io.swagger.annotations.ApiModel;
+import chatgptserver.bean.po.UserPO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
- * @Author：chenzhenyu
- * @Date：2024/1/4 15:06
+ * @author : 其然乐衣Letitbe
+ * @date : 2024/4/3
  */
-@ApiModel("用户")
 @Data
-public class UserAO {
+public class UserLoginReqAO {
 
     @ApiModelProperty("唯一code")
     private String userCode;
@@ -21,16 +23,15 @@ public class UserAO {
     @ApiModelProperty("电话号码")
     private String phone;
 
-    @ApiModelProperty("用户输入的验证码")
-    private String userVerifyCode;
-
-    @ApiModelProperty("验证码")
-    private String verifyCode;
-
     @ApiModelProperty("用户名")
     private String username;
 
+    @ApiModelProperty("头像")
+    private String headshot;
+
     @ApiModelProperty("密码")
     private String password;
+
+    private String token;
 
 }

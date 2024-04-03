@@ -1,6 +1,5 @@
 package chatgptserver.dao;
 
-import chatgptserver.bean.ao.ChatAddRequestAO;
 import chatgptserver.bean.ao.UserFeedbackRequestAO;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.UserFeedbackPO;
@@ -21,7 +20,7 @@ public interface UserMapper {
 
     int newChat(ChatPO chatPO);
 
-    void updateUserCode(@Param("chatCode") String chatCode, @Param("id") int id);
+    void updateChatCode(@Param("chatCode") String chatCode, @Param("id") int id);
 
     ChatPO getChatByCode(String chatCode);
 
@@ -32,4 +31,8 @@ public interface UserMapper {
     int getTotalOfchatUserFeedbackList();
 
     UserPO getUserByEmail(String email);
+
+    int userAdd(UserPO user);
+
+    void updateUserCode(@Param("userCode") String userCode, @Param("id") Integer id);
 }

@@ -17,7 +17,7 @@ import java.util.Map;
  * @date : 2024/4/2
  */
 @Component
-public class JwtTokenManager {
+public class JwtUtils {
 
     /**
      * 用于签名的私钥
@@ -88,7 +88,6 @@ public class JwtTokenManager {
         claims.put("username", user.getUsername());
         claims.put("password", user.getPassword());
 
-
         String token = Jwts.builder()
                 // 发证人
                 .setIssuer(ISSUER)
@@ -105,6 +104,7 @@ public class JwtTokenManager {
                 .compressWith(CompressionCodecs.GZIP)
                 // 生成JWT
                 .compact();
+
         return token;
     }
 
@@ -125,6 +125,7 @@ public class JwtTokenManager {
         user.setUserCode(userCode);
         user.setUsername( username );
         user.setPassword( password );
+
         return user;
     }
     /**

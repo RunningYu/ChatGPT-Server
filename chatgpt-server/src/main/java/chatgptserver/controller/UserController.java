@@ -45,6 +45,15 @@ public class UserController {
         return response;
     }
 
+    @ApiOperation("发邮箱验证码")
+    @PostMapping("/user/send/email")
+    public JsonResult sendEmailVerifyCode(@Param("String") String email) {
+        log.info("UserController sendEmailVerifyCode email:[{}]", email);
+        String verifyCode = userService.sendEmailVerifyCode(email);
+
+        return JsonResult.success(verifyCode);
+    }
+
 //    @ApiOperation("通过token")
 //    @PostMapping("/getUserInfoByToken")
 //    public JsonResult getUserInfoByToken(@RequestBody TokenAO token) {
