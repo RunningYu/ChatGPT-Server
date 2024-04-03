@@ -221,11 +221,11 @@ public class XunFeiWenDaBigModelNew extends WebSocketListener {
             totalAnswer=totalAnswer+temp.content;
 
             try {
-                SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
-                sseEmitter.send(SseEmitter.event().comment(temp.content));
+//                SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
+//                sseEmitter.send(SseEmitter.event().comment(temp.content));
                 String pre = XunFeiUtils.questionFlagMap.containsKey(threadId) ? XunFeiUtils.questionTotalResponseMap.get(threadId) : "";
                 XunFeiUtils.questionTotalResponseMap.put(threadId, pre + temp.content);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException();
             }
 

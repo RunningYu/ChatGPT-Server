@@ -72,7 +72,7 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：图片理解
      */
     @Override
-    public SseEmitter xfImageUnderstand(Long threadId, MultipartFile image, String content, String userCode, String chatCode) {
+    public String xfImageUnderstand(Long threadId, MultipartFile image, String content, String userCode, String chatCode) {
         log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}], userCode:[{}], chatCode:[{}]", threadId, image, content, userCode, chatCode);
         XunFeiUtils.imageUnderstandFlagMap.put(threadId, false);
         XunFeiUtils.imageUnderstandResponseMap.put(threadId, "");
@@ -101,7 +101,8 @@ public class XunFeiServiceImpl implements XunFeiService {
                     log.info("XunFeiServiceImpl xfImageUnderstand totalResponse:[{}]", totalResponse);
                     UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
                     messageService.recordHistoryWithImage(userCode, chatCode, uploadResponse.getMinIoUrl(), content, totalResponse);
-                    return sseEmitter;
+
+                    return totalResponse;
                 }
             }
         } catch (Exception e) {
@@ -256,13 +257,13 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：文本问答
      */
     @Override
-    public SseEmitter xfQuestion(Long threadId, QuestionRequestAO requestAO) {
+    public String xfQuestion(Long threadId, QuestionRequestAO requestAO) {
         log.info("XunFeiServiceImpl xfQuestion threadId:[{}], requestAO:[{}]", threadId, requestAO);
+        String totalResponse = "";
         XunFeiUtils.questionFlagMap.put(threadId, false);
         XunFeiUtils.questionTotalResponseMap.put(threadId, "");
         boolean flag = true;
         List<MessagesPO> historyList = messageMapper.getWenXinHistory(requestAO.getChatCode());
-
         try {
             // 构建鉴权url
             String authUrl = getAuthUrl(GPTConstants.XF_XH_QUESTION_URL, GPT_KEY_MAP.get(GPTConstants.XF_XH_API_KEY), GPT_KEY_MAP.get(XF_XH_API_SECRET_KEY));
@@ -276,21 +277,20 @@ public class XunFeiServiceImpl implements XunFeiService {
         } catch (Exception e) {
             throw new RuntimeException();
         }
-
         while (true) {
             boolean closeFlag = XunFeiUtils.questionFlagMap.get(threadId);
             if (!closeFlag) {
                 // Thread.sleep(200);
-
             } else {
-                String totalResponse = XunFeiUtils.questionTotalResponseMap.get(threadId);
+                totalResponse = XunFeiUtils.questionTotalResponseMap.get(threadId);
                 log.info("XunFeiServiceImpl xfQuestion totalResponse:[{}]", totalResponse);
                 messageService.recordHistory(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse);
+
                 break;
             }
         }
 
-        return SseUtils.sseEmittersMap.get(threadId);
+        return totalResponse;
     }
 
     public static String getPicAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {

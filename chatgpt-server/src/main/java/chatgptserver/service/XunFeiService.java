@@ -16,9 +16,9 @@ public interface XunFeiService {
 
     JsonResult xfImageCreate(String content, String userCode, String chatCode);
 
-    SseEmitter xfQuestion(Long threadId, QuestionRequestAO request);
+    String xfQuestion(Long threadId, QuestionRequestAO request);
 
-    SseEmitter xfImageUnderstand(Long threadId, MultipartFile file, String content, String userCode, String chatCode);
+    String xfImageUnderstand(Long threadId, MultipartFile file, String content, String userCode, String chatCode);
 
     String xfPptCreate(String content, String userCode, String chatCode);
 }

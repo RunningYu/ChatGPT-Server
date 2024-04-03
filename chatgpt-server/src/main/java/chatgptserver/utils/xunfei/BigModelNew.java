@@ -227,12 +227,12 @@ public class BigModelNew extends WebSocketListener {
             XunFeiUtils.imageUnderstandResponseMap.put(threadId, temp.content);
             String pre = XunFeiUtils.imageUnderstandTotalResponseMap.containsKey(threadId) ? XunFeiUtils.imageUnderstandTotalResponseMap.get(threadId) : "";
             XunFeiUtils.imageUnderstandTotalResponseMap.put(threadId, pre += temp.content);
-            sseEmitter = SseUtils.sseEmittersMap.get(threadId);
-            try {
-                sseEmitter.send(SseEmitter.event().comment(temp.content));
-            } catch (IOException e) {
-                throw new RuntimeException();
-            }
+//            sseEmitter = SseUtils.sseEmittersMap.get(threadId);
+//            try {
+//                sseEmitter.send(SseEmitter.event().comment(temp.content));
+//            } catch (IOException e) {
+//                throw new RuntimeException();
+//            }
         }
         if (myJsonParse.header.status == 2) {
             // 可以关闭连接，释放资源
