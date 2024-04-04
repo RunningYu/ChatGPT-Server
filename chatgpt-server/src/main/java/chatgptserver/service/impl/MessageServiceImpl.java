@@ -1,6 +1,7 @@
 package chatgptserver.service.impl;
 
 import chatgptserver.Mapping.ConvertMapping;
+import chatgptserver.bean.ao.ChatAO;
 import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.MessagesResponseAO;
 import chatgptserver.bean.po.ChatPO;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -76,9 +78,29 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<ChatPO> chatCreateList(String userCode, String gptCode) {
+    public List<ChatAO> chatCreateList(String userCode, String gptCode) {
         log.info("MessageServiceImpl chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
-        List<ChatPO> response = messageMapper.chatCreateList(userCode, gptCode);
+        List<ChatPO> list = messageMapper.chatCreateList(userCode, gptCode);
+        List<ChatAO> response = new ArrayList<>();
+        for (ChatPO chatPO : list) {
+            // 统计对话的总数量
+            int chatAmount = messageMapper.getChatAmount(chatPO.getChatCode());
+            ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);
+            chatAO.setChatAmount(chatAmount);
+            Date lastChatTime = messageMapper.getLastChatTime(chatPO.getChatCode());
+            chatAO.setLastChatTime(lastChatTime);
+            response.add(chatAO);
+        }
+        // 根据时间排序
+        for(int i = 0; i < response.size() - 1; i++) {
+            for(int j = 0; j < response.size() - 1 - i; j ++) {
+                if(response.get(j).getLastChatTime().compareTo(response.get(j + 1).getLastChatTime()) < 0) {
+                    ChatAO temp = response.get(j);
+                    response.set(j, response.get(j + 1));
+                    response.set(j + 1, temp);
+                }
+            }
+        }
         log.info("MessageServiceImpl chatBoxList response:[{}]", response);
 
         return response;
@@ -107,7 +129,8 @@ public class MessageServiceImpl implements MessageService {
             list.add(messagesAO);
         }
         int total = messageMapper.getToalMessages(chatCode);
-        MessagesResponseAO response = new MessagesResponseAO(list, total);
+        boolean hasMore = (startIndex + size) < total ? true : false;
+        MessagesResponseAO response = new MessagesResponseAO(list, total, hasMore);
 
         return response;
     }

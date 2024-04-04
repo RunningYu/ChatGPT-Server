@@ -32,4 +32,12 @@
         select * from tb_chatgpt_chat where user_code = #{userCode} and gpt_code = #{gptCode} and is_delete = 0
     </select>
 
+    <select id="getChatAmount" resultType="java.lang.Integer">
+        select count(*) from tb_chatgpt_messages where chat_code = #{chatCode}
+    </select>
+
+    <select id="getLastChatTime" resultType="java.util.Date">
+        select create_time from tb_chatgpt_messages where chat_code = #{chatCode} order by create_time DESC limit 0, 1
+    </select>
+
 </mapper>

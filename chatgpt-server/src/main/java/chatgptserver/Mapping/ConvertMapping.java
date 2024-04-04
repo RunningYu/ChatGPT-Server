@@ -85,4 +85,18 @@ public class ConvertMapping {
 
         return reqAO;
     }
+
+    public static ChatAO chatPO2ChatAO(ChatPO chatPO) {
+        if (Objects.isNull(chatPO)) {
+            return null;
+        }
+        ChatAO chatAO = new ChatAO();
+        chatAO.setChatCode(chatPO.getChatCode());
+        chatAO.setChatName(chatPO.getChatName());
+        chatAO.setGptCode(chatPO.getGptCode());
+        chatAO.setUserCode(chatPO.getUserCode());
+        chatAO.setCreateTime(chatPO.getCreateTime());
+
+        return chatAO;
+    }
 }

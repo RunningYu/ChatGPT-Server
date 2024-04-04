@@ -84,9 +84,9 @@ public class UserController {
 
     @ApiOperation("获取用户创建的聊天列表")
     @GetMapping("/chat/create/list")
-    public JsonResult<List<ChatPO>> chatCreateList(@Param("userCode") String userCode, @Param("gptCode") String gptCode) {
+    public JsonResult<List<ChatAO>> chatCreateList(@Param("userCode") String userCode, @Param("gptCode") String gptCode) {
         log.info("UserController chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
-        List<ChatPO> response = messageService.chatCreateList(userCode, gptCode);
+        List<ChatAO> response = messageService.chatCreateList(userCode, gptCode);
 
         return JsonResult.success(response);
     }

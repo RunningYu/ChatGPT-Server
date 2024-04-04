@@ -5,6 +5,7 @@ import chatgptserver.bean.po.MessagesPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,4 +31,8 @@ public interface MessageMapper {
     MessagesPO getTongYiQuestionFistChat(String chatCode);
 
     List<ChatPO> chatCreateList(@Param("userCode")String userCode, @Param("gptCode")String gptCode);
+
+    int getChatAmount(String chatCode);
+
+    Date getLastChatTime(String chatCode);
 }

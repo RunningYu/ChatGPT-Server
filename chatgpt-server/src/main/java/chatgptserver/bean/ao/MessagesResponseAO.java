@@ -25,4 +25,7 @@ public class MessagesResponseAO {
     @ApiModelProperty("总数")
     private Integer total;
 
+    @ApiModelProperty("是都还有")
+    private Boolean hasMore;
+
 }
