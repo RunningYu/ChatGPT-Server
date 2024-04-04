@@ -98,10 +98,10 @@ public class WenXinServiceImpl implements WenXinService {
             log.info("MessageServiceImpl getMessageFromWenXin response:[{}]", wenXinRspDTO);
 
             messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult());
-
-            return wenXinRspDTO.getResult();
+            String response = "[" + ( (wenXinRspDTO.getResult() == null || wenXinRspDTO.getResult().equals("")) ? "没有生成相应的结果" : wenXinRspDTO.getResult() )+ "]";
+            return response;
         } catch (Exception e) {
-            return null;
+            throw new RuntimeException();
         }
 
     }

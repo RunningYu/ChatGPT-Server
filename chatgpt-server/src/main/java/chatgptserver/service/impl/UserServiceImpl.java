@@ -109,7 +109,6 @@ public class UserServiceImpl implements UserService {
                         } else {
                             throw new RuntimeException("输入的验证码错误");
                         }
-
                 } else {
                     throw new RuntimeException("请输入验证码");
                 }
