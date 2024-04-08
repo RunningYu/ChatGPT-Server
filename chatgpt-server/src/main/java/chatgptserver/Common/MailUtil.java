@@ -80,7 +80,7 @@ public class MailUtil {
     public static String createVerifyCode() {
         String verifyCode = "";
         for (int i = 0; i < 4; i ++) {
-            int code = 10 * (int) Math.random() - 1;
+            int code = (int)(10 * (Math.random()) - 1);
             verifyCode += code;
         }
 

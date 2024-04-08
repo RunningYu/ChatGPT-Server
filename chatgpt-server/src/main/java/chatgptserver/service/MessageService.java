@@ -1,9 +1,10 @@
 package chatgptserver.service;
 
 import chatgptserver.bean.ao.ChatAO;
+import chatgptserver.bean.ao.ChatAddRequestAO;
 import chatgptserver.bean.ao.MessagesResponseAO;
-import chatgptserver.bean.po.ChatPO;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**

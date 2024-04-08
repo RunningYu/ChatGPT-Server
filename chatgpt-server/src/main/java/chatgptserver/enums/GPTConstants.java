@@ -27,9 +27,9 @@ public class GPTConstants {
 
     public static final String WEN_XIN_APP_ID = "58299734";
 
-    public static final String WEN_XIN_API_KEY = "aHZkdH6mSkMz0q24rDSf655D";
+    public static final String WEN_XIN_API_KEY = "8n7iZg2LgIZiSoFsycaGkb2z";
 
-    public static final String WEN_XIN_SECRET_KEY = "cVkrqCb5Z0KG5k9aqwsOgR9FX3wwICLs";
+    public static final String WEN_XIN_SECRET_KEY = "y4KeIGGnVAQ0nDBRjy6p3HuBGdRHk0Dv";
 
     public static final String WEN_XIN_API_KEY_NAME = "wenXinApiKey";
 
@@ -40,13 +40,17 @@ public class GPTConstants {
      * 【文本问答】
      * ERNIE-Bot-8K (有限免费，现在代充费状态)
      */
-//    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_bot_8k?access_token=%s";
+    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_bot_8k?access_token=%s";
     /**
      * 【文本问答】
      * Yi-34B-Chat (免费使用)
      */
-    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/yi_34b_chat?access_token=%s";
+//    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/yi_34b_chat?access_token=%s";
 
+    /**
+     * 【图片生成】
+     * Stable-Diffusion-XL
+     */
     public static final String WEN_XIN_IMAGE_CREATE_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/text2image/sd_xl?access_token=%S";
 
     static {

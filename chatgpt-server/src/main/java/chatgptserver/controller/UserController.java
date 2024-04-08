@@ -3,20 +3,19 @@ package chatgptserver.controller;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
-import chatgptserver.bean.po.MessagesPO;
-import chatgptserver.bean.po.UserFeedbackPO;
+import chatgptserver.bean.po.UserPO;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
+import chatgptserver.utils.JwtUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +27,9 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class UserController {
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Autowired
     private MessageService messageService;
@@ -46,8 +48,8 @@ public class UserController {
     }
 
     @ApiOperation("发邮箱验证码")
-    @PostMapping("/user/send/email")
-    public JsonResult sendEmailVerifyCode(@Param("String") String email) {
+    @GetMapping("/user/send/email")
+    public JsonResult sendEmailVerifyCode(@Param("email") String email) {
         log.info("UserController sendEmailVerifyCode email:[{}]", email);
         String verifyCode = userService.sendEmailVerifyCode(email);
 
@@ -63,10 +65,25 @@ public class UserController {
 //    }
 
 
+//    @ApiOperation("新建聊天")
+//    @PostMapping("/chat/add")
+//    public JsonResult wenXinAdd(HttpServletRequest httpServletRequest) {
+//        String token = httpServletRequest.getHeader("token");
+//        log.info("UserController wenXinChat token:[{}], request:[{}]", token);
+//        UserPO userPO = jwtUtils.getUserFromToken(token);
+////        request.setUserCode(userPO.getUserCode());
+//
+//        return JsonResult.success(userPO);
+//    }
+
     @ApiOperation("新建聊天")
     @PostMapping("/chat/add")
-    public JsonResult wenXinAdd(@RequestBody ChatAddRequestAO request) {
+    public JsonResult wenXinAdd(@RequestBody ChatAddRequestAO request,
+                                HttpServletRequest httpServletRequest) {
         log.info("UserController wenXinChat request:[{}]", request);
+        String token = httpServletRequest.getHeader("token");
+        UserPO userPO = jwtUtils.getUserFromToken(token);
+        request.setUserCode(userPO.getUserCode());
         ChatPO chatPO = ConvertMapping.ChatAddRequestAO2ChatPO(request);
         Map<String, String> response = userService.createNewChat(chatPO);
 
@@ -84,20 +101,27 @@ public class UserController {
 
     @ApiOperation("获取用户创建的聊天列表")
     @GetMapping("/chat/create/list")
-    public JsonResult<List<ChatAO>> chatCreateList(@Param("userCode") String userCode, @Param("gptCode") String gptCode) {
-        log.info("UserController chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
-        List<ChatAO> response = messageService.chatCreateList(userCode, gptCode);
+    public JsonResult<List<ChatAO>> chatCreateList(HttpServletRequest httpServletRequest, @Param("gptCode") String gptCode) {
+        log.info("UserController chatCreateList gptCode:[{}]", gptCode);
+        String token = httpServletRequest.getHeader("token");
+        UserPO userPO = jwtUtils.getUserFromToken(token);
+        log.info("UserController chatCreateList userPO:[{}]", userPO);
+        List<ChatAO> response = messageService.chatCreateList(userPO.getUserCode(), gptCode);
 
         return JsonResult.success(response);
     }
 
     @ApiOperation("用户反馈")
     @PostMapping("/chat/user/feedback")
-    public JsonResult chatUserFeedback(@RequestBody UserFeedbackRequestAO request) {
+    public JsonResult chatUserFeedback(HttpServletRequest httpServletRequest, @RequestBody UserFeedbackRequestAO request) {
         log.info("UserController chatUserFeedback request:[{}]", request);
+        String token = httpServletRequest.getHeader("token");
+        UserPO userPO = jwtUtils.getUserFromToken(token);
+        log.info("UserController chatUserFeedback userPO:[{}]", userPO);
+        request.setUserCode(userPO.getUserCode());
         userService.chatUserFeedback(request);
 
-        return JsonResult.success();
+        return JsonResult.success("感谢反馈！");
     }
 
     @ApiOperation("用户反馈列表")

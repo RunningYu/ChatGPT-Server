@@ -7,8 +7,10 @@ import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ProgressResponse;
+import chatgptserver.bean.po.UserPO;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.XunFeiService;
+import chatgptserver.utils.JwtUtils;
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static chatgptserver.Common.SseUtils.sseEmitterThreadLocal;
@@ -32,6 +35,9 @@ import static chatgptserver.Common.SseUtils.sseEmitterThreadLocal;
 @Slf4j
 @RestController
 public class XunFeiXingHuoController {
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Autowired
     private XunFeiService xunFeiService;
@@ -93,21 +99,30 @@ public class XunFeiXingHuoController {
 
     @ApiOperation("讯飞星火：图片理解")
     @GetMapping("/chat/xf/image/understander")
-    public JsonResult xfImageUnderstand(@RequestParam("image") MultipartFile image, @RequestParam("content") String content,
-                                        @RequestParam("userCode") String userCode, @RequestParam("chatCode") String chatCode) {
-        log.info("ChatGptController xfPictureUnderstand image:[{}], content[{}], userCode:[{}], chatCode:[{}]", image, content, userCode, chatCode);
+    public JsonResult xfImageUnderstand(HttpServletRequest httpServletRequest,
+                                        @RequestParam("image") MultipartFile image,
+                                        @RequestParam("content") String content,
+                                        @RequestParam("chatCode") String chatCode) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("ChatGptController xfPictureUnderstand token:[{}]", token);
+        UserPO tokenUser = jwtUtils.getUserFromToken(token);
+        log.info("ChatGptController xfPictureUnderstand image:[{}], content[{}], tokenUser:[{}], chatCode:[{}]", image, content, tokenUser, chatCode);
         Long threadId = Thread.currentThread().getId();
-        String response = xunFeiService.xfImageUnderstand(threadId, image, content, userCode, chatCode);
+        String response = xunFeiService.xfImageUnderstand(threadId, image, content, tokenUser.getUserCode(), chatCode);
 
         return JsonResult.success(response);
     }
 
     @ApiOperation("讯飞星火：图片生成")
     @GetMapping("/chat/xf/image/create")
-    public JsonResult xfImageCreate(@Param("content") String content, @Param("userCode") String userCode,
+    public JsonResult xfImageCreate(HttpServletRequest httpServletRequest,
+                                    @Param("content") String content,
                                     @Param("chatCode") String chatCode) {
-        log.info("ChatGptController xfImageCreate content:[{}], userCode:[{}], chatCode:[{}]", content, userCode, chatCode);
-        JsonResult response = xunFeiService.xfImageCreate(content, userCode, chatCode);
+        String token = httpServletRequest.getHeader("token");
+        log.info("ChatGptController xfImageCreate token:[{}]", token);
+        UserPO tokenUser = jwtUtils.getUserFromToken(token);
+        log.info("ChatGptController xfImageCreate content:[{}], userCode:[{}], chatCode:[{}]", content, tokenUser, chatCode);
+        JsonResult response = xunFeiService.xfImageCreate(content, tokenUser.getUserCode(), chatCode);
 
         return response;
     }
@@ -126,8 +141,13 @@ public class XunFeiXingHuoController {
 
     @ApiOperation("讯飞星火：文本问答")
     @PostMapping(value = "/chat/xf/question")
-    public JsonResult xfQuestion(@RequestBody QuestionRequestAO request) {
+    public JsonResult xfQuestion(HttpServletRequest httpServletRequest,
+                                 @RequestBody QuestionRequestAO request) {
         log.info("ChatGptController xfQuestion request:[{}]", request);
+        String token = httpServletRequest.getHeader("token");
+        UserPO tokenUser = jwtUtils.getUserFromToken(token);
+        request.setUserCode(tokenUser.getUserCode());
+        log.info("ChatGptController xfQuestion token:[{}], tokenUser:[{}]", token, tokenUser);
         Long threadId = Thread.currentThread().getId();
         String response = xunFeiService.xfQuestion(threadId, request);
 
@@ -136,10 +156,13 @@ public class XunFeiXingHuoController {
 
     @ApiOperation("讯飞星火：PPT生成")
     @GetMapping("/chat/xf/ppt/create")
-    public JsonResult xfPptCreate(@Param("content") String content, @Param("userCode") String userCode,
-                                    @Param("chatCode") String chatCode) {
-        log.info("ChatGptController xfPptCreate content:[{}], userCode:[{}], chatCode:[{}]", content, userCode, chatCode);
-        String response = xunFeiService.xfPptCreate(content, userCode, chatCode);
+    public JsonResult xfPptCreate(HttpServletRequest httpServletRequest,
+                                  @Param("content") String content, @Param("chatCode") String chatCode) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("ChatGptController xfPptCreate token:[{}]", token);
+        UserPO tokenUser = jwtUtils.getUserFromToken(token);
+        log.info("ChatGptController xfPptCreate content:[{}], tokenUser:[{}], chatCode:[{}]", content, tokenUser, chatCode);
+        String response = xunFeiService.xfPptCreate(content, tokenUser.getUserCode(), chatCode);
 
         return JsonResult.success(response);
     }

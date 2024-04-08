@@ -51,13 +51,11 @@ public class JwtUtils {
             // 如果是0，就设置默认 1天 的过期时间
             expireTime = EXPIRATION_ONE_MONTH;
         }
-
         Map<String, Object> claims = new HashMap<>();
         // 自定义有效载荷部分, 将User实体类用户名和密码存储
         claims.put("userCode", user.getUserCode());
         claims.put("userame", user.getUsername());
         claims.put("password", user.getPassword());
-
 
         String token = Jwts.builder()
                 // 发证人
@@ -125,6 +123,10 @@ public class JwtUtils {
         user.setUserCode(userCode);
         user.setUsername( username );
         user.setPassword( password );
+
+        if (userCode == null && userCode.equals("")) {
+            throw new RuntimeException("token过期");
+        }
 
         return user;
     }

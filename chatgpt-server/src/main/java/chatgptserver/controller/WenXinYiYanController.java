@@ -1,14 +1,17 @@
 package chatgptserver.controller;
 
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.po.UserPO;
 import chatgptserver.service.UserService;
 import chatgptserver.service.WenXinService;
+import chatgptserver.utils.JwtUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -20,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 public class WenXinYiYanController {
 
     @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
     private WenXinService wenXinService;
 
     @Autowired
@@ -27,11 +33,14 @@ public class WenXinYiYanController {
 
     @ApiOperation("文心一言：文本问答")
     @GetMapping("/chat/wenXin/question")
-    public JsonResult wenXinChat(@Param("userCode") String userCode,
+    public JsonResult wenXinChat(HttpServletRequest httpServletRequest,
                                  @Param("chatCode") String chatCode,
                                  @Param("content") String content) {
-        log.info("WenXinYiYanController wenXinChat userCode:[{}] chatCode:[{}] content:[{}]", userCode, chatCode, content);
-        String result = wenXinService.getMessageFromWenXin(userCode, chatCode, content);
+        String token = httpServletRequest.getHeader("token");
+        log.info("ChatGptController wenXinChat token:[{}]", token);
+        UserPO tokenUser = jwtUtils.getUserFromToken(token);
+        log.info("WenXinYiYanController wenXinChat userCode:[{}] chatCode:[{}] content:[{}]", tokenUser, chatCode, content);
+        String result = wenXinService.getMessageFromWenXin(tokenUser.getUserCode(), chatCode, content);
 
         return JsonResult.success(result);
     }
@@ -41,9 +50,13 @@ public class WenXinYiYanController {
      */
     @ApiOperation("文心一言：图片生成")
     @GetMapping("/chat/wenXin/image/create")
-    public JsonResult wenXinImageCreate(@Param("userCode") String userCode, @Param("chatCode") String chatCode, @Param("content") String content) {
-        log.info("WenXinYiYanController wenXinImageCreate userCode:[{}] chatCode:[{}] content:[{}]", userCode, chatCode, content);
-        String result = wenXinService.wxImageCreate(userCode, chatCode, content);
+    public JsonResult wenXinImageCreate(HttpServletRequest httpServletRequest,
+                                        @Param("chatCode") String chatCode, @Param("content") String content) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("WenXinYiYanController wenXinImageCreate token:[{}]", token);
+        UserPO tokenUser = jwtUtils.getUserFromToken(token);
+        log.info("WenXinYiYanController wenXinImageCreate tokenUser:[{}] chatCode:[{}] content:[{}]", tokenUser, chatCode, content);
+        String result = wenXinService.wxImageCreate(tokenUser.getUserCode(), chatCode, content);
 
         return JsonResult.success(result);
     }

@@ -2,6 +2,7 @@ package chatgptserver.service.impl;
 
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.ChatAO;
+import chatgptserver.bean.ao.ChatAddRequestAO;
 import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.MessagesResponseAO;
 import chatgptserver.bean.po.ChatPO;
