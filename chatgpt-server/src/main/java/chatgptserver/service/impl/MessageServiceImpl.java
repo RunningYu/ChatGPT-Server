@@ -1,10 +1,7 @@
 package chatgptserver.service.impl;
 
 import chatgptserver.Mapping.ConvertMapping;
-import chatgptserver.bean.ao.ChatAO;
-import chatgptserver.bean.ao.ChatAddRequestAO;
-import chatgptserver.bean.ao.MessagesAO;
-import chatgptserver.bean.ao.MessagesResponseAO;
+import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.GptPO;
 import chatgptserver.bean.po.MessagesPO;
@@ -14,15 +11,13 @@ import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.enums.RoleTypeEnums;
 import chatgptserver.service.MessageService;
+import chatgptserver.service.UserService;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -32,6 +27,9 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class MessageServiceImpl implements MessageService {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private Cache<String, Object> caffeineCache;
@@ -48,14 +46,20 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void recordHistory(String userCode, String chatCode, String message, String result) {
         log.info("MessageServiceImpl recordHistory userCode:[{}], chatCode:[{}], message:[{}], result:[{}]", userCode, chatCode, message, result);
-        UserPO sender = userMapper.getUserByCode(userCode);
+        String userName = "";
         ChatPO target = userMapper.getChatByCode(chatCode);
+        if (!userCode.equals("")) {
+            UserPO sender = userMapper.getUserByCode(userCode);
+            userName = sender.getUsername();
+        } else {
+            chatCode = "x_" + chatCode;
+        }
 
         MessagesPO messagesPO = new MessagesPO();
         messagesPO.setRole(RoleTypeEnums.WEN_XIN_USER.getType());
         messagesPO.setUserCode(userCode);
         messagesPO.setChatCode(chatCode);
-        messagesPO.setUsername(sender.getUsername());
+        messagesPO.setUsername(userName);
         messagesPO.setChatName(target.getChatName());
         messagesPO.setQuestion(message);
         result = (result == null || result.equals("")) ? "没有生成相应的结果" : result;
@@ -70,6 +74,7 @@ public class MessageServiceImpl implements MessageService {
         MessagesPO messagesPO = new MessagesPO();
         messagesPO.setRole(RoleTypeEnums.WEN_XIN_USER.getType());
         messagesPO.setUserCode(userCode);
+        chatCode = (userCode.equals("") ? ("x_" + chatCode) : chatCode);
         messagesPO.setChatCode(chatCode);
         messagesPO.setImage(imageUrl);
         messagesPO.setQuestion(content);
@@ -78,11 +83,37 @@ public class MessageServiceImpl implements MessageService {
         messageMapper.insertMessage(messagesPO);
     }
 
+//    @Override
+//    public Map<String, String> createNewChat(ChatPO chatPO) {
+//        log.info("UserServiceImpl createNewChat chatPO:[{}]", chatPO);
+//        int id = userMapper.newChat(chatPO);
+//        String chatCode = "chat_" + chatPO.getId();
+//        userMapper.updateChatCode(chatCode, chatPO.getId());
+//        Map<String, String> response = new HashMap<>();
+//        response.put("chatCode", chatCode);
+//        log.info("UserServiceImpl createNewChat response:[{}]", response);
+//
+//        return response;
+//    }
+
     @Override
     public List<ChatAO> chatCreateList(String userCode, String gptCode) {
         log.info("MessageServiceImpl chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
         List<ChatPO> list = messageMapper.chatCreateList(userCode, gptCode);
         List<ChatAO> response = new ArrayList<>();
+        if (list.size() == 0) {
+            // 创建默认的聊天
+            ChatPO chatPO = new ChatPO();
+            chatPO.setChatName("默认聊天");
+            chatPO.setGptCode(gptCode);
+            chatPO.setUserCode(userCode);
+            Map<String, String> map = userService.createNewChat(chatPO);
+            ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);
+            chatAO.setChatCode(map.get("chatCode"));
+            chatAO.setChatAmount(0);
+            response.add(chatAO);
+            return response;
+        }
         for (ChatPO chatPO : list) {
             // 统计对话的总数量
             int chatAmount = messageMapper.getChatAmount(chatPO.getChatCode());

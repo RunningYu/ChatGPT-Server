@@ -26,4 +26,10 @@ public interface UserService {
     JsonResult login(UserAO request);
 
     String sendEmailVerifyCode(String email);
+
+    void chatDelete(String chatCode);
+
+    String getUserCodeByToken(String token);
+
+    JsonResult gptChatFunctionList(String gptCode);
 }

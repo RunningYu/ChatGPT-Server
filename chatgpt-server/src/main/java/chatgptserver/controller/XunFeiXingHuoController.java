@@ -9,12 +9,14 @@ import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ProgressResponse;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.enums.GPTConstants;
+import chatgptserver.service.UserService;
 import chatgptserver.service.XunFeiService;
 import chatgptserver.utils.JwtUtils;
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,9 @@ import static chatgptserver.Common.SseUtils.sseEmitterThreadLocal;
 @Slf4j
 @RestController
 public class XunFeiXingHuoController {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -105,10 +110,9 @@ public class XunFeiXingHuoController {
                                         @RequestParam("chatCode") String chatCode) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfPictureUnderstand token:[{}]", token);
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("ChatGptController xfPictureUnderstand image:[{}], content[{}], tokenUser:[{}], chatCode:[{}]", image, content, tokenUser, chatCode);
+        log.info("ChatGptController xfPictureUnderstand token:[{}], image:[{}], content[{}], chatCode:[{}]", token, image, content, chatCode);
         Long threadId = Thread.currentThread().getId();
-        String response = xunFeiService.xfImageUnderstand(threadId, image, content, tokenUser.getUserCode(), chatCode);
+        String response = xunFeiService.xfImageUnderstand(threadId, image, content, token, chatCode);
 
         return JsonResult.success(response);
     }
@@ -119,10 +123,8 @@ public class XunFeiXingHuoController {
                                     @Param("content") String content,
                                     @Param("chatCode") String chatCode) {
         String token = httpServletRequest.getHeader("token");
-        log.info("ChatGptController xfImageCreate token:[{}]", token);
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("ChatGptController xfImageCreate content:[{}], userCode:[{}], chatCode:[{}]", content, tokenUser, chatCode);
-        JsonResult response = xunFeiService.xfImageCreate(content, tokenUser.getUserCode(), chatCode);
+        log.info("ChatGptController xfImageCreate token:[{}], content:[{}], chatCode:[{}]", token, content, chatCode);
+        JsonResult response = xunFeiService.xfImageCreate(content, token, chatCode);
 
         return response;
     }
@@ -143,11 +145,10 @@ public class XunFeiXingHuoController {
     @PostMapping(value = "/chat/xf/question")
     public JsonResult xfQuestion(HttpServletRequest httpServletRequest,
                                  @RequestBody QuestionRequestAO request) {
-        log.info("ChatGptController xfQuestion request:[{}]", request);
         String token = httpServletRequest.getHeader("token");
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        request.setUserCode(tokenUser.getUserCode());
-        log.info("ChatGptController xfQuestion token:[{}], tokenUser:[{}]", token, tokenUser);
+        String userCode = userService.getUserCodeByToken(token);
+        request.setUserCode(userCode);
+        log.info("ChatGptController xfQuestion userCode:[{}], request:[{}]", userCode, request);
         Long threadId = Thread.currentThread().getId();
         String response = xunFeiService.xfQuestion(threadId, request);
 
@@ -159,10 +160,8 @@ public class XunFeiXingHuoController {
     public JsonResult xfPptCreate(HttpServletRequest httpServletRequest,
                                   @Param("content") String content, @Param("chatCode") String chatCode) {
         String token = httpServletRequest.getHeader("token");
-        log.info("ChatGptController xfPptCreate token:[{}]", token);
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("ChatGptController xfPptCreate content:[{}], tokenUser:[{}], chatCode:[{}]", content, tokenUser, chatCode);
-        String response = xunFeiService.xfPptCreate(content, tokenUser.getUserCode(), chatCode);
+        log.info("ChatGptController xfPptCreate token:[{}], content:[{}], chatCode:[{}]", token, content, chatCode);
+        String response = xunFeiService.xfPptCreate(content, token, chatCode);
 
         return JsonResult.success(response);
     }

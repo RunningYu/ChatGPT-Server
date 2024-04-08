@@ -3,6 +3,7 @@ package chatgptserver.service.impl;
 import chatgptserver.Common.MailUtil;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
+import chatgptserver.bean.po.ChatFunctionPO;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.UserFeedbackPO;
 import chatgptserver.bean.po.UserPO;
@@ -145,6 +146,28 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new RuntimeException("邮箱格式错误！");
         }
+    }
+
+    @Override
+    public void chatDelete(String chatCode) {
+        userMapper.chatDelete(chatCode);
+    }
+
+    @Override
+    public String getUserCodeByToken(String token) {
+        String userCode = "";
+        if (token != null && !"".equals(token)) {
+            UserPO userPO = jwtUtils.getUserFromToken(token);
+            userCode = userPO.getUserCode();
+        }
+        return userCode;
+    }
+
+    @Override
+    public JsonResult gptChatFunctionList(String gptCode) {
+        List<ChatFunctionPO> list = userMapper.gptChatFunctionList(gptCode);
+
+        return JsonResult.success(list);
     }
 
 }

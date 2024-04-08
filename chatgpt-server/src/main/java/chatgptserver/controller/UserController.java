@@ -78,16 +78,28 @@ public class UserController {
 
     @ApiOperation("新建聊天")
     @PostMapping("/chat/add")
-    public JsonResult wenXinAdd(@RequestBody ChatAddRequestAO request,
+    public JsonResult chatAdd(@RequestBody ChatAddRequestAO request,
                                 HttpServletRequest httpServletRequest) {
-        log.info("UserController wenXinChat request:[{}]", request);
+        log.info("UserController chatAdd request:[{}]", request);
         String token = httpServletRequest.getHeader("token");
+        if (token == null || "".equals(token)) {
+            return JsonResult.success("请先登录");
+        }
         UserPO userPO = jwtUtils.getUserFromToken(token);
         request.setUserCode(userPO.getUserCode());
         ChatPO chatPO = ConvertMapping.ChatAddRequestAO2ChatPO(request);
         Map<String, String> response = userService.createNewChat(chatPO);
 
         return JsonResult.success(response);
+    }
+
+    @ApiOperation("删除聊天")
+    @GetMapping("/chat/delete")
+    public JsonResult chatDelete(@Param("chatCode") String chatCode) {
+        log.info("UserController chatDelete chatCode:[{}]", chatCode);
+        userService.chatDelete(chatCode);
+
+        return JsonResult.success("删除成功");
     }
 
     @ApiOperation("获取聊天记录")
@@ -131,6 +143,15 @@ public class UserController {
         UserFeedbackListResponseAO response = userService.chatUserFeedbackList(page, size);
 
         return JsonResult.success(response);
+    }
+
+    @ApiOperation("获取gpt平台的功能列表")
+    @GetMapping("/gpt/chat/function/list")
+    public JsonResult gptChatFunctionList(@Param("gptCode") String gptCode) {
+        log.info("UserController gptChatFunctionList gptCode:[{}]", gptCode);
+        JsonResult response = userService.gptChatFunctionList(gptCode);
+
+        return response;
     }
 
 }

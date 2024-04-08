@@ -23,6 +23,10 @@
         update tb_chatgpt_user set user_code = #{userCode} where id = #{id}
     </update>
 
+    <delete id="chatDelete">
+        update tb_chatgpt_chat set is_delete = 1 where chat_code = #{chatCode}
+    </delete>
+
     <select id="getUserByCode" resultType="chatgptserver.bean.po.UserPO">
         select * from tb_chatgpt_user where user_code = #{userCode}
     </select>
@@ -41,6 +45,10 @@
 
     <select id="getUserByEmail" resultType="chatgptserver.bean.po.UserPO">
         select * from tb_chatgpt_user where email = #{email}
+    </select>
+
+    <select id="gptChatFunctionList" resultType="chatgptserver.bean.po.ChatFunctionPO">
+        select * from tb_chatgpt_chat_functions where gpt_code = #{gptCode}
     </select>
 
 </mapper>

@@ -14,11 +14,11 @@ import java.io.IOException;
  */
 public interface XunFeiService {
 
-    JsonResult xfImageCreate(String content, String userCode, String chatCode);
+    JsonResult xfImageCreate(String content, String token, String chatCode);
 
     String xfQuestion(Long threadId, QuestionRequestAO request);
 
-    String xfImageUnderstand(Long threadId, MultipartFile file, String content, String userCode, String chatCode);
+    String xfImageUnderstand(Long threadId, MultipartFile file, String content, String token, String chatCode);
 
-    String xfPptCreate(String content, String userCode, String chatCode);
+    String xfPptCreate(String content, String token, String chatCode);
 }

@@ -40,11 +40,10 @@ public class TongYiQianWenController {
     @GetMapping("/chat/tongYi/question")
     public JsonResult tongYiQuestion(HttpServletRequest httpServletRequest,
                                  @Param("chatCode") String chatCode,
-                                     @Param("content") String content) {
+                                 @Param("content") String content) {
         String token = httpServletRequest.getHeader("token");
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("WenXinYiYanController wenXinChat tokenUser:[{}] chatCode:[{}] content:[{}], token:[{}]", tokenUser, chatCode, content, token);
-        String result = tongYiService.tyQuestion(tokenUser.getUserCode(), chatCode, content);
+        log.info("WenXinYiYanController tongYiQuestion token:[{}], chatCode:[{}] content:[{}]", token, chatCode, content);
+        String result = tongYiService.tyQuestion(token, chatCode, content);
 
         return JsonResult.success(result);
     }
@@ -56,10 +55,8 @@ public class TongYiQianWenController {
                                             @RequestParam("content") String content,
                                             @RequestParam("chatCode") String chatCode) {
         String token = httpServletRequest.getHeader("token");
-        log.info("WenXinYiYanController tongYiImageUnderstand token:[{}]", token);
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("WenXinYiYanController tongYiImageUnderstand image:[{}] content:[{}], tokenUser:[{}], chatCode:[{}]", image, content, tokenUser, chatCode);
-        String response = tongYiService.tyImageUnderstand(image, content, tokenUser.getUserCode(), chatCode);
+        log.info("WenXinYiYanController tongYiImageUnderstand token:[{}], image:[{}] content:[{}], token:[{}], chatCode:[{}]", token, image, content, token, chatCode);
+        String response = tongYiService.tyImageUnderstand(image, content, token, chatCode);
 
         return JsonResult.success(response);
     }

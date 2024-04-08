@@ -3,16 +3,19 @@ package chatgptserver.service.impl;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.Text;
 import chatgptserver.bean.dto.tongYiQianWen.*;
 import chatgptserver.bean.po.MessagesPO;
+import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
 import chatgptserver.service.TongYiService;
+import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MinioUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,6 +33,9 @@ import java.util.Map;
 public class TongYiServiceImpl implements TongYiService {
 
     @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
     private OkHttpService okHttpService;
 
     @Autowired
@@ -42,20 +48,25 @@ public class TongYiServiceImpl implements TongYiService {
     private MessageMapper messageMapper;
 
     @Override
-    public String tyImageUnderstand(MultipartFile image, String content, String userCode, String chatCode) {
-        log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], userCode:[{}], chatCode:[{}]", image, content, userCode, chatCode);
+    public String tyImageUnderstand(MultipartFile image, String content, String token, String chatCode) {
+        log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}]", image, content, token, chatCode);
         String imageUrl = "";
         if (image != null) {
             imageUrl = minioUtil.upLoadFileToURL(image);
+        }
+        String userCode = "";
+        if (token != null && !"".equals(token)) {
+            UserPO userPO = jwtUtils.getUserFromToken(token);
+            userCode = userPO.getUserCode();
         }
         TongYiImageUnderStandRequestDTO request = buildTongYiImageUnderstandRequestDTO(chatCode, imageUrl, content);
         log.info("WenXinServiceImpl tyImageUnderstand request:[{}]", request);
         String responseStr = "";
         try {
             responseStr = okHttpService.makePostRequest(
-                    GPTConstants.TONG_YI_QIAN_WEN_IMAGE_UNDERSTAND_URL,
-                    JSON.toJSONString(request),
-                    GPTConstants.TONG_YI_QIAN_WEN_API_KEY);
+                        GPTConstants.TONG_YI_QIAN_WEN_IMAGE_UNDERSTAND_URL,
+                        JSON.toJSONString(request),
+                        GPTConstants.TONG_YI_QIAN_WEN_API_KEY);
             log.info("WenXinServiceImpl tyImageUnderstand responseStr:[{}]", responseStr);
         } catch (IOException e) {
             throw new RuntimeException("请求通义千问接口异常");
@@ -69,21 +80,25 @@ public class TongYiServiceImpl implements TongYiService {
     }
 
     @Override
-    public String tyQuestion(String userCode, String chatCode, String content) {
-        log.info("TongYiServiceImpl getMessageFromWenXin userCode:[{}] chatCode:[{}], content:[{}]", userCode, chatCode, content);
+    public String tyQuestion(String token, String chatCode, String content) {
+        log.info("TongYiServiceImpl getMessageFromWenXin token:[{}] chatCode:[{}], content:[{}]", token, chatCode, content);
         Text text = new Text("user", content);
         List<Text> textList = new ArrayList<>();
         textList.add(text);
+        String userCode = "";
+        if (token != null && !"".equals(token)) {
+            UserPO userPO = jwtUtils.getUserFromToken(token);
+            userCode = userPO.getUserCode();
+            // 获取历史聊天记录
+            List<MessagesPO> historyLis = messageMapper.getWenXinHistory(chatCode);
+            for (MessagesPO history : historyLis) {
+                Text replication = new Text("assistant", history.getReplication());
+                textList.add(0, replication);
+                Text question = new Text("user", history.getQuestion());
+                textList.add(0, question);
+            }
 
-        // 获取历史聊天记录
-        List<MessagesPO> historyLis = messageMapper.getWenXinHistory(chatCode);
-        for (MessagesPO history : historyLis) {
-            Text replication = new Text("assistant", history.getReplication());
-            textList.add(0, replication);
-            Text question = new Text("user", history.getQuestion());
-            textList.add(0, question);
         }
-
         QuestionInput input = new QuestionInput(textList);
         QuestionRequestDTO request = new QuestionRequestDTO("qwen-14b-chat", input);
         log.info("TongYiServiceImpl getMessageFromWenXin input:[{}]", input);

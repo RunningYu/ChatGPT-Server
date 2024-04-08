@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * JwtTokenManager工具类
@@ -114,6 +115,9 @@ public class JwtUtils {
     public UserPO getUserFromToken(String token) {
         // 获取有效载荷
         Claims claims = getClaimsFromToken(token);
+        if (Objects.isNull(claims)) {
+            throw  new RuntimeException("token invalid");
+        }
         // 解析token后，从有效载荷取出值
         String userCode = (String) claims.get("userCode");
         String username = (String) claims.get("username");
