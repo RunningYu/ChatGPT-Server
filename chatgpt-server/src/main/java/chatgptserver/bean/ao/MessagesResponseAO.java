@@ -28,4 +28,7 @@ public class MessagesResponseAO {
     @ApiModelProperty("是都还有")
     private Boolean hasMore;
 
+    @ApiModelProperty("聊天名称")
+    private String chatName;
+
 }
