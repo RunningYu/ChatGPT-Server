@@ -3,7 +3,7 @@
 <mapper namespace="chatgptserver.dao.UserMapper">
 
     <insert id="newChat" parameterType="chatgptserver.bean.po.ChatPO" useGeneratedKeys="true" keyProperty="id">
-        insert into tb_chatgpt_chat (user_code, chat_name, gpt_code) values(#{userCode}, #{chatName}, #{gptCode})
+        insert into tb_chatgpt_chat (user_code, chat_name, gpt_code, function_code) values(#{userCode}, #{chatName}, #{gptCode}, #{functionCode})
     </insert>
 
     <insert id="chatUserFeedback">

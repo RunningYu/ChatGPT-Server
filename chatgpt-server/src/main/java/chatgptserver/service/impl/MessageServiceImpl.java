@@ -97,12 +97,12 @@ public class MessageServiceImpl implements MessageService {
 //    }
 
     @Override
-    public List<ChatAO> chatCreateList(String token, String gptCode) {
-        log.info("MessageServiceImpl chatCreateList token:[{}], gptCode:[{}]", token, gptCode);
+    public List<ChatAO> chatCreateList(String token, String gptCode, String functionCode) {
+        log.info("MessageServiceImpl chatCreateList token:[{}], gptCode:[{}], functionCode:[{}]", token, gptCode, functionCode);
         String userCode = userService.getUserCodeByToken(token);
         List<ChatPO> list = new ArrayList<>();
         if (!"".equals(userCode)) {
-            list = messageMapper.chatCreateList(userCode, gptCode);
+            list = messageMapper.chatCreateList(userCode, gptCode, functionCode);
         }
         List<ChatAO> response = new ArrayList<>();
         if (list.size() == 0) {
@@ -111,6 +111,7 @@ public class MessageServiceImpl implements MessageService {
             chatPO.setChatName("默认聊天");
             chatPO.setGptCode(gptCode);
             chatPO.setUserCode(userCode);
+            chatPO.setFunctionCode(functionCode);
             Map<String, String> map = userService.createNewChat(chatPO);
             String chatCode = map.get("chatCode");
             ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);

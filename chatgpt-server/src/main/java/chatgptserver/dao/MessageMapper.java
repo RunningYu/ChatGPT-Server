@@ -30,7 +30,7 @@ public interface MessageMapper {
      */
     MessagesPO getTongYiQuestionFistChat(String chatCode);
 
-    List<ChatPO> chatCreateList(@Param("userCode")String userCode, @Param("gptCode")String gptCode);
+    List<ChatPO> chatCreateList(@Param("userCode") String userCode, @Param("gptCode") String gptCode, @Param("functionCode") String functionCode);
 
     int getChatAmount(String chatCode);
 

@@ -54,6 +54,8 @@ public class UserServiceImpl implements UserService {
         userMapper.updateChatCode(chatCode, chatPO.getId());
         Map<String, String> response = new HashMap<>();
         response.put("chatCode", chatCode);
+        response.put("chatName", chatPO.getChatName());
+        response.put("functionCode", chatPO.getFunctionCode());
         log.info("UserServiceImpl createNewChat response:[{}]", response);
 
         return response;

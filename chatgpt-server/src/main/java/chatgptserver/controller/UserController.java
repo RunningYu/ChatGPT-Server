@@ -85,8 +85,8 @@ public class UserController {
         if (token == null || "".equals(token)) {
             return JsonResult.success("请先登录");
         }
-        UserPO userPO = jwtUtils.getUserFromToken(token);
-        request.setUserCode(userPO.getUserCode());
+        String userCode = userService.getUserCodeByToken(token);
+        request.setUserCode(userCode);
         ChatPO chatPO = ConvertMapping.ChatAddRequestAO2ChatPO(request);
         Map<String, String> response = userService.createNewChat(chatPO);
 
@@ -113,10 +113,10 @@ public class UserController {
 
     @ApiOperation("获取用户创建的聊天列表")
     @GetMapping("/chat/create/list")
-    public JsonResult<List<ChatAO>> chatCreateList(HttpServletRequest httpServletRequest, @Param("gptCode") String gptCode) {
+    public JsonResult<List<ChatAO>> chatCreateList(HttpServletRequest httpServletRequest, @Param("gptCode") String gptCode, @Param("functionCode") String functionCode) {
         String token = httpServletRequest.getHeader("token");
-        log.info("UserController chatCreateList token:[{}], gptCode:[{}]", token, gptCode);
-        List<ChatAO> response = messageService.chatCreateList(token, gptCode);
+        log.info("UserController chatCreateList token:[{}], gptCode:[{}], functionCode:[{}]", token, gptCode, functionCode);
+        List<ChatAO> response = messageService.chatCreateList(token, gptCode, functionCode);
 
         return JsonResult.success(response);
     }

@@ -41,6 +41,7 @@ public class ConvertMapping {
         chatPO.setUserCode(request.getUserCode());
         chatPO.setChatName(request.getChatName());
         chatPO.setGptCode(request.getGptCode());
+        chatPO.setFunctionCode(request.getFunctionCode());
 
         return chatPO;
     }
@@ -94,6 +95,7 @@ public class ConvertMapping {
         chatAO.setChatCode(chatPO.getChatCode());
         chatAO.setChatName(chatPO.getChatName());
         chatAO.setGptCode(chatPO.getGptCode());
+        chatAO.setFunctionCode(chatPO.getFunctionCode());
         chatAO.setUserCode(chatPO.getUserCode());
         chatAO.setCreateTime(chatPO.getCreateTime());
 

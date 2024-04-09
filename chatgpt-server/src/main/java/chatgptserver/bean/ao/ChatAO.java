@@ -27,6 +27,9 @@ public class ChatAO {
     @ApiModelProperty(value = "大模型code")
     private String gptCode;
 
+    @ApiModelProperty(value = "功能code")
+    private String functionCode;
+
     @ApiModelProperty(value = "聊天数量")
     private Integer chatAmount;
 

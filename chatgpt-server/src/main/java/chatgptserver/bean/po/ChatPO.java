@@ -33,6 +33,9 @@ public class ChatPO {
     @ApiModelProperty(value = "大模型code", required = true)
     private String gptCode;
 
+    @ApiModelProperty(value = "功能code", required = true)
+    private String functionCode;
+
     @ApiModelProperty(value = "0-未删除 1-已删除")
     private Integer isDelete;
 

@@ -12,11 +12,14 @@ import lombok.Data;
 @Data
 public class ChatAddRequestAO {
 
-    @ApiModelProperty(value = "用户的code", required = true)
+    @ApiModelProperty(value = "用户的code")
     private String userCode;
 
     @ApiModelProperty(value = "大模型code", required = true)
     private String gptCode;
+
+    @ApiModelProperty(value = "功能code", required = true)
+    private String functionCode;
 
     @ApiModelProperty(value = "新建的对话的名字", required = true)
     private String chatName;
