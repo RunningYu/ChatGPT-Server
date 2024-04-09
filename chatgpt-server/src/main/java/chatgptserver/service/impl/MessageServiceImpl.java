@@ -97,9 +97,13 @@ public class MessageServiceImpl implements MessageService {
 //    }
 
     @Override
-    public List<ChatAO> chatCreateList(String userCode, String gptCode) {
-        log.info("MessageServiceImpl chatBoxList userCode:[{}], gptCode:[{}]", userCode, gptCode);
-        List<ChatPO> list = messageMapper.chatCreateList(userCode, gptCode);
+    public List<ChatAO> chatCreateList(String token, String gptCode) {
+        log.info("MessageServiceImpl chatCreateList token:[{}], gptCode:[{}]", token, gptCode);
+        String userCode = userService.getUserCodeByToken(token);
+        List<ChatPO> list = new ArrayList<>();
+        if (!"".equals(userCode)) {
+            list = messageMapper.chatCreateList(userCode, gptCode);
+        }
         List<ChatAO> response = new ArrayList<>();
         if (list.size() == 0) {
             // 创建默认的聊天
@@ -108,9 +112,12 @@ public class MessageServiceImpl implements MessageService {
             chatPO.setGptCode(gptCode);
             chatPO.setUserCode(userCode);
             Map<String, String> map = userService.createNewChat(chatPO);
+            String chatCode = map.get("chatCode");
             ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);
-            chatAO.setChatCode(map.get("chatCode"));
+            chatAO.setChatCode(chatCode);
             chatAO.setChatAmount(0);
+            chatAO.setLastChatTime(new Date());
+            chatAO.setCreateTime(new Date());
             response.add(chatAO);
             return response;
         }
@@ -120,6 +127,7 @@ public class MessageServiceImpl implements MessageService {
             ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);
             chatAO.setChatAmount(chatAmount);
             Date lastChatTime = messageMapper.getLastChatTime(chatPO.getChatCode());
+            lastChatTime = lastChatTime == null ? new Date() : lastChatTime;
             chatAO.setLastChatTime(lastChatTime);
             response.add(chatAO);
         }

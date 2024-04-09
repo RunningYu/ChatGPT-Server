@@ -40,4 +40,5 @@ public interface UserMapper {
     void chatDelete(String chatCode);
 
     List<ChatFunctionPO> gptChatFunctionList(String gptCode);
+
 }

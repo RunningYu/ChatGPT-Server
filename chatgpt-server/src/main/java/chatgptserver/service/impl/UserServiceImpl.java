@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
 
             return MD5Util.encrypt(email);
         } else {
-            throw new RuntimeException("邮箱格式错误！");
+            return "邮箱格式错误！";
         }
     }
 

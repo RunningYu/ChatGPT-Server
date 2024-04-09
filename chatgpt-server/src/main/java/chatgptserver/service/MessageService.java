@@ -19,5 +19,5 @@ public interface MessageService {
 
     void recordHistoryWithImage(String userCode, String chatCode, String imageUrl, String content, String totalResponse);
 
-    List<ChatAO> chatCreateList(String userCode, String gptCode);
+    List<ChatAO> chatCreateList(String token, String gptCode);
 }

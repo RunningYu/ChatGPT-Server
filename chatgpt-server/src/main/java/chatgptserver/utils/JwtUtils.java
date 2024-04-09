@@ -116,7 +116,7 @@ public class JwtUtils {
         // 获取有效载荷
         Claims claims = getClaimsFromToken(token);
         if (Objects.isNull(claims)) {
-            throw  new RuntimeException("token invalid");
+            throw new RuntimeException("token invalid");
         }
         // 解析token后，从有效载荷取出值
         String userCode = (String) claims.get("userCode");

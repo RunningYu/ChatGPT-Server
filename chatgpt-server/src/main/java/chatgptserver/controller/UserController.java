@@ -114,11 +114,9 @@ public class UserController {
     @ApiOperation("获取用户创建的聊天列表")
     @GetMapping("/chat/create/list")
     public JsonResult<List<ChatAO>> chatCreateList(HttpServletRequest httpServletRequest, @Param("gptCode") String gptCode) {
-        log.info("UserController chatCreateList gptCode:[{}]", gptCode);
         String token = httpServletRequest.getHeader("token");
-        UserPO userPO = jwtUtils.getUserFromToken(token);
-        log.info("UserController chatCreateList userPO:[{}]", userPO);
-        List<ChatAO> response = messageService.chatCreateList(userPO.getUserCode(), gptCode);
+        log.info("UserController chatCreateList token:[{}], gptCode:[{}]", token, gptCode);
+        List<ChatAO> response = messageService.chatCreateList(token, gptCode);
 
         return JsonResult.success(response);
     }

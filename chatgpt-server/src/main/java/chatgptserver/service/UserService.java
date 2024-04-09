@@ -32,4 +32,5 @@ public interface UserService {
     String getUserCodeByToken(String token);
 
     JsonResult gptChatFunctionList(String gptCode);
+
 }
