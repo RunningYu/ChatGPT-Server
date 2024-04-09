@@ -9,6 +9,27 @@ spring:
       max-file-size: 50MB     # 设置单个文件大小
       max-request-size: 50MB  # 设置单次请求文件的总大小
 
+##发送邮件配置
+## SMTP服务器的地址，这是QQ的，其他的邮箱要改一下
+##spring:
+#  mail:
+#    host=smtp.qq.com
+#  #发送方的邮箱
+#    username: 947219346@qq.com
+#  #这里刚刚获得的16位授权码
+#    password: sajjlydgkqttbajb
+#  # 设置是否需要认证，如果为true,那么用户名和密码就必须的，
+#  # 如果设置false，可以不设置用户名和密码，当然也得看你的对接的平台是否支持无密码进行访问的。
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#  # STARTTLS 是对纯文本通信协议的扩展。它提供一种方式将纯文本连接升级为加密连接（TLS或SSL），而不是另外使用一个端口作加密通信。
+#          starttls:
+#            enable: true
+#            required: true
+#    default-encoding: UTF-8
+
 
 #  jackson:
 #    date-format: yyyy-MM-dd HH:mm:ss

@@ -40,12 +40,15 @@ public class GPTConstants {
      * 【文本问答】
      * ERNIE-Bot-8K (有限免费，现在代充费状态)
      */
-    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_bot_8k?access_token=%s";
+//    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_bot_8k?access_token=%s";
+
     /**
      * 【文本问答】
      * Yi-34B-Chat (免费使用)
      */
 //    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/yi_34b_chat?access_token=%s";
+
+    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions";
 
     /**
      * 【图片生成】

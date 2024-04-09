@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.security.GeneralSecurityException;
 import java.util.*;
 
 /**
@@ -140,7 +142,12 @@ public class UserServiceImpl implements UserService {
             // 发邮件
             String verifyCode = MailUtil.createVerifyCode();
             log.info("UserServiceImpl sendEmailVerifyCode verifyCode:[{}]", verifyCode);
-            MailUtil.sendEmailMessage("ChatGPT集成平台注册验证码", email, verifyCode);
+//            MailUtil.sendEmailMessage("ChatGPT集成平台注册验证码", email, verifyCode);
+            try {
+                MailUtil.sendSimpleMail("ChatGPT集成平台注册验证码", email, verifyCode);
+            } catch (Exception e) {
+                return "发送邮件失败！";
+            }
 
             return MD5Util.encrypt(email);
         } else {

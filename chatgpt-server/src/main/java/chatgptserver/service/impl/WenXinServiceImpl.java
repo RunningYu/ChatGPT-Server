@@ -70,19 +70,19 @@ public class WenXinServiceImpl implements WenXinService {
             log.info("MessageServiceImpl getMessageFromWenXin url:[{}], accessToken:[{}]", url, accessTokenResponse.getAccess_token());
             String url1 = String.format(GPTConstants.WEN_XIN_ASK_URL, accessTokenResponse.getAccess_token());
             List<WenXinReqMessagesDTO> messagesList = new ArrayList<>();
-
-            List<MessagesPO> historyLis = messageMapper.getWenXinHistory(chatCode);
-            for (MessagesPO history : historyLis) {
-                WenXinReqMessagesDTO replication = new WenXinReqMessagesDTO();
-                replication.setRole(RoleTypeEnums.getRole(RoleTypeEnums.WEN_XIN_ASSISTANT.getType()));
-                replication.setContent(history.getReplication());
-                messagesList.add(0, replication);
-
-                WenXinReqMessagesDTO question = new WenXinReqMessagesDTO();
-                question.setRole(RoleTypeEnums.getRole(RoleTypeEnums.WEN_XIN_USER.getType()));
-                question.setContent(history.getQuestion());
-                messagesList.add(0, question);
-            }
+//
+//            List<MessagesPO> historyLis = messageMapper.getWenXinHistory(chatCode);
+//            for (MessagesPO history : historyLis) {
+//                WenXinReqMessagesDTO replication = new WenXinReqMessagesDTO();
+//                replication.setRole(RoleTypeEnums.getRole(RoleTypeEnums.WEN_XIN_ASSISTANT.getType()));
+//                replication.setContent(history.getReplication());
+//                messagesList.add(0, replication);
+//
+//                WenXinReqMessagesDTO question = new WenXinReqMessagesDTO();
+//                question.setRole(RoleTypeEnums.getRole(RoleTypeEnums.WEN_XIN_USER.getType()));
+//                question.setContent(history.getQuestion());
+//                messagesList.add(0, question);
+//            }
             WenXinReqMessagesDTO messagesDTO = new WenXinReqMessagesDTO();
             messagesDTO.setRole(RoleTypeEnums.getRole(1));
             messagesDTO.setContent(message);

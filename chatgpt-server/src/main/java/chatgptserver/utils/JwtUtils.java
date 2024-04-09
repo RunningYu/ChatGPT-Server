@@ -38,7 +38,7 @@ public class JwtUtils {
     /**
      * 过期时间 1 月
      */
-    private final long EXPIRATION_ONE_MONTH = 3600 * 24 * 30;
+    private final long EXPIRATION_ONE_MONTH = 1000 * 60 * 60 * 24 * 30L;
 
     /**
      * 生成Token
@@ -79,7 +79,8 @@ public class JwtUtils {
 
     public String createToken(UserPO user) {
         // 设置默认 1 月个 的过期时间
-        long expireTime = EXPIRATION_ONE_MONTH;
+//        long expireTime = EXPIRATION_ONE_MONTH;
+        long expireTime = 1000 * 60 * 60 * 24 * 30L;
 
         Map<String, Object> claims = new HashMap<>();
         // 自定义有效载荷部分, 将User实体类用户名和密码存储
