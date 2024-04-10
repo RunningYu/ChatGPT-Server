@@ -16,7 +16,4 @@ public class EmailTest {
     private MailUtil mailUtil;
 
 
-    //接收人
-    private static final String recipient = "947219346@qq.com";
-
 }
