@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String getUserCodeByToken(String token) {
-        String userCode = "";
+        String userCode = null;
         if (token != null && !"".equals(token)) {
             UserPO userPO = jwtUtils.getUserFromToken(token);
             userCode = userPO.getUserCode();

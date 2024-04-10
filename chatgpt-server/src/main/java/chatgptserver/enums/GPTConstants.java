@@ -17,13 +17,15 @@ public class GPTConstants {
     /**
      * 文本问答
      */
-    public static final String WEN_XIN_GET_ACCESS_TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s";
+//    public static final String WEN_XIN_GET_ACCESS_TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s";
 
-//    public static final String WEN_XIN_APP_ID = "46343402";
+    public static final String WEN_XIN_GET_ACCESS_TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token?client_id=%s&client_secret=%s&grant_type=client_credentials";
+
+//    public static final String WEN_XIN_APP_ID = "58299734";
 //
-//    public static final String WEN_XIN_API_KEY = "yyNK54os4e9jF3fadlT47mFV";
+//    public static final String WEN_XIN_API_KEY = "aHZkdH6mSkMz0q24rDSf655D";
 //
-//    public static final String WEN_XIN_SECRET_KEY = "Fb5T1AF8YiWrLEpQugmlHjew8zNuclVt";
+//    public static final String WEN_XIN_SECRET_KEY = "cVkrqCb5Z0KG5k9aqwsOgR9FX3wwICLs";
 
     public static final String WEN_XIN_APP_ID = "58299734";
 
@@ -46,15 +48,21 @@ public class GPTConstants {
      * 【文本问答】
      * Yi-34B-Chat (免费使用)
      */
-//    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/yi_34b_chat?access_token=%s";
+    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/yi_34b_chat?access_token=%s";
 
-    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions";
+//    public static final String WEN_XIN_ASK_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions";
 
     /**
      * 【图片生成】
      * Stable-Diffusion-XL
      */
-    public static final String WEN_XIN_IMAGE_CREATE_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/text2image/sd_xl?access_token=%S";
+    public static final String WEN_XIN_IMAGE_CREATE_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/text2image/sd_xl?access_token=%s";
+
+    /**
+     * 【图片理解】
+     *  Fuyu-8B(免费使用)
+     */
+    public static final String WEN_XIN_IMAGE_UNDERSTAND_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/image2text/fuyu_8b?access_token=";
 
     static {
         GPT_KEY_MAP.put(WEN_XIN_API_KEY_NAME, WEN_XIN_API_KEY);

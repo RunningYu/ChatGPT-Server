@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -59,6 +60,20 @@ public class WenXinYiYanController {
         String result = wenXinService.wxImageCreate(tokenUser.getUserCode(), chatCode, content);
 
         return JsonResult.success(result);
+    }
+
+    @ApiOperation("文心一言：图片理解")
+    @GetMapping("/chat/wenXin/image/understand")
+    public JsonResult wenXinImageUnderstand(HttpServletRequest httpServletRequest,
+                                            @RequestParam("image") MultipartFile image,
+                                            @RequestParam("chatCode") String chatCode,
+                                            @RequestParam("content") String content) {
+        log.info("WenXinYiYanController wenXinImageUnderstand chatCode:[{}], image:[{}], content:[{}]", chatCode, image, content);
+        String token = httpServletRequest.getHeader("token");
+        log.info("WenXinYiYanController wenXinImageUnderstand token:[{}]", token);
+        JsonResult response = wenXinService.wenXinImageUnderstand(token, chatCode, image, content);
+
+        return response;
     }
 
 

@@ -1,9 +1,8 @@
 package chatgptserver.service;
 
 
+import chatgptserver.bean.ao.JsonResult;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 /**
  * @Author：chenzhenyu
@@ -15,4 +14,5 @@ public interface WenXinService {
 
     String wxImageCreate(String userCode, String chatCode, String content);
 
+    JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content);
 }
