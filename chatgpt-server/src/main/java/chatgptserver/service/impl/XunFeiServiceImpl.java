@@ -276,7 +276,7 @@ public class XunFeiServiceImpl implements XunFeiService {
         boolean flag = true;
         List<MessagesPO> historyList = new ArrayList<>();
         if (requestAO.getUserCode() != null && !"".equals(requestAO.getUserCode())) {
-            messageMapper.getWenXinHistory(requestAO.getChatCode());
+            historyList = messageMapper.getWenXinHistory(requestAO.getChatCode());
         }
         try {
             // 构建鉴权url
