@@ -16,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import java.security.GeneralSecurityException;
 import java.util.*;
 
 /**
@@ -177,6 +175,13 @@ public class UserServiceImpl implements UserService {
         List<ChatFunctionPO> list = userMapper.gptChatFunctionList(gptCode);
 
         return JsonResult.success(list);
+    }
+
+    @Override
+    public JsonResult userInfo(String userCode) {
+
+
+        return null;
     }
 
 }

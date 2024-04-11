@@ -56,13 +56,22 @@ public class UserController {
         return JsonResult.success(verifyCode);
     }
 
-//    @ApiOperation("通过token")
-//    @PostMapping("/getUserInfoByToken")
-//    public JsonResult getUserInfoByToken(@RequestBody TokenAO token) {
-//        log.info("userController getUserInfoByToken token:{}", token);
-//        JsonResult jsonResult = userService.getUserInfoByToken(token.getToken());
-//        return jsonResult;
-//    }
+    @ApiOperation("通过token")
+    @PostMapping("/user/info")
+    public JsonResult userInfo(HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("userController userInfo token:[{}]", token);
+        if (token == null || "".equals(token)) {
+            return JsonResult.error("请先登录");
+        }
+        String userCode = userService.getUserCodeByToken(token);
+        if (userCode == null) {
+            return JsonResult.error("token失效或国企");
+        }
+        JsonResult response = userService.userInfo(userCode);
+
+        return response;
+    }
 
 
 //    @ApiOperation("新建聊天")

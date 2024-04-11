@@ -31,4 +31,7 @@ public class MessagesResponseAO {
     @ApiModelProperty("聊天名称")
     private String chatName;
 
+    @ApiModelProperty("功能类型")
+    private String functionCode;
+
 }

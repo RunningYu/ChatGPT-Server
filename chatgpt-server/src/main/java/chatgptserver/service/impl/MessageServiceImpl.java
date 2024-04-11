@@ -171,7 +171,7 @@ public class MessageServiceImpl implements MessageService {
         }
         int total = messageMapper.getToalMessages(chatCode);
         boolean hasMore = (startIndex + size) < total ? true : false;
-        MessagesResponseAO response = new MessagesResponseAO(list, total, hasMore, chat.getChatName());
+        MessagesResponseAO response = new MessagesResponseAO(list, total, hasMore, chat.getChatName(), chat.getFunctionCode());
 
         return response;
     }

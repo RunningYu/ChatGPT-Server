@@ -33,4 +33,5 @@ public interface UserService {
 
     JsonResult gptChatFunctionList(String gptCode);
 
+    JsonResult userInfo(String userCode);
 }
