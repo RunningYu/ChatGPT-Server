@@ -48,7 +48,7 @@ public class MessageServiceImpl implements MessageService {
         log.info("MessageServiceImpl recordHistory userCode:[{}], chatCode:[{}], message:[{}], result:[{}]", userCode, chatCode, message, result);
         String userName = "";
         ChatPO target = userMapper.getChatByCode(chatCode);
-        if (!userCode.equals("")) {
+        if (userCode != null && !userCode.equals("")) {
             UserPO sender = userMapper.getUserByCode(userCode);
             userName = sender.getUsername();
         } else {
@@ -101,7 +101,7 @@ public class MessageServiceImpl implements MessageService {
         log.info("MessageServiceImpl chatCreateList token:[{}], gptCode:[{}], functionCode:[{}]", token, gptCode, functionCode);
         String userCode = userService.getUserCodeByToken(token);
         List<ChatPO> list = new ArrayList<>();
-        if (!"".equals(userCode)) {
+        if (userCode != null && !"".equals(userCode)) {
             list = messageMapper.chatCreateList(userCode, gptCode, functionCode);
         }
         List<ChatAO> response = new ArrayList<>();
@@ -112,6 +112,7 @@ public class MessageServiceImpl implements MessageService {
             chatPO.setGptCode(gptCode);
             chatPO.setUserCode(userCode);
             chatPO.setFunctionCode(functionCode);
+            chatPO.setFunctionCode("function_1");
             Map<String, String> map = userService.createNewChat(chatPO);
             String chatCode = map.get("chatCode");
             ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);
@@ -152,12 +153,14 @@ public class MessageServiceImpl implements MessageService {
         log.info("MessageServiceImpl historyList chatCode:[{}], page:[{}], size:[{}]", chatCode, page, size);
         page = (page > 0 ? page : 1);
         int startIndex = (page - 1) * size;
+        ChatPO chat = userMapper.getChatByCode(chatCode);
         List<MessagesPO> historyList = messageMapper.getHistoryList(chatCode, startIndex, size);
         if (Objects.isNull(historyList) || historyList.size() == 0) {
-            return null;
+            MessagesResponseAO response = buildDefaultResponse(chat.getChatName(), chat.getFunctionCode());
+
+            return response;
         }
         List<MessagesAO> list = new ArrayList<>();
-        ChatPO chat = userMapper.getChatByCode(chatCode);
         UserPO user = userMapper.getUserByCode(historyList.get(0).getUserCode());
         GptPO gpt = gptMapper.getGptByCode(chat.getGptCode());
         String headshot = gpt.getHeadshot();
@@ -172,6 +175,17 @@ public class MessageServiceImpl implements MessageService {
         int total = messageMapper.getToalMessages(chatCode);
         boolean hasMore = (startIndex + size) < total ? true : false;
         MessagesResponseAO response = new MessagesResponseAO(list, total, hasMore, chat.getChatName(), chat.getFunctionCode());
+
+        return response;
+    }
+
+    public MessagesResponseAO buildDefaultResponse(String chatName, String functionCode) {
+        MessagesResponseAO response = new MessagesResponseAO();
+        response.setChatName(chatName);
+        response.setHasMore(false);
+        response.setFunctionCode(functionCode);
+        response.setTotal(0);
+        response.setList(new ArrayList<>());
 
         return response;
     }

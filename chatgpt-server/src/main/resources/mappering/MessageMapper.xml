@@ -28,8 +28,22 @@
         select * from tb_chatgpt_messages where chat_code = #{chatCode} and image != '0' order by create_time DESC limit 0, 1
     </select>
 
+<!--    &#45;&#45;         select * from tb_chatgpt_chat where user_code = #{userCode} and gpt_code = #{gptCode} and function_code = #{functionCode} and is_delete = 0-->
     <select id="chatCreateList" resultType="chatgptserver.bean.po.ChatPO">
-        select * from tb_chatgpt_chat where user_code = #{userCode} and gpt_code = #{gptCode} and function_code = #{functionCode} and is_delete = 0
+        select *
+        from tb_chatgpt_chat
+        <where>
+            <if test="userCode != null">
+                and user_code = #{userCode}
+            </if>
+            <if test="gptCode != null">
+                and gpt_code = #{gptCode}
+            </if>
+            <if test="functionCode != null">
+                and function_code = #{functionCode}
+            </if>
+            and is_delete = 0
+        </where>
     </select>
 
     <select id="getChatAmount" resultType="java.lang.Integer">
