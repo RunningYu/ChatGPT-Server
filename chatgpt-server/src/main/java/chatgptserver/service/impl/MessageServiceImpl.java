@@ -149,6 +149,29 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public MessagesAO buildMessageAO(String userCode, String chatCode, String content, String totalResponse) {
+        MessagesAO response = new MessagesAO();
+        response.setQuestion(content);
+        response.setReplication(totalResponse);
+        if (userCode != null) {
+            response.setUserCode(userCode);
+            UserPO userPO = userService.getUserByCode(userCode);
+            response.setUsername(userPO.getUsername());
+            response.setUserHeadshot(userPO.getHeadshot());
+        }
+        ChatPO chat = userMapper.getChatByCode(chatCode);
+        response.setChatName(chat.getChatName());
+        GptPO gptPO = gptMapper.getGptByCode(chat.getGptCode());
+        if (!Objects.isNull(gptPO)) {
+            response.setChatHeadshot(gptPO.getHeadshot());
+        }
+        response.setChatCode(chatCode);
+        response.setCreateTime(new Date());
+
+        return response;
+    }
+
+    @Override
     public MessagesResponseAO historyList(String chatCode, int page, int size) {
         log.info("MessageServiceImpl historyList chatCode:[{}], page:[{}], size:[{}]", chatCode, page, size);
         page = (page > 0 ? page : 1);

@@ -2,6 +2,7 @@ package chatgptserver.controller;
 
 import chatgptserver.Common.SseUtils;
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
@@ -112,9 +113,9 @@ public class XunFeiXingHuoController {
         log.info("ChatGptController xfPictureUnderstand token:[{}]", token);
         log.info("ChatGptController xfPictureUnderstand token:[{}], image:[{}], content[{}], chatCode:[{}]", token, image, content, chatCode);
         Long threadId = Thread.currentThread().getId();
-        String response = xunFeiService.xfImageUnderstand(threadId, image, content, token, chatCode);
+        JsonResult response = xunFeiService.xfImageUnderstand(threadId, image, content, token, chatCode);
 
-        return JsonResult.success(response);
+        return response;
     }
 
     @ApiOperation("讯飞星火：图片生成")
@@ -150,7 +151,7 @@ public class XunFeiXingHuoController {
         request.setUserCode(userCode);
         log.info("ChatGptController xfQuestion userCode:[{}], request:[{}]", userCode, request);
         Long threadId = Thread.currentThread().getId();
-        String response = xunFeiService.xfQuestion(threadId, request);
+        MessagesAO response = xunFeiService.xfQuestion(threadId, request);
 
         return JsonResult.success(response);
     }
@@ -161,9 +162,9 @@ public class XunFeiXingHuoController {
                                   @Param("content") String content, @Param("chatCode") String chatCode) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfPptCreate token:[{}], content:[{}], chatCode:[{}]", token, content, chatCode);
-        String response = xunFeiService.xfPptCreate(content, token, chatCode);
+        JsonResult response = xunFeiService.xfPptCreate(content, token, chatCode);
 
-        return JsonResult.success(response);
+        return response;
     }
 
 

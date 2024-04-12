@@ -13,7 +13,7 @@
     </select>
 
     <select id="getHistoryList" resultType="chatgptserver.bean.po.MessagesPO">
-        select * from tb_chatgpt_messages where chat_code = #{chatCode} order by id DESC limit #{startIndex}, #{size}
+        select * from tb_chatgpt_messages where chat_code = #{chatCode} order by id ASC limit #{startIndex}, #{size}
     </select>
 
     <select id="getToalMessages" resultType="java.lang.Integer">

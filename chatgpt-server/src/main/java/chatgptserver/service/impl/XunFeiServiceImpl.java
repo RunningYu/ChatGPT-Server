@@ -3,6 +3,7 @@ package chatgptserver.service.impl;
 import chatgptserver.Common.ImageUtil;
 import chatgptserver.Common.SseUtils;
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.*;
@@ -11,9 +12,11 @@ import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ProgressResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.ImageResponse;
+import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.MessageMapper;
+import chatgptserver.dao.UserMapper;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
 import chatgptserver.service.UserService;
@@ -59,6 +62,9 @@ import static chatgptserver.enums.GPTConstants.XF_XH_API_SECRET_KEY;
 public class XunFeiServiceImpl implements XunFeiService {
 
     @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -81,7 +87,7 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：图片理解
      */
     @Override
-    public String xfImageUnderstand(Long threadId, MultipartFile image, String content, String token, String chatCode) {
+    public JsonResult xfImageUnderstand(Long threadId, MultipartFile image, String content, String token, String chatCode) {
         log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}], token:[{}], chatCode:[{}]", threadId, image, content, token, chatCode);
         XunFeiUtils.imageUnderstandFlagMap.put(threadId, false);
         XunFeiUtils.imageUnderstandResponseMap.put(threadId, "");
@@ -110,9 +116,11 @@ public class XunFeiServiceImpl implements XunFeiService {
                     log.info("XunFeiServiceImpl xfImageUnderstand totalResponse:[{}]", totalResponse);
                     UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
                     String userCode = userService.getUserCodeByToken(token);
+                    MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, totalResponse);
+                    response.setImage(uploadResponse.getMinIoUrl());
                     messageService.recordHistoryWithImage(userCode, chatCode, uploadResponse.getMinIoUrl(), content, totalResponse);
 
-                    return totalResponse;
+                    return JsonResult.success(response);
                 }
             }
         } catch (Exception e) {
@@ -122,7 +130,7 @@ public class XunFeiServiceImpl implements XunFeiService {
     }
 
     @Override
-    public String xfPptCreate(String content, String token, String chatCode) {
+    public JsonResult xfPptCreate(String content, String token, String chatCode) {
         log.info("XunFeiServiceImpl xfImageUnderstand content:[{}], token:[{}], chatCode:[{}]", content, token, chatCode);
         String pptUrl = "";
         String userCode = userService.getUserCodeByToken(token);
@@ -207,9 +215,10 @@ public class XunFeiServiceImpl implements XunFeiService {
                     Thread.sleep(5000);
                 }
             }
+            MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, pptUrl);
             messageService.recordHistory(userCode, chatCode, content, pptUrl);
 
-            return pptUrl;
+            return JsonResult.success(responseAO);
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -258,21 +267,23 @@ public class XunFeiServiceImpl implements XunFeiService {
             throw new RuntimeException("条用通义千问图片生成接口异常！");
         }
         String userCode = userService.getUserCodeByToken(token);
+        MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, imageUrl);
         // 保存聊天记录
         messageService.recordHistory(userCode, chatCode, content, imageUrl);
 
-        return JsonResult.success(imageUrl);
+        return JsonResult.success(response);
     }
 
     /**
      * 讯飞星火：文本问答
      */
     @Override
-    public String xfQuestion(Long threadId, QuestionRequestAO requestAO) {
+    public MessagesAO xfQuestion(Long threadId, QuestionRequestAO requestAO) {
         log.info("XunFeiServiceImpl xfQuestion threadId:[{}], requestAO:[{}]", threadId, requestAO);
         String totalResponse = "";
         XunFeiUtils.questionFlagMap.put(threadId, false);
         XunFeiUtils.questionTotalResponseMap.put(threadId, "");
+        MessagesAO response = new MessagesAO();
         boolean flag = true;
         List<MessagesPO> historyList = new ArrayList<>();
         if (requestAO.getUserCode() != null && !"".equals(requestAO.getUserCode())) {
@@ -298,13 +309,15 @@ public class XunFeiServiceImpl implements XunFeiService {
             } else {
                 totalResponse = XunFeiUtils.questionTotalResponseMap.get(threadId);
                 log.info("XunFeiServiceImpl xfQuestion totalResponse:[{}]", totalResponse);
+                response = messageService.buildMessageAO(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse);
+                log.info("XunFeiServiceImpl xfQuestion response:[{}]", response);
                 messageService.recordHistory(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse);
 
                 break;
             }
         }
 
-        return totalResponse;
+        return response;
     }
 
     public static String getPicAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {
