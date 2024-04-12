@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface WenXinService {
 
-    String getMessageFromWenXin(String userCode, String chatCode, String message);
+    JsonResult getMessageFromWenXin(String userCode, String chatCode, String message);
 
     String wxImageCreate(String userCode, String chatCode, String content);
 

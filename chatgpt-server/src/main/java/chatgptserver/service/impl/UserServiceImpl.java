@@ -3,10 +3,8 @@ package chatgptserver.service.impl;
 import chatgptserver.Common.MailUtil;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
-import chatgptserver.bean.po.ChatFunctionPO;
-import chatgptserver.bean.po.ChatPO;
-import chatgptserver.bean.po.UserFeedbackPO;
-import chatgptserver.bean.po.UserPO;
+import chatgptserver.bean.po.*;
+import chatgptserver.dao.GptMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
@@ -25,6 +23,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private GptMapper gptMapper;
 
     @Autowired
     private Cache<String, Object> caffeineCache;
@@ -173,8 +174,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public JsonResult gptChatFunctionList(String gptCode) {
         List<ChatFunctionPO> list = userMapper.gptChatFunctionList(gptCode);
+        List<ChatFunctionAO> response = new ArrayList<>();
+        GptPO gptPO = gptMapper.getGptByCode(gptCode);
+        for (ChatFunctionPO chatFunctionPO : list) {
+            ChatFunctionAO chatFunctionAO = ConvertMapping.chatFunctionPO2ChatFunctionAO(chatFunctionPO);
+            chatFunctionAO.setGptName(gptPO.getGptName());
+            response.add(chatFunctionAO);
 
-        return JsonResult.success(list);
+        }
+
+        return JsonResult.success(response);
     }
 
     @Override

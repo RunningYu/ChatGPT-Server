@@ -1,6 +1,7 @@
 package chatgptserver.controller;
 
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.service.UserService;
 import chatgptserver.service.WenXinService;
@@ -33,17 +34,16 @@ public class WenXinYiYanController {
     private UserService userService;
 
     @ApiOperation("文心一言：文本问答")
-    @GetMapping("/chat/wenXin/question")
+    @PostMapping("/chat/wenXin/question")
     public JsonResult wenXinChat(HttpServletRequest httpServletRequest,
-                                 @Param("chatCode") String chatCode,
-                                 @Param("content") String content) {
+                                 @RequestBody QuestionRequestAO requestAO) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController wenXinChat token:[{}]", token);
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("WenXinYiYanController wenXinChat userCode:[{}] chatCode:[{}] content:[{}]", tokenUser, chatCode, content);
-        String result = wenXinService.getMessageFromWenXin(tokenUser.getUserCode(), chatCode, content);
+        String userCode = userService.getUserCodeByToken(token);
+        log.info("WenXinYiYanController wenXinChat requestAO:[{}]", requestAO);
+        JsonResult response = wenXinService.getMessageFromWenXin(userCode, requestAO.getChatCode(), requestAO.getContent());
 
-        return JsonResult.success(result);
+        return response;
     }
 
     /**

@@ -193,7 +193,7 @@ public class MessageServiceImpl implements MessageService {
             messagesAO.setChatHeadshot(headshot);
             messagesAO.setChatName(chat.getChatName());
             messagesAO.setUsername(user.getUsername());
-            list.add(messagesAO);
+            list.add(0, messagesAO);
         }
         int total = messageMapper.getToalMessages(chatCode);
         boolean hasMore = (startIndex + size) < total ? true : false;

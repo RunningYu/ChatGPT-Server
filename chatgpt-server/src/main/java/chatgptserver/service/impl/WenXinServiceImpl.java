@@ -3,6 +3,7 @@ package chatgptserver.service.impl;
 import chatgptserver.Common.FileUtil;
 import chatgptserver.Common.ImageUtil;
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.WenXin.*;
 import chatgptserver.bean.dto.WenXin.imageCreate.WenXinImageResponse;
@@ -40,13 +41,13 @@ import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
 public class WenXinServiceImpl implements WenXinService {
 
     @Autowired
+    private MessageService messageService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
     private MinioUtil minioUtil;
-
-    @Autowired
-    private MessageService messageService;
 
     @Autowired
     private UserMapper userMapper;
@@ -58,7 +59,7 @@ public class WenXinServiceImpl implements WenXinService {
     private OkHttpService okHttpService;
 
     @Override
-    public String getMessageFromWenXin(String userCode, String chatCode, String message) {
+    public JsonResult getMessageFromWenXin(String userCode, String chatCode, String message) {
         log.info("MessageServiceImpl getMessageFromWenXin");
         String url = String.format(GPTConstants.WEN_XIN_GET_ACCESS_TOKEN_URL, GPT_KEY_MAP.get(GPTConstants.WEN_XIN_API_KEY_NAME), GPT_KEY_MAP.get(GPTConstants.WEN_XIN_SECRET_KEY_NAME));
 
@@ -97,7 +98,9 @@ public class WenXinServiceImpl implements WenXinService {
 
             messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult());
             String response = ( (wenXinRspDTO.getResult() == null || wenXinRspDTO.getResult().equals("")) ? "[没有生成相应的结果]" : wenXinRspDTO.getResult() );
-            return response;
+            MessagesAO messagesAO = messageService.buildMessageAO(userCode, chatCode, message, response);
+
+            return JsonResult.success(messagesAO);
         } catch (Exception e) {
             throw new RuntimeException();
         }
