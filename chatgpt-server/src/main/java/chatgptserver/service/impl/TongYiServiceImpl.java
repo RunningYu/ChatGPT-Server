@@ -59,6 +59,7 @@ public class TongYiServiceImpl implements TongYiService {
             UserPO userPO = jwtUtils.getUserFromToken(token);
             userCode = userPO.getUserCode();
         }
+        // 构建多轮对话请求体
         TongYiImageUnderStandRequestDTO request = buildTongYiImageUnderstandRequestDTO(chatCode, imageUrl, content);
         log.info("WenXinServiceImpl tyImageUnderstand request:[{}]", request);
         String responseStr = "";

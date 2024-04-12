@@ -104,7 +104,7 @@ public class XunFeiXingHuoController {
 //    }
 
     @ApiOperation("讯飞星火：图片理解")
-    @GetMapping("/chat/xf/image/understander")
+    @PostMapping("/chat/xf/image/understander")
     public JsonResult xfImageUnderstand(HttpServletRequest httpServletRequest,
                                         @RequestParam("image") MultipartFile image,
                                         @RequestParam("content") String content,
@@ -119,13 +119,12 @@ public class XunFeiXingHuoController {
     }
 
     @ApiOperation("讯飞星火：图片生成")
-    @GetMapping("/chat/xf/image/create")
+    @PostMapping("/chat/xf/image/create")
     public JsonResult xfImageCreate(HttpServletRequest httpServletRequest,
-                                    @Param("content") String content,
-                                    @Param("chatCode") String chatCode) {
+                                    @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
-        log.info("ChatGptController xfImageCreate token:[{}], content:[{}], chatCode:[{}]", token, content, chatCode);
-        JsonResult response = xunFeiService.xfImageCreate(content, token, chatCode);
+        log.info("ChatGptController xfImageCreate token:[{}], request:[{}]", token, request);
+        JsonResult response = xunFeiService.xfImageCreate(request.getContent(), token, request.getChatCode());
 
         return response;
     }
