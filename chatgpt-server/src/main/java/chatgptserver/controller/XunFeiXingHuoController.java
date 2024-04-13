@@ -156,12 +156,12 @@ public class XunFeiXingHuoController {
     }
 
     @ApiOperation("讯飞星火：PPT生成")
-    @GetMapping("/chat/xf/ppt/create")
+    @PostMapping("/chat/xf/ppt/create")
     public JsonResult xfPptCreate(HttpServletRequest httpServletRequest,
-                                  @Param("content") String content, @Param("chatCode") String chatCode) {
+                                  @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
-        log.info("ChatGptController xfPptCreate token:[{}], content:[{}], chatCode:[{}]", token, content, chatCode);
-        JsonResult response = xunFeiService.xfPptCreate(content, token, chatCode);
+        log.info("ChatGptController xfPptCreate token:[{}], request:[{}]", token, request);
+        JsonResult response = xunFeiService.xfPptCreate(request.getContent(), token, request.getChatCode());
 
         return response;
     }

@@ -1,6 +1,7 @@
 package chatgptserver.controller;
 
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.service.TongYiService;
 import chatgptserver.service.UserService;
@@ -10,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,13 +35,12 @@ public class TongYiQianWenController {
     private UserService userService;
 
     @ApiOperation("通义千问：文本问答")
-    @GetMapping("/chat/tongYi/question")
+    @PostMapping("/chat/tongYi/question")
     public JsonResult tongYiQuestion(HttpServletRequest httpServletRequest,
-                                 @Param("chatCode") String chatCode,
-                                 @Param("content") String content) {
+                                     @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
-        log.info("WenXinYiYanController tongYiQuestion token:[{}], chatCode:[{}] content:[{}]", token, chatCode, content);
-        String result = tongYiService.tyQuestion(token, chatCode, content);
+        log.info("WenXinYiYanController tongYiQuestion token:[{}], request:[{}]", token, request);
+        String result = tongYiService.tyQuestion(token, request.getChatCode(), request.getContent());
 
         return JsonResult.success(result);
     }
@@ -65,15 +62,14 @@ public class TongYiQianWenController {
      * todo：模型申请ing，待审核通过再进行接口测试
      */
     @ApiOperation("通义千问：图片生成")
-    @GetMapping("/chat/tongYi/image/create")
+    @PostMapping("/chat/tongYi/image/create")
     public JsonResult tongYiImageCreate(HttpServletRequest httpServletRequest,
-                                        @Param("content") String content,
-                                        @Param("chatCode") String chatCode) {
+                                        @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("WenXinYiYanController tongYiImageUnderstand token:[{}]", token);
-        UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("WenXinYiYanController tongYiImageCreate content:[{}], tokenUser:[{}], chatCode:[{}]", content, tokenUser, chatCode);
-        String response = tongYiService.tyImageCreate(tokenUser.getUserCode(), chatCode, content);
+        String userCode = userService.getUserCodeByToken(token);
+        log.info("WenXinYiYanController tongYiImageCreate userCode:[{}], request:[{}]", userCode, request);
+        String response = tongYiService.tyImageCreate(userCode, request.getChatCode(), request.getContent());
 
         return JsonResult.success();
     }

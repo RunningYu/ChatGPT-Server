@@ -46,24 +46,21 @@ public class WenXinYiYanController {
         return response;
     }
 
-    /**
-     * todo: 开源接口欠费，未测试完
-     */
     @ApiOperation("文心一言：图片生成")
-    @GetMapping("/chat/wenXin/image/create")
+    @PostMapping("/chat/wenXin/image/create")
     public JsonResult wenXinImageCreate(HttpServletRequest httpServletRequest,
-                                        @Param("chatCode") String chatCode, @Param("content") String content) {
+                                        @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("WenXinYiYanController wenXinImageCreate token:[{}]", token);
         UserPO tokenUser = jwtUtils.getUserFromToken(token);
-        log.info("WenXinYiYanController wenXinImageCreate tokenUser:[{}] chatCode:[{}] content:[{}]", tokenUser, chatCode, content);
-        String result = wenXinService.wxImageCreate(tokenUser.getUserCode(), chatCode, content);
+        log.info("WenXinYiYanController wenXinImageCreate tokenUser:[{}] request:[{}]", tokenUser, request);
+        String result = wenXinService.wxImageCreate(tokenUser.getUserCode(), request.getChatCode(), request.getContent());
 
         return JsonResult.success(result);
     }
 
     @ApiOperation("文心一言：图片理解")
-    @GetMapping("/chat/wenXin/image/understand")
+    @PostMapping("/chat/wenXin/image/understand")
     public JsonResult wenXinImageUnderstand(HttpServletRequest httpServletRequest,
                                             @RequestParam("image") MultipartFile image,
                                             @RequestParam("chatCode") String chatCode,
