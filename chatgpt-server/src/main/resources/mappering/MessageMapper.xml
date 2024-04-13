@@ -43,6 +43,7 @@
             </if>
             and is_delete = 0
         </where>
+        order by create_time DESC
     </select>
 
     <select id="getChatAmount" resultType="java.lang.Integer">

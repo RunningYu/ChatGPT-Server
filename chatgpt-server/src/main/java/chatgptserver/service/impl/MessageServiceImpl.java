@@ -133,16 +133,16 @@ public class MessageServiceImpl implements MessageService {
             chatAO.setLastChatTime(lastChatTime);
             response.add(chatAO);
         }
-        // 根据时间排序
-        for(int i = 0; i < response.size() - 1; i++) {
-            for(int j = 0; j < response.size() - 1 - i; j ++) {
-                if(response.get(j).getLastChatTime().compareTo(response.get(j + 1).getLastChatTime()) < 0) {
-                    ChatAO temp = response.get(j);
-                    response.set(j, response.get(j + 1));
-                    response.set(j + 1, temp);
-                }
-            }
-        }
+//        // 根据时间排序
+//        for(int i = 0; i < response.size() - 1; i++) {
+//            for(int j = 0; j < response.size() - 1 - i; j ++) {
+//                if(response.get(j).getLastChatTime().compareTo(response.get(j + 1).getLastChatTime()) < 0) {
+//                    ChatAO temp = response.get(j);
+//                    response.set(j, response.get(j + 1));
+//                    response.set(j + 1, temp);
+//                }
+//            }
+//        }
         log.info("MessageServiceImpl chatBoxList response:[{}]", response);
 
         return response;
