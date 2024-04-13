@@ -4,6 +4,7 @@ import chatgptserver.bean.dto.WenXin.ImageFlagDTO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.enums.GPTConstants;
+import chatgptserver.service.MessageService;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,6 +26,9 @@ import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
 class ChatgptServerApplicationTests {
 
     ThreadLocal<Boolean> flagLocal = new ThreadLocal<>();
+
+    @Autowired
+    private MessageService messageService;
 
     @Autowired
     private MessageMapper messageMapper;
@@ -103,6 +107,11 @@ class ChatgptServerApplicationTests {
 
         // System.err.println(httpUrl.toString());
         return httpUrl.toString();
+    }
+
+    @Test
+    public void test2() {
+        messageService.recordHistoryWithReplyImage("", "1111", "1111", "22", "12124");
     }
 
 }

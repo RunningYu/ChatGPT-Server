@@ -172,6 +172,21 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public void recordHistoryWithReplyImage(String userCode, String chatCode, String content, String replication, String replyImage) {
+        log.info("MessageServiceImpl recordHistoryWithReplyImage userCode:[{}], chatCode:[{}], content:[{}], result:[{}], replyImage:[{}]", userCode, chatCode, content, replication, replyImage);
+        MessagesPO messagesPO = new MessagesPO();
+        messagesPO.setRole(RoleTypeEnums.WEN_XIN_USER.getType());
+        messagesPO.setUserCode(userCode);
+        chatCode = ((userCode != null && !userCode.equals("")) ? chatCode : ("x_" + chatCode));
+        messagesPO.setChatCode(chatCode);
+        messagesPO.setQuestion(content);
+        messagesPO.setReplication(replication);
+        messagesPO.setReplyImage(replyImage);
+
+        messageMapper.insertMessage(messagesPO);
+    }
+
+    @Override
     public MessagesResponseAO historyList(String chatCode, int page, int size) {
         log.info("MessageServiceImpl historyList chatCode:[{}], page:[{}], size:[{}]", chatCode, page, size);
         page = (page > 0 ? page : 1);

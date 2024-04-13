@@ -21,4 +21,6 @@ public interface MessageService {
     List<ChatAO> chatCreateList(String token, String gptCode, String functionCode);
 
     MessagesAO buildMessageAO(String userCode, String chatCode, String content, String totalResponse);
+
+    void recordHistoryWithReplyImage(String userCode, String chatCode, String content, String replication, String replyImage);
 }

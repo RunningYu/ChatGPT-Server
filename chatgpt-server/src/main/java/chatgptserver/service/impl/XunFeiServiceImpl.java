@@ -12,6 +12,7 @@ import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ProgressResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.ImageResponse;
+import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptCoverResponseDTO;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.bean.po.UserPO;
@@ -131,8 +132,8 @@ public class XunFeiServiceImpl implements XunFeiService {
 
     @Override
     public JsonResult xfPptCreate(String content, String token, String chatCode) {
-        log.info("XunFeiServiceImpl xfImageUnderstand content:[{}], token:[{}], chatCode:[{}]", content, token, chatCode);
-        String pptUrl = "";
+        log.info("XunFeiServiceImpl xfPptCreate content:[{}], token:[{}], chatCode:[{}]", content, token, chatCode);
+        String pptUrl = "", coverImgSrc = "";
         String userCode = userService.getUserCodeByToken(token);
         // 输入个人appId
         String appId = GPTConstants.GPT_KEY_MAP.get(GPTConstants.XF_XH_APPID_KEY);
@@ -150,12 +151,18 @@ public class XunFeiServiceImpl implements XunFeiService {
         try {
             // 查询PPT模板信息
             String templateResult = client.getTemplateList(appId, ts, signature);
-            System.out.println(templateResult);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+            log.info("XunFeiServiceImpl xfPptCreate templateResult:[{}]", templateResult);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
 
             // 发送生成PPT请求
             String query = content;
-            String resp = client.createPPT(appId, ts, signature,query);
-            System.out.println(resp);
+            String resp = client.createPPT(appId, ts, signature, query);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+            log.info("XunFeiServiceImpl xfPptCreate resp:[{}]", resp);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+            PptCoverResponseDTO coverRes = JSON.parseObject(resp, PptCoverResponseDTO.class);
+            coverImgSrc = coverRes.getData().getCoverImgSrc();
             CreateResponse response = JSON.parseObject(resp, CreateResponse.class);
 
             // 利用sid查询PPT生成进度
@@ -165,7 +172,7 @@ public class XunFeiServiceImpl implements XunFeiService {
                 String progressResult = client.checkProgress(appId, ts, signature, response.getData().getSid());
                 progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
                 progress = progressResponse.getData().getProcess();
-                System.out.println(progressResult);
+                System.out.println("-->" + progressResult);
 
                 if (progress < 100) {
                     Thread.sleep(5000);
@@ -178,14 +185,25 @@ public class XunFeiServiceImpl implements XunFeiService {
             System.out.println(outlineResp);
             CreateResponse outlineResponse = JSON.parseObject(outlineResp, CreateResponse.class);
             System.out.println("生成的大纲如下：");
-            System.out.println(outlineResponse.getData().getOutline());
+//            System.out.println(outlineResponse.getData().getOutline());
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+            log.info("XunFeiServiceImpl xfPptCreate Outline:[{}]", outlineResponse.getData().getOutline());
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+
 
             // 基于sid和大纲生成ppt
             String sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
-            System.out.println(sidResp);
+//            System.out.println(sidResp);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+            log.info("XunFeiServiceImpl xfPptCreate sidResp1:[{}]", sidResp);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
             CreateResponse sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
             sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
             System.out.println(sidResp);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+            log.info("XunFeiServiceImpl xfPptCreate sidResp2:[{}]", sidResp);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+
             sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
             // 利用sid查询PPT生成进度
             progress = 0;
@@ -193,15 +211,18 @@ public class XunFeiServiceImpl implements XunFeiService {
                 String progressResult = client.checkProgress(appId, ts, signature, sidResponse.getData().getSid());
                 progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
                 progress = progressResponse.getData().getProcess();
-                System.out.println(progressResult);
+                System.out.println("-->" + progressResult);
                 if (progress < 100) {
                     Thread.sleep(5000);
-                } 
+                }
             }
 
             // 基于大纲生成ppt
             String pptResp = client.createPptByOutline(appId, ts, signature, outlineQuery, outlineResponse.getData().getOutline());
-            System.out.println(pptResp);
+//            System.out.println(pptResp);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+            log.info("XunFeiServiceImpl xfPptCreate pptResp:[{}]", pptResp);
+            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
             CreateResponse pptResponse = JSON.parseObject(pptResp, CreateResponse.class);
             // 利用sid查询PPT生成进度
             progress = 0;
@@ -209,14 +230,14 @@ public class XunFeiServiceImpl implements XunFeiService {
                 String progressResult = client.checkProgress(appId, ts, signature, pptResponse.getData().getSid());
                 progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
                 progress = progressResponse.getData().getProcess();
-                System.out.println(progressResult);
+                System.out.println("-->" + progressResult);
                 pptUrl = progressResponse.getData().getPptUrl();
                 if (progress < 100) {
                     Thread.sleep(5000);
                 }
             }
             MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, pptUrl);
-            messageService.recordHistory(userCode, chatCode, content, pptUrl);
+            messageService.recordHistoryWithReplyImage(userCode, chatCode, content, pptUrl, coverImgSrc);
 
             return JsonResult.success(responseAO);
         } catch (Exception e) {
