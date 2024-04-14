@@ -135,9 +135,12 @@ public class UserController {
     public JsonResult chatUserFeedback(HttpServletRequest httpServletRequest, @RequestBody UserFeedbackRequestAO request) {
         log.info("UserController chatUserFeedback request:[{}]", request);
         String token = httpServletRequest.getHeader("token");
-        UserPO userPO = jwtUtils.getUserFromToken(token);
-        log.info("UserController chatUserFeedback userPO:[{}]", userPO);
-        request.setUserCode(userPO.getUserCode());
+        String userCode = userService.getUserCodeByToken(token);
+        if (userCode == null || "".equals(userCode)) {
+            return JsonResult.error("token无效或过期");
+        }
+        log.info("UserController chatUserFeedback userCode:[{}]", userCode);
+        request.setUserCode(userCode);
         userService.chatUserFeedback(request);
 
         return JsonResult.success("感谢反馈！");
