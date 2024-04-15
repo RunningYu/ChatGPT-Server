@@ -10,6 +10,9 @@ import java.util.Map;
  * @Date：2024/1/4 9:49
  */
 public class GPTConstants {
+
+    public static final String RESULT_CREATE_TAG = "我已经完成作品，欢迎您提出宝贵的意见和建议，帮助我快速进步~~";
+
     public static Map<String, String> GPT_KEY_MAP = new HashMap<>();
 
 //    -----------------------------------------文心一言---------------------------------------------------

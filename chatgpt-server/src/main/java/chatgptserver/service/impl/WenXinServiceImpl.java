@@ -108,7 +108,7 @@ public class WenXinServiceImpl implements WenXinService {
     }
 
     @Override
-    public String wxImageCreate(String userCode, String chatCode, String content) {
+    public JsonResult wxImageCreate(String userCode, String chatCode, String content) {
         log.info("WenXinServiceImpl wxImageCreate userCode:[{}], chatCode:[{}], content:[{}]", userCode, chatCode, content);
         String accessToken = null;
         try {
@@ -137,10 +137,13 @@ public class WenXinServiceImpl implements WenXinService {
         try {
             // 将AI生成的图片上传到MinIO返回Url
             UploadResponse uploadResponse = minioUtil.uploadFile(multipartFile, "file");
+            String replication = uploadResponse.getMinIoUrl() + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
+            MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
             // 记录历史记录
-            messageService.recordHistory(userCode, chatCode, content, uploadResponse.getMinIoUrl());
+            messageService.recordHistory(userCode, chatCode, content, replication);
+//            messageService.recordHistory(userCode, chatCode, content, uploadResponse.getMinIoUrl());
 
-            return uploadResponse.getMinIoUrl();
+            return JsonResult.success(result);
         } catch (Exception e) {
             throw new RuntimeException("图片生成MinIO失败");
         }
@@ -182,9 +185,12 @@ public class WenXinServiceImpl implements WenXinService {
         } catch (Exception e) {
             return JsonResult.error("图片处理异常！");
         }
-        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, content, response.getResult());
+        String question = imageUrl + "\n\n" + content;
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult());
+        messageService.recordHistory(userCode, chatCode, question, response.getResult());
+//        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, content, response.getResult());
 
-        return JsonResult.success(response.getResult());
+        return JsonResult.success(result);
     }
 
 

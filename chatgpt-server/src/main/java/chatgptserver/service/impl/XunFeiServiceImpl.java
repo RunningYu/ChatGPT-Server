@@ -236,8 +236,10 @@ public class XunFeiServiceImpl implements XunFeiService {
                     Thread.sleep(5000);
                 }
             }
-            MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, pptUrl);
-            messageService.recordHistoryWithReplyImage(userCode, chatCode, content, pptUrl, coverImgSrc);
+            String replication = coverImgSrc + "\n\n" + pptUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
+            MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, replication);
+            messageService.recordHistory(userCode, chatCode, content, replication);
+//            messageService.recordHistoryWithReplyImage(userCode, chatCode, content, pptUrl, coverImgSrc);
 
             return JsonResult.success(responseAO);
         } catch (Exception e) {
@@ -288,9 +290,10 @@ public class XunFeiServiceImpl implements XunFeiService {
             throw new RuntimeException("调通义千问图片生成接口异常！");
         }
         String userCode = userService.getUserCodeByToken(token);
-        MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, imageUrl);
+        String replication = imageUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
+        MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, replication);
         // 保存聊天记录
-        messageService.recordHistory(userCode, chatCode, content, imageUrl);
+        messageService.recordHistory(userCode, chatCode, content, replication);
 
         return JsonResult.success(response);
     }

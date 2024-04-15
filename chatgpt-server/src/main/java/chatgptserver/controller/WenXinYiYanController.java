@@ -54,9 +54,9 @@ public class WenXinYiYanController {
         log.info("WenXinYiYanController wenXinImageCreate token:[{}]", token);
         UserPO tokenUser = jwtUtils.getUserFromToken(token);
         log.info("WenXinYiYanController wenXinImageCreate tokenUser:[{}] request:[{}]", tokenUser, request);
-        String result = wenXinService.wxImageCreate(tokenUser.getUserCode(), request.getChatCode(), request.getContent());
+        JsonResult response = wenXinService.wxImageCreate(tokenUser.getUserCode(), request.getChatCode(), request.getContent());
 
-        return JsonResult.success(result);
+        return response;
     }
 
     @ApiOperation("文心一言：图片理解")

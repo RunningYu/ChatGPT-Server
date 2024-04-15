@@ -12,7 +12,7 @@ public interface WenXinService {
 
     JsonResult getMessageFromWenXin(String userCode, String chatCode, String message);
 
-    String wxImageCreate(String userCode, String chatCode, String content);
+    JsonResult wxImageCreate(String userCode, String chatCode, String content);
 
     JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content);
 }
