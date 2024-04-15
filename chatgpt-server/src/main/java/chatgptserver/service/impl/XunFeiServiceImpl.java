@@ -12,12 +12,16 @@ import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ProgressResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.ImageResponse;
+import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.ChapterContents;
+import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.Chapters;
 import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptCoverResponseDTO;
+import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptOutlineResponse;
 import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
+import chatgptserver.enums.CharacterConstants;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
 import chatgptserver.service.UserService;
@@ -119,9 +123,12 @@ public class XunFeiServiceImpl implements XunFeiService {
                     String userCode = userService.getUserCodeByToken(token);
                     MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, totalResponse);
                     response.setImage(uploadResponse.getMinIoUrl());
-                    messageService.recordHistoryWithImage(userCode, chatCode, uploadResponse.getMinIoUrl(), content, totalResponse);
 
-                    return JsonResult.success(response);
+                    String question = uploadResponse.getMinIoUrl() + "\n\n" + content;
+                    MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, totalResponse);
+                    messageService.recordHistory(userCode, chatCode, question, totalResponse);
+
+                    return JsonResult.success(result);
                 }
             }
         } catch (Exception e) {
@@ -133,7 +140,7 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfPptCreate(String content, String token, String chatCode) {
         log.info("XunFeiServiceImpl xfPptCreate content:[{}], token:[{}], chatCode:[{}]", content, token, chatCode);
-        String pptUrl = "", coverImgSrc = "";
+        String pptUrl = "", coverImgSrc = "", outLineStr = "";
         String userCode = userService.getUserCodeByToken(token);
         // 输入个人appId
         String appId = GPTConstants.GPT_KEY_MAP.get(GPTConstants.XF_XH_APPID_KEY);
@@ -161,8 +168,6 @@ public class XunFeiServiceImpl implements XunFeiService {
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
             log.info("XunFeiServiceImpl xfPptCreate resp:[{}]", resp);
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            PptCoverResponseDTO coverRes = JSON.parseObject(resp, PptCoverResponseDTO.class);
-            coverImgSrc = coverRes.getData().getCoverImgSrc();
             CreateResponse response = JSON.parseObject(resp, CreateResponse.class);
 
             // 利用sid查询PPT生成进度
@@ -184,16 +189,18 @@ public class XunFeiServiceImpl implements XunFeiService {
             String outlineResp = client.createOutline(appId, ts, signature,outlineQuery);
             System.out.println(outlineResp);
             CreateResponse outlineResponse = JSON.parseObject(outlineResp, CreateResponse.class);
-            System.out.println("生成的大纲如下：");
-//            System.out.println(outlineResponse.getData().getOutline());
+            // 封装大纲
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            log.info("XunFeiServiceImpl xfPptCreate Outline:[{}]", outlineResponse.getData().getOutline());
+            PptOutlineResponse outline = JSON.parseObject(outlineResponse.getData().getOutline(), PptOutlineResponse.class);
+            outLineStr = buildOutLineMD(outline);
+            System.out.println("生成的大纲如下：");
+            log.info("XunFeiServiceImpl xfPptCreate outline:[{}]", outline);
+//            log.info("XunFeiServiceImpl xfPptCreate Outline:[{}]", outlineResponse.getData().getOutline());
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
 
 
             // 基于sid和大纲生成ppt
             String sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
-//            System.out.println(sidResp);
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
             log.info("XunFeiServiceImpl xfPptCreate sidResp1:[{}]", sidResp);
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
@@ -219,7 +226,9 @@ public class XunFeiServiceImpl implements XunFeiService {
 
             // 基于大纲生成ppt
             String pptResp = client.createPptByOutline(appId, ts, signature, outlineQuery, outlineResponse.getData().getOutline());
-//            System.out.println(pptResp);
+            // 解析 PPT封面
+            PptCoverResponseDTO coverRes = JSON.parseObject(pptResp, PptCoverResponseDTO.class);
+            coverImgSrc = coverRes.getData().getCoverImgSrc();
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
             log.info("XunFeiServiceImpl xfPptCreate pptResp:[{}]", pptResp);
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
@@ -236,16 +245,41 @@ public class XunFeiServiceImpl implements XunFeiService {
                     Thread.sleep(5000);
                 }
             }
-            String replication = coverImgSrc + "\n\n" + pptUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
+            String replication = outLineStr + "\n" + coverImgSrc + "\n\n" + pptUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
             MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, replication);
             messageService.recordHistory(userCode, chatCode, content, replication);
-//            messageService.recordHistoryWithReplyImage(userCode, chatCode, content, pptUrl, coverImgSrc);
 
             return JsonResult.success(responseAO);
         } catch (Exception e) {
             throw new RuntimeException();
         }
 
+    }
+
+    private String buildOutLineMD(PptOutlineResponse outline) {
+        StringBuffer outlineStr = new StringBuffer();
+        String tile = outline.getTitle();
+        String subTile = outline.getSubTitle();
+        outlineStr.append("**主标题：**" + tile + "\n");
+        outlineStr.append("**副标题：**" + subTile + "\n");
+        outlineStr.append(CharacterConstants.BOUNDARY_LINE + "\n");
+        List<Chapters> chapters = outline.getChapters();
+        for (int i = 0; i < chapters.size(); i ++) {
+            Chapters chapter = chapters.get(i);
+            String chapterTitle = chapter.getChapterTitle();
+            outlineStr.append(chapterTitle + "\n");
+            List<ChapterContents> chapterContents = chapter.getChapterContents();
+            for (ChapterContents chapterContent : chapterContents) {
+                outlineStr.append(CharacterConstants.BLACK_SPOTS + chapterContent.getChapterTitle() + "\n");
+            }
+            if (i < chapters.size() - 1) {
+                outlineStr.append("\n\n\n");
+            }
+        }
+        System.out.println("————————————————————————————");
+        System.out.println(outlineStr);
+        System.out.println("————————————————————————————");
+        return outlineStr + "";
     }
 
     /**
