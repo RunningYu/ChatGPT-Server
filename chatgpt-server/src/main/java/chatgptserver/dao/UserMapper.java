@@ -1,5 +1,6 @@
 package chatgptserver.dao;
 
+import chatgptserver.bean.ao.UserAO;
 import chatgptserver.bean.ao.UserFeedbackRequestAO;
 import chatgptserver.bean.po.ChatFunctionPO;
 import chatgptserver.bean.po.ChatPO;
@@ -41,4 +42,5 @@ public interface UserMapper {
 
     List<ChatFunctionPO> gptChatFunctionList(String gptCode);
 
+    void userInfoUpdate(UserAO request);
 }

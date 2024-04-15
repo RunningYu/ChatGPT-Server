@@ -56,8 +56,8 @@ public class UserController {
         return JsonResult.success(verifyCode);
     }
 
-    @ApiOperation("通过token")
-    @PostMapping("/user/info")
+    @ApiOperation("用户信息")
+    @GetMapping("/user/info")
     public JsonResult userInfo(HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader("token");
         log.info("userController userInfo token:[{}]", token);
@@ -65,10 +65,19 @@ public class UserController {
             return JsonResult.error("请先登录");
         }
         String userCode = userService.getUserCodeByToken(token);
-        if (userCode == null) {
-            return JsonResult.error("token失效或国企");
-        }
         JsonResult response = userService.userInfo(userCode);
+
+        return response;
+    }
+
+    @ApiOperation("用户信息修改")
+    @PostMapping("/user/info/update")
+    public JsonResult userInfoUpdate(HttpServletRequest httpServletRequest,
+                                     @RequestBody UserAO request) {
+        log.info("userController userInfoUpdate request:[{}]", request);
+        String token = httpServletRequest.getHeader("token");
+        log.info("userController userInfoUpdate token:[{}]", token);
+        JsonResult response = userService.userInfoUpdate(token, request);
 
         return response;
     }

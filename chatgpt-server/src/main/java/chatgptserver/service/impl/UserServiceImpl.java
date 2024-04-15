@@ -188,9 +188,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public JsonResult userInfo(String userCode) {
+        log.info("UserServiceImpl userInfo userCode:[{}]", userCode);
+        if (userCode == null) {
+            return JsonResult.error("token失效或过期");
+        }
+        UserPO userPO = userMapper.getUserByCode(userCode);
 
+        return JsonResult.success(userPO);
+    }
 
-        return null;
+    @Override
+    public JsonResult userInfoUpdate(String token, UserAO request) {
+        log.info("UserServiceImpl userInfoUpdate token:[{}], request:[{}]", token, request);
+        if (token == null || "".equals(token)) {
+            return JsonResult.error("请先登录");
+        }
+        String userCode = getUserCodeByToken(token);
+        if (userCode == null) {
+            return JsonResult.error("token失效或过期");
+        }
+        request.setUserCode(userCode);
+        userMapper.userInfoUpdate(request);
+
+        return JsonResult.success("update successfully");
     }
 
 }

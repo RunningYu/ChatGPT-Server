@@ -23,6 +23,11 @@
         update tb_chatgpt_user set user_code = #{userCode} where id = #{id}
     </update>
 
+    <update id="userInfoUpdate">
+        update tb_chatgpt_user set email = #{email}, phone = #{phone}, username = #{username}, headshot = #{headShot},
+                                   password = #{password} where user_code = #{userCode}
+    </update>
+
     <delete id="chatDelete">
         update tb_chatgpt_chat set is_delete = 1 where chat_code = #{chatCode}
     </delete>
