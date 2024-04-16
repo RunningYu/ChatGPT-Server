@@ -124,6 +124,9 @@ public class UserController {
     public JsonResult<List<ChatAO>> chatCreateList(HttpServletRequest httpServletRequest, @RequestParam("gptCode") String gptCode, @RequestParam(value = "functionCode", required = false) String functionCode) {
         String token = httpServletRequest.getHeader("token");
         log.info("UserController chatCreateList token:[{}], gptCode:[{}], functionCode:[{}]", token, gptCode, functionCode);
+        if (gptCode == null || "".equals(gptCode)) {
+            return JsonResult.error("请选定 gptCode");
+        }
         List<ChatAO> response = messageService.chatCreateList(token, gptCode, functionCode);
 
         return JsonResult.success(response);
