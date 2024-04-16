@@ -3,6 +3,7 @@ package chatgptserver.utils.xunfei;
 
 import chatgptserver.Common.ImageUtil;
 import chatgptserver.Common.SseUtils;
+import chatgptserver.bean.dto.XunFeiXingHuo.Text;
 import chatgptserver.service.XunFeiService;
 import chatgptserver.utils.XunFeiUtils;
 import com.alibaba.fastjson.JSON;
@@ -55,6 +56,9 @@ public class BigModelNew extends WebSocketListener {
 
     private static Boolean totalFlag = true; // 控制提示用户是否输入
 
+    // 多轮对话请求体
+    public static List<chatgptserver.bean.dto.XunFeiXingHuo.Text> request = new ArrayList<>();
+
     // 构造函数
     public BigModelNew(String userId, Boolean wsCloseFlag) {
         this.userId = userId;
@@ -70,6 +74,13 @@ public class BigModelNew extends WebSocketListener {
         this.wsCloseFlag = wsCloseFlag;
     }
 
+    public BigModelNew(Long threadId, List<chatgptserver.bean.dto.XunFeiXingHuo.Text> imageUnderstandRequest, String userId, Boolean wsCloseFlag) {
+        this.threadId = threadId;
+        sseEmitter = SseUtils.sseEmittersMap.get(threadId);
+        request = imageUnderstandRequest;
+        this.userId = userId;
+        this.wsCloseFlag = wsCloseFlag;
+    }
 
 
     // 主函数
@@ -132,7 +143,7 @@ public class BigModelNew extends WebSocketListener {
                 JSONObject chat = new JSONObject();
                 chat.put("domain", "image");
                 chat.put("temperature", 0.5);
-                chat.put("max_tokens", 4096);
+                chat.put("max_tokens", 8192);
                 chat.put("auditing", "default");
                 parameter.put("chat", chat);
 
@@ -140,52 +151,16 @@ public class BigModelNew extends WebSocketListener {
                 JSONObject message = new JSONObject();
                 JSONArray text = new JSONArray();
 
-                // 历史问题获取
-                if (historyList.size() > 0) { // 保证首个添加的是图片
-                    for (RoleContent tempRoleContent : historyList) {
-                        if (tempRoleContent.content_type.equals("image")) { // 保证首个添加的是图片
-                            text.add(JSON.toJSON(tempRoleContent));
-                            ImageAddFlag = true;
-                        }
-                    }
-                }
-                if (historyList.size() > 0) {
-                    for (RoleContent tempRoleContent : historyList) {
-                        if (!tempRoleContent.content_type.equals("image")) { // 添加费图片类型
-                            text.add(JSON.toJSON(tempRoleContent));
-                        }
-                    }
-                }
-
-                // 最新问题
-                RoleContent roleContent = new RoleContent();
-                // 添加图片信息
-                if (!ImageAddFlag) {
-                    roleContent.role = "user";
-//                    roleContent.content = Base64.getEncoder().encodeToString(ImageUtil.read("src\\main\\resources\\images\\1.png"));
-                    roleContent.content = ImageUtil.imageMultipartFileToBase64(imageFile);
-                    log.info("base64:[{}]", roleContent.content);
-                    roleContent.content_type = "image";
-                    text.add(JSON.toJSON(roleContent));
-                    historyList.add(roleContent);
-                }
-                // 添加对图片提出要求的信息
-                RoleContent roleContent1 = new RoleContent();
-                roleContent1.role = "user";
-                roleContent1.content = NewQuestion;
-                roleContent1.content_type = "text";
-                text.add(JSON.toJSON(roleContent1));
-                historyList.add(roleContent1);
-
-
-                message.put("text", text);
+                message.put("text", request);
                 payload.put("message", message);
 
 
                 requestJson.put("header", header);
                 requestJson.put("parameter", parameter);
                 requestJson.put("payload", payload);
-                 System.err.println(requestJson); // 可以打印看每次的传参明细
+                System.out.println("————————————————可以打印看每次的传参明细——————————————————————————————————————————————————————————————————————————————————");
+                System.err.println(requestJson); // 可以打印看每次的传参明细
+                System.out.println("———————————————————————————————————————————————————————————————————————————————————————————————————");
                 webSocket.send(requestJson.toString());
                 // 等待服务端返回完毕后关闭
                 while (true) {

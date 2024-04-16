@@ -16,21 +16,16 @@ import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.ChapterContents;
 import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.Chapters;
 import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptCoverResponseDTO;
 import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptOutlineResponse;
-import chatgptserver.bean.po.ChatPO;
 import chatgptserver.bean.po.MessagesPO;
-import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.enums.CharacterConstants;
-import chatgptserver.service.MessageService;
-import chatgptserver.service.OkHttpService;
-import chatgptserver.service.UserService;
+import chatgptserver.service.*;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MinioUtil;
 import chatgptserver.utils.XunFeiUtils;
 import chatgptserver.utils.xunfei.BigModelNew;
 import chatgptserver.enums.GPTConstants;
-import chatgptserver.service.XunFeiService;
 import chatgptserver.utils.xunfei.XunFeiWenDaBigModelNew;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -107,8 +102,10 @@ public class XunFeiServiceImpl implements XunFeiService {
             OkHttpClient client = new OkHttpClient.Builder().build();
             String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
             Request request = new Request.Builder().url(url).build();
+            // 封装多轮对话的请求body
+            List<Text> imageUnderstandRequest = buildImageUnderstandRequest(chatCode, image, content);
             for (int i = 0; i < 1; i++) {
-                WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, image, content, i + "", false));
+                WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, imageUnderstandRequest, i + "", false));
             }
 
             while (true) {
@@ -119,14 +116,20 @@ public class XunFeiServiceImpl implements XunFeiService {
                 } else {
                     totalResponse = XunFeiUtils.imageUnderstandTotalResponseMap.get(threadId);
                     log.info("XunFeiServiceImpl xfImageUnderstand totalResponse:[{}]", totalResponse);
-                    UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
                     String userCode = userService.getUserCodeByToken(token);
                     MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, totalResponse);
-                    response.setImage(uploadResponse.getMinIoUrl());
-
-                    String question = uploadResponse.getMinIoUrl() + "\n\n" + content;
+                    String question = "";
+                    if (image != null) {
+                        UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
+                        String imageUrl = uploadResponse.getMinIoUrl();
+                        response.setImage(uploadResponse.getMinIoUrl());
+                        question = imageUrl + "\n\n" + content;
+                        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, question, totalResponse);
+                    } else {
+                        question = content;
+                        messageService.recordHistoryWithImage(userCode, chatCode, "0", question, totalResponse);
+                    }
                     MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, totalResponse);
-                    messageService.recordHistory(userCode, chatCode, question, totalResponse);
 
                     return JsonResult.success(result);
                 }
@@ -135,6 +138,37 @@ public class XunFeiServiceImpl implements XunFeiService {
             throw new RuntimeException();
         }
 
+    }
+
+    private List<Text> buildImageUnderstandRequest(String chatCode, MultipartFile image, String content) {
+        List<Text> requestList = new ArrayList<>();
+        String base64Image = "";
+        // 如果图片为空，则表示多轮对话
+        if (Objects.isNull(image)) {
+            // 获取第一轮对话
+            MessagesPO messagesFistChat = messageMapper.getTongYiQuestionFistChat(chatCode);
+            log.info("XunFeiServiceImpl buildImageUnderstandRequest messagesFistChat:[{}]", messagesFistChat);
+            // 图片URL --> base64
+            base64Image = ImageUtil.imageUrlToBase64(messagesFistChat.getImage());
+            requestList.add(new Text("user", base64Image, "image"));
+            String question = messagesFistChat.getQuestion().split("\n")[messagesFistChat.getQuestion().split("\n").length - 1];
+            requestList.add(new Text("user",question, "text"));
+            requestList.add(new Text("assistant", messagesFistChat.getReplication(), "text"));
+
+            List<MessagesPO> historyLis = messageMapper.getTongYiMultipleQuestionHistory(chatCode, messagesFistChat.getId());
+            for (MessagesPO history : historyLis) {
+                question = messagesFistChat.getQuestion().split("\n")[messagesFistChat.getQuestion().split("\n").length - 1];
+                requestList.add(new Text("user", question, "text"));
+                requestList.add(new Text("assistant", history.getReplication(), "text"));
+            }
+        } else {
+            base64Image = ImageUtil.imageMultipartFileToBase64(image);
+            requestList.add(new Text("user", base64Image, "image"));
+        }
+        requestList.add(new Text("user", content, "text"));
+        log.info("XunFeiServiceImpl buildImageUnderstandRequest requestList:[{}]", requestList);
+
+        return requestList;
     }
 
     @Override

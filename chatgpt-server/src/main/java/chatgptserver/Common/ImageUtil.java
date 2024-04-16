@@ -1,14 +1,17 @@
 package chatgptserver.Common;
 
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Base64;
 
 public class ImageUtil {
@@ -87,5 +90,103 @@ public class ImageUtil {
         }
 
     }
+
+    /**
+     * 将图片转为file
+     * @param url 图片url
+     */
+    public static File imageUrlToFile(String url) {
+        //对本地文件命名
+        String fileName = url.substring(url.lastIndexOf("."),url.length());
+        File file = null;
+
+        URL urlfile;
+        InputStream inStream = null;
+        OutputStream os = null;
+        try {
+            file = File.createTempFile("net_url", fileName);
+            //下载
+            urlfile = new URL(url);
+            inStream = urlfile.openStream();
+            os = new FileOutputStream(file);
+
+            int bytesRead = 0;
+            byte[] buffer = new byte[8192];
+            while ((bytesRead = inStream.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (null != os) {
+                    os.close();
+                }
+                if (null != inStream) {
+                    inStream.close();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return file;
+    }
+
+
+    /**
+     * 获取图片二进制
+     */
+    public static byte[] downloadPicture(String url) {
+        URL urlConnection = null;
+        HttpURLConnection httpURLConnection = null;
+        try {
+            urlConnection = new URL(url);
+            httpURLConnection = (HttpURLConnection) urlConnection.openConnection();
+            InputStream in = httpURLConnection.getInputStream();
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+            in.close();
+            out.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            httpURLConnection.disconnect();
+        }
+        return null;
+    }
+
+    /**
+     * 图片url --> base64
+     * @param url
+     * @return
+     */
+    public static String imageUrlToBase64(String url) {
+        byte[] bytes = downloadPicture(url);
+
+        MultipartFile mfile = null;
+        ByteArrayInputStream in = null;
+        try {
+            in = new ByteArrayInputStream(bytes);
+            FileItemFactory factory = new DiskFileItemFactory(16, null);
+            FileItem fileItem = factory.createItem("mainFile", "text/plain", false, "name");
+            IOUtils.copy(new ByteArrayInputStream(bytes), fileItem.getOutputStream());
+            mfile = new CommonsMultipartFile(fileItem);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String base64Image = ImageUtil.imageMultipartFileToBase64(mfile);
+
+        return base64Image;
+    }
+
+
 
 }

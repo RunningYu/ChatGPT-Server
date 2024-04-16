@@ -106,7 +106,7 @@ public class XunFeiXingHuoController {
     @ApiOperation("讯飞星火：图片理解")
     @PostMapping("/chat/xf/image/understander")
     public JsonResult xfImageUnderstand(HttpServletRequest httpServletRequest,
-                                        @RequestParam("image") MultipartFile image,
+                                        @RequestParam(value = "image", required = false) MultipartFile image,
                                         @RequestParam("content") String content,
                                         @RequestParam("chatCode") String chatCode) {
         String token = httpServletRequest.getHeader("token");

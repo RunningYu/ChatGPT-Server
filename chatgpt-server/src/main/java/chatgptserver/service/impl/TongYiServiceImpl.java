@@ -175,7 +175,8 @@ public class TongYiServiceImpl implements TongYiService {
             // 获取 通义千问：文本问答 的第一轮对话
             MessagesPO messagesFistChat = messageMapper.getTongYiQuestionFistChat(chatCode);
             log.info("TongYiServiceImpl TongYiImageUnderStandRequestDTO messagesFistChat:[{}]", messagesFistChat);
-            TongYiMessages tongYiMessagesFirstMap = TongYiMessages.buildTongYiMessages("user", messagesFistChat.getImage(), messagesFistChat.getQuestion());
+            String question = messagesFistChat.getQuestion().split("\n")[messagesFistChat.getQuestion().split("\n").length - 1];
+            TongYiMessages tongYiMessagesFirstMap = TongYiMessages.buildTongYiMessages("user", messagesFistChat.getImage(), question);
             TongYiMessages tongYiMessagesFirstRplMap = TongYiMessages.buildTongYiMessages("assistant", messagesFistChat.getReplication());
             list.add(tongYiMessagesFirstMap);
             list.add(tongYiMessagesFirstRplMap);
@@ -186,7 +187,8 @@ public class TongYiServiceImpl implements TongYiService {
             List<MessagesPO> historyLis = messageMapper.getTongYiMultipleQuestionHistory(chatCode, messagesFistChat.getId());
             for (MessagesPO history : historyLis) {
 
-                TongYiMessages messagesQuestion = TongYiMessages.buildTongYiMessages("user", history.getQuestion());
+                question = history.getQuestion().split("\n")[history.getQuestion().split("\n").length - 1];
+                TongYiMessages messagesQuestion = TongYiMessages.buildTongYiMessages("user", question);
                 TongYiMessages messagesReplication = TongYiMessages.buildTongYiMessages("assistant", history.getReplication());
                 list.add(messagesQuestion);
                 list.add(messagesReplication);

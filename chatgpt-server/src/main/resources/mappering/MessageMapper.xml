@@ -21,7 +21,7 @@
     </select>
 
     <select id="getTongYiMultipleQuestionHistory" resultType="chatgptserver.bean.po.MessagesPO">
-        select * from tb_chatgpt_messages where chat_code = #{chatCode} and id >= #{id} order by create_time DESC
+        select * from tb_chatgpt_messages where chat_code = #{chatCode} and id > #{id} order by create_time DESC
     </select>
 
     <select id="getTongYiQuestionFistChat" resultType="chatgptserver.bean.po.MessagesPO">
