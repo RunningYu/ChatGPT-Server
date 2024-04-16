@@ -3,6 +3,7 @@ package chatgptserver.controller;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
+import chatgptserver.service.GptService;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
@@ -28,6 +29,9 @@ public class UserController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private GptService gptService;
 
     @Autowired
     private MessageService messageService;
@@ -117,7 +121,7 @@ public class UserController {
 
     @ApiOperation("获取用户创建的聊天列表")
     @GetMapping("/chat/create/list")
-    public JsonResult<List<ChatAO>> chatCreateList(HttpServletRequest httpServletRequest, @Param("gptCode") String gptCode, @Param("functionCode") String functionCode) {
+    public JsonResult<List<ChatAO>> chatCreateList(HttpServletRequest httpServletRequest, @RequestParam("gptCode") String gptCode, @RequestParam(value = "functionCode", required = false) String functionCode) {
         String token = httpServletRequest.getHeader("token");
         log.info("UserController chatCreateList token:[{}], gptCode:[{}], functionCode:[{}]", token, gptCode, functionCode);
         List<ChatAO> response = messageService.chatCreateList(token, gptCode, functionCode);
@@ -155,6 +159,15 @@ public class UserController {
     public JsonResult gptChatFunctionList(@Param("gptCode") String gptCode) {
         log.info("UserController gptChatFunctionList gptCode:[{}]", gptCode);
         JsonResult response = userService.gptChatFunctionList(gptCode);
+
+        return response;
+    }
+
+    @ApiOperation("获取gpt列表")
+    @GetMapping("/gpt/list")
+    public JsonResult gptList() {
+        log.info("UserController gptList");
+        JsonResult response = gptService.gptList();
 
         return response;
     }

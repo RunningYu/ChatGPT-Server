@@ -1,5 +1,6 @@
 package chatgptserver.service;
 
+import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.po.GptPO;
 
 /**
@@ -8,4 +9,5 @@ import chatgptserver.bean.po.GptPO;
  */
 public interface GptService {
 
+    JsonResult gptList();
 }

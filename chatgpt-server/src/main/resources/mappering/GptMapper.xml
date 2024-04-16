@@ -6,5 +6,9 @@
         select * from tb_chatgpt_gpt where gpt_code = #{gptCode}
     </select>
 
+    <select id="gptList" resultType="chatgptserver.bean.po.GptPO">
+        select * from tb_chatgpt_gpt
+    </select>
+
 
 </mapper>

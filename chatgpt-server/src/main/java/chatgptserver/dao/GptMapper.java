@@ -6,6 +6,8 @@ import chatgptserver.bean.po.UserPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @Author：chenzhenyu
  * @Date：2024/1/4 15:30
@@ -14,4 +16,6 @@ import org.apache.ibatis.annotations.Param;
 public interface GptMapper {
 
     GptPO getGptByCode(String gptCode);
+
+    List<GptPO> gptList();
 }
