@@ -3,7 +3,6 @@ package chatgptserver.controller;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
-import chatgptserver.bean.po.UserPO;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -81,18 +79,6 @@ public class UserController {
 
         return response;
     }
-
-
-//    @ApiOperation("新建聊天")
-//    @PostMapping("/chat/add")
-//    public JsonResult wenXinAdd(HttpServletRequest httpServletRequest) {
-//        String token = httpServletRequest.getHeader("token");
-//        log.info("UserController wenXinChat token:[{}], request:[{}]", token);
-//        UserPO userPO = jwtUtils.getUserFromToken(token);
-////        request.setUserCode(userPO.getUserCode());
-//
-//        return JsonResult.success(userPO);
-//    }
 
     @ApiOperation("新建聊天")
     @PostMapping("/chat/add")

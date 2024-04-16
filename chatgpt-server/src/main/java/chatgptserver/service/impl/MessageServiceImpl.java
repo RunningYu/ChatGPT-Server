@@ -153,7 +153,7 @@ public class MessageServiceImpl implements MessageService {
         MessagesAO response = new MessagesAO();
         response.setQuestion(content);
         response.setReplication(totalResponse);
-        if (userCode != null) {
+        if (userCode != null && !"".equals(userCode)) {
             response.setUserCode(userCode);
             UserPO userPO = userService.getUserByCode(userCode);
             response.setUsername(userPO.getUsername());

@@ -1,6 +1,7 @@
 package chatgptserver.service;
 
 
+import chatgptserver.bean.ao.JsonResult;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -9,9 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface TongYiService {
 
-    String tyImageUnderstand(MultipartFile image, String content, String token, String chatCode);
+    JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode);
 
-    String tyQuestion(String token, String chatCode, String content);
+    JsonResult tyQuestion(String token, String chatCode, String content);
 
-    String tyImageCreate(String userCode, String chatCode, String content);
+    JsonResult tyImageCreate(String userCode, String chatCode, String content);
 }

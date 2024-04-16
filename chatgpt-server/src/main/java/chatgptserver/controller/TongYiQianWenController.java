@@ -40,9 +40,9 @@ public class TongYiQianWenController {
                                      @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("WenXinYiYanController tongYiQuestion token:[{}], request:[{}]", token, request);
-        String result = tongYiService.tyQuestion(token, request.getChatCode(), request.getContent());
+        JsonResult response = tongYiService.tyQuestion(token, request.getChatCode(), request.getContent());
 
-        return JsonResult.success(result);
+        return response;
     }
 
     @ApiOperation("通义千问：图片理解")
@@ -53,9 +53,9 @@ public class TongYiQianWenController {
                                             @RequestParam("chatCode") String chatCode) {
         String token = httpServletRequest.getHeader("token");
         log.info("WenXinYiYanController tongYiImageUnderstand token:[{}], image:[{}] content:[{}], token:[{}], chatCode:[{}]", token, image, content, token, chatCode);
-        String response = tongYiService.tyImageUnderstand(image, content, token, chatCode);
+        JsonResult response = tongYiService.tyImageUnderstand(image, content, token, chatCode);
 
-        return JsonResult.success(response);
+        return response;
     }
 
     /**
@@ -69,9 +69,9 @@ public class TongYiQianWenController {
         log.info("WenXinYiYanController tongYiImageUnderstand token:[{}]", token);
         String userCode = userService.getUserCodeByToken(token);
         log.info("WenXinYiYanController tongYiImageCreate userCode:[{}], request:[{}]", userCode, request);
-        String response = tongYiService.tyImageCreate(userCode, request.getChatCode(), request.getContent());
+        JsonResult response = tongYiService.tyImageCreate(userCode, request.getChatCode(), request.getContent());
 
-        return JsonResult.success();
+        return response;
     }
 
 }

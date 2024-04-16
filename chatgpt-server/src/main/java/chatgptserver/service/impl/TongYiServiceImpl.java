@@ -1,5 +1,7 @@
 package chatgptserver.service.impl;
 
+import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.Text;
 import chatgptserver.bean.dto.tongYiQianWen.*;
 import chatgptserver.bean.po.MessagesPO;
@@ -9,6 +11,7 @@ import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
 import chatgptserver.service.TongYiService;
+import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MinioUtil;
 import com.alibaba.fastjson.JSON;
@@ -33,6 +36,9 @@ import java.util.Map;
 public class TongYiServiceImpl implements TongYiService {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -48,17 +54,13 @@ public class TongYiServiceImpl implements TongYiService {
     private MessageMapper messageMapper;
 
     @Override
-    public String tyImageUnderstand(MultipartFile image, String content, String token, String chatCode) {
+    public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode) {
         log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}]", image, content, token, chatCode);
         String imageUrl = "";
         if (image != null) {
             imageUrl = minioUtil.upLoadFileToURL(image);
         }
-        String userCode = "";
-        if (token != null && !"".equals(token)) {
-            UserPO userPO = jwtUtils.getUserFromToken(token);
-            userCode = userPO.getUserCode();
-        }
+        String userCode = userService.getUserCodeByToken(token);
         // 构建多轮对话请求体
         TongYiImageUnderStandRequestDTO request = buildTongYiImageUnderstandRequestDTO(chatCode, imageUrl, content);
         log.info("WenXinServiceImpl tyImageUnderstand request:[{}]", request);
@@ -75,13 +77,15 @@ public class TongYiServiceImpl implements TongYiService {
         TongYiImageUnderstandResponseDTO responseDTO = JSON.parseObject(responseStr, TongYiImageUnderstandResponseDTO.class);
         String response = responseDTO.getOutput().getChoices().get(0).getMessage().getContent().get(0).get("text");
         log.info("TongYiServiceImpl tyImageUnderstand response:[{}]", response);
-        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl.equals("") ? "0" : imageUrl, content, response);
+        String question = imageUrl.equals("") ? content : (imageUrl + "\n\n" + content);
+        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl.equals("") ? "0" : imageUrl, question, response);
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response);
 
-        return response;
+        return JsonResult.success(result);
     }
 
     @Override
-    public String tyQuestion(String token, String chatCode, String content) {
+    public JsonResult tyQuestion(String token, String chatCode, String content) {
         log.info("TongYiServiceImpl getMessageFromWenXin token:[{}] chatCode:[{}], content:[{}]", token, chatCode, content);
         Text text = new Text("user", content);
         List<Text> textList = new ArrayList<>();
@@ -113,12 +117,13 @@ public class TongYiServiceImpl implements TongYiService {
         QuestionResponseDTO responseDTO = JSON.parseObject(responseStr, QuestionResponseDTO.class);
         String response = responseDTO.getOutput().getText();
         messageService.recordHistory(userCode, chatCode, content, response);
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, response);
 
-        return response;
+        return JsonResult.success(result);
     }
 
     @Override
-    public String tyImageCreate(String userCode, String chatCode, String content) {
+    public JsonResult tyImageCreate(String userCode, String chatCode, String content) {
         log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}]", userCode, chatCode, chatCode);
         TongYiImageCreateRequestDTO request = TongYiImageCreateRequestDTO.buildTongYiImageCreateRequestDTO(content);
         log.info("TongYiServiceImpl tyImageCreate request:[{}]", JSON.toJSONString(request));
@@ -155,9 +160,11 @@ public class TongYiServiceImpl implements TongYiService {
             }
         }
         log.info("TongYiServiceImpl tyImageCreate response:[{}]", response);
-        messageService.recordHistory(userCode, chatCode, content, response);
+        String replication = response + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
+        messageService.recordHistory(userCode, chatCode, content, replication);
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
 
-        return response;
+        return JsonResult.success(result);
     }
 
 
