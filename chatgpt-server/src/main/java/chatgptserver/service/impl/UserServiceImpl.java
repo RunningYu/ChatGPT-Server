@@ -119,10 +119,9 @@ public class UserServiceImpl implements UserService {
                     //数字+字母，6-20位. 返回true 否则false
                     boolean isLegal = request.getPassword().matches("/^(?=.*[0-9])(?=.*[a-zA-Z])[0-9a-zA-Z]{6,20}$/");
                     if (isLegal == false) {
-                        log.info("UserServiceImpl login 请输入数字+字母，6-20位");
-                        return JsonResult.error("请输入数字+字母，6-20位");
+                        log.info("UserServiceImpl login 密码请输入数字+字母，6-20位");
+                        return JsonResult.error("密码请输入数字+字母，6-20位");
                     }
-
                     if (!request.getPassword().equals(request.getAgainPassword())) {
                         log.info("UserServiceImpl login 前后密码不对应");
                         return JsonResult.error("前后密码不对应");
@@ -225,6 +224,16 @@ public class UserServiceImpl implements UserService {
         String userCode = getUserCodeByToken(token);
         if (userCode == null) {
             return JsonResult.error("token失效或过期");
+        }
+        if (!(request.getUsername() != null && request.getUsername().length() <= 50)) {
+            log.info("UserServiceImpl userInfoUpdate 用户名不能为空，长度最大为50");
+            return JsonResult.error("用户名不能为空，长度最大为50");
+        }
+        // 数字+字母，6-20位. 返回true 否则false
+        boolean isLegal = request.getPassword().matches("/^(?=.*[0-9])(?=.*[a-zA-Z])[0-9a-zA-Z]{6,20}$/");
+        if (isLegal == false) {
+            log.info("UserServiceImpl userInfoUpdate 密码请输入数字+字母，6-20位");
+            return JsonResult.error("密码请输入数字+字母，6-20位");
         }
         request.setUserCode(userCode);
         request.setPassword(MD5Util.encrypt(request.getPassword()));
