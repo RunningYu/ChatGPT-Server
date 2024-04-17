@@ -89,6 +89,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public JsonResult login(UserAO request) {
         log.info("UserServiceImpl login request:[{}]", request);
+        if (!(request.getUsername() != null && request.getUsername().length() <= 50)) {
+            log.info("UserServiceImpl login 用户名不能为空，长度最大为50");
+            return JsonResult.error("用户名不能为空，长度最大为50");
+        }
         // 查询数据库是否存在该用户（有则直接登录，并生成token）
         UserPO userPO = userMapper.getUserByEmail(request.getEmail());
         // 注册
@@ -98,31 +102,46 @@ public class UserServiceImpl implements UserService {
             if (userEmail != null && !userEmail.equals("") && userEmail.length() > 7
                     && userEmail.substring(userEmail.length() - 7, userEmail.length()).equals("@qq.com")) {
                 if (request.getUserVerifyCode() != null && !request.getUserVerifyCode().equals("")) {
-                        String md5Code = MD5Util.encrypt(request.getUserVerifyCode());
-                        if (md5Code.equals(request.getVerifyCode())) {
-                            request.setPassword(MD5Util.encrypt(request.getPassword()));
-                            UserPO user = ConvertMapping.userAO2UserPO(request);
-                            int id = userMapper.userAdd(user);
-                            String userCode = "user_" + user.getId();
-                            user.setUserCode(userCode);
-                            userPO = user;
-                            log.info("UserServiceImpl login user:[{}]", user);
-                            userMapper.updateUserCode(userCode, user.getId());
-                        } else {
-                            throw new RuntimeException("输入的验证码错误");
-                        }
+                    String md5Code = MD5Util.encrypt(request.getUserVerifyCode());
+                    if (md5Code.equals(request.getVerifyCode())) {
+                        request.setPassword(MD5Util.encrypt(request.getPassword()));
+                        UserPO user = ConvertMapping.userAO2UserPO(request);
+                        int id = userMapper.userAdd(user);
+                        String userCode = "user_" + user.getId();
+                        user.setUserCode(userCode);
+                        userPO = user;
+                        log.info("UserServiceImpl login user:[{}]", user);
+                        userMapper.updateUserCode(userCode, user.getId());
+                    } else {
+                        log.info("UserServiceImpl login 输入的验证码错误");
+                        return JsonResult.error("输入的验证码错误");
+                    }
+                    //数字+字母，6-20位. 返回true 否则false
+                    boolean isLegal = request.getPassword().matches("/^(?=.*[0-9])(?=.*[a-zA-Z])[0-9a-zA-Z]{6,20}$/");
+                    if (isLegal == false) {
+                        log.info("UserServiceImpl login 请输入数字+字母，6-20位");
+                        return JsonResult.error("请输入数字+字母，6-20位");
+                    }
+
+                    if (!request.getPassword().equals(request.getAgainPassword())) {
+                        log.info("UserServiceImpl login 前后密码不对应");
+                        return JsonResult.error("前后密码不对应");
+                    }
                 } else {
-                    throw new RuntimeException("请输入验证码");
+                    log.info("UserServiceImpl login 请输入验证码");
+                    return JsonResult.error("请输入验证码");
                 }
             } else {
-                throw new RuntimeException("邮箱格式不正确!");
+                log.info("UserServiceImpl login 邮箱格式不正确！");
+                return JsonResult.error("邮箱格式不正确！");
             }
         }
         // 登录
         else {
             String md5Password = MD5Util.encrypt(request.getPassword());
             if (!md5Password.equals(userPO.getPassword())) {
-                throw new RuntimeException("密码错误！");
+                log.info("UserServiceImpl login 密码错误！");
+                return JsonResult.error("密码错误！");
             }
         }
         // 生成token，存token进redis
@@ -150,7 +169,7 @@ public class UserServiceImpl implements UserService {
                 return "发送邮件失败！";
             }
 
-            return MD5Util.encrypt(email);
+            return MD5Util.encrypt(verifyCode);
         } else {
             return "邮箱格式错误！";
         }
@@ -208,6 +227,7 @@ public class UserServiceImpl implements UserService {
             return JsonResult.error("token失效或过期");
         }
         request.setUserCode(userCode);
+        request.setPassword(MD5Util.encrypt(request.getPassword()));
         userMapper.userInfoUpdate(request);
 
         return JsonResult.success("update successfully");

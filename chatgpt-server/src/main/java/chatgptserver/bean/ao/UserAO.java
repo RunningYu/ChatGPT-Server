@@ -36,4 +36,7 @@ public class UserAO {
     @ApiModelProperty("密码")
     private String password;
 
+    @ApiModelProperty("再次确认的密码")
+    private String againPassword;
+
 }
