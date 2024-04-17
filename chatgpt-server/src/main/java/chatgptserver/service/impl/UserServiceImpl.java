@@ -103,21 +103,12 @@ public class UserServiceImpl implements UserService {
                     && userEmail.substring(userEmail.length() - 7, userEmail.length()).equals("@qq.com")) {
                 if (request.getUserVerifyCode() != null && !request.getUserVerifyCode().equals("")) {
                     String md5Code = MD5Util.encrypt(request.getUserVerifyCode());
-                    if (md5Code.equals(request.getVerifyCode())) {
-                        request.setPassword(MD5Util.encrypt(request.getPassword()));
-                        UserPO user = ConvertMapping.userAO2UserPO(request);
-                        int id = userMapper.userAdd(user);
-                        String userCode = "user_" + user.getId();
-                        user.setUserCode(userCode);
-                        userPO = user;
-                        log.info("UserServiceImpl login user:[{}]", user);
-                        userMapper.updateUserCode(userCode, user.getId());
-                    } else {
+                    if (!md5Code.equals(request.getVerifyCode())) {
                         log.info("UserServiceImpl login 输入的验证码错误");
                         return JsonResult.error("输入的验证码错误");
                     }
                     //数字+字母，6-20位. 返回true 否则false
-                    boolean isLegal = request.getPassword().matches("/^(?=.*[0-9])(?=.*[a-zA-Z])[0-9a-zA-Z]{6,20}$/");
+                    boolean isLegal = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,20}$");
                     if (isLegal == false) {
                         log.info("UserServiceImpl login 密码请输入数字+字母，6-20位");
                         return JsonResult.error("密码请输入数字+字母，6-20位");
@@ -126,6 +117,14 @@ public class UserServiceImpl implements UserService {
                         log.info("UserServiceImpl login 前后密码不对应");
                         return JsonResult.error("前后密码不对应");
                     }
+                    request.setPassword(MD5Util.encrypt(request.getPassword()));
+                    UserPO user = ConvertMapping.userAO2UserPO(request);
+                    int id = userMapper.userAdd(user);
+                    String userCode = "user_" + user.getId();
+                    user.setUserCode(userCode);
+                    userPO = user;
+                    log.info("UserServiceImpl login user:[{}]", user);
+                    userMapper.updateUserCode(userCode, user.getId());
                 } else {
                     log.info("UserServiceImpl login 请输入验证码");
                     return JsonResult.error("请输入验证码");
