@@ -21,7 +21,9 @@ public class TongYiImageCreateRequestDTO {
 
     public static TongYiImageCreateRequestDTO buildTongYiImageCreateRequestDTO(String content) {
         TongYiImageCreateRequestDTO requestDTO = new TongYiImageCreateRequestDTO();
-        requestDTO.setModel("stable-diffusion-xl");
+//        requestDTO.setModel("stable-diffusion-xl");
+        // wanx-v1 模型是有免费额度的
+        requestDTO.setModel("wanx-v1");
         ImageCreateInput input = new ImageCreateInput();
         input.setPrompt(content);
         requestDTO.setInput(input);

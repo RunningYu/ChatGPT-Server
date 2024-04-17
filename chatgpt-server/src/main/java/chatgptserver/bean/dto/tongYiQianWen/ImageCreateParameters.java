@@ -11,11 +11,12 @@ import lombok.Data;
 @Data
 public class ImageCreateParameters {
 
+    private String style;
+
     private String size;
 
     @ApiModelProperty(value = "本次请求生成的图片数量，目前支持1~4张，默认为1。", required = false)
     private Integer n;
-
 
     private Integer seed;
 }

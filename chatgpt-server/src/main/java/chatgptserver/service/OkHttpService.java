@@ -85,4 +85,39 @@ public class OkHttpService {
             }
         }
     }
+
+    public String makePostRequest(String apiUrl, String requestBody, String authorization, String enable) throws IOException {
+        RequestBody body = RequestBody.create(requestBody, MediaType.parse("application/json"));
+        Request request = new Request.Builder().
+                url(apiUrl).
+                addHeader("Authorization", authorization).
+                addHeader("X-DashScope-Async", enable).
+                post(body).
+                build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                return response.body().string();
+            }
+            else {
+                System.out.println(response.code() + " " + response.message());
+                throw new IOException("Unexpected response: " + response.code());
+            }
+        }
+    }
+
+    public String makeGetRequest(String apiUrl, String authorization) throws IOException {
+        Request request = new Request.Builder().
+                url(apiUrl).
+                addHeader("Authorization", authorization).
+                build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                return response.body().string();
+            } else {
+                throw new IOException("Unexpected response: " + response.code());
+            }
+        }
+    }
 }

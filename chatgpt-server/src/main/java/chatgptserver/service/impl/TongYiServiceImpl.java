@@ -129,20 +129,21 @@ public class TongYiServiceImpl implements TongYiService {
         log.info("TongYiServiceImpl tyImageCreate request:[{}]", JSON.toJSONString(request));
 
         String responseStr = "";
+        String authorization = "Bearer " + GPTConstants.TONG_YI_QIAN_WEN_API_KEY;
         try {
-            responseStr = okHttpService.makePostRequest(GPTConstants.TONG_YI_QIAN_WEN_IMAGE_CREATE_POST_URL, JSON.toJSONString(request), GPTConstants.TONG_YI_QIAN_WEN_API_KEY);
+            responseStr = okHttpService.makePostRequest(GPTConstants.TONG_YI_QIAN_WEN_IMAGE_CREATE_POST_URL, JSON.toJSONString(request), authorization, "enable");
             log.info("TongYiServiceImpl tyImageCreate responseStr:[{}]", responseStr);
         } catch (IOException e) {
             throw new RuntimeException("调用大模型接口异常");
         }
-        ImageCreateResultOutput resultOutput = JSON.parseObject(responseStr, ImageCreateResultOutput.class);
-        String task_id = resultOutput.getTask_id();
+        ImageCreateTaskIdRes resultOutput = JSON.parseObject(responseStr, ImageCreateTaskIdRes.class);
+        String task_id = resultOutput.getOutput().getTask_id();
         String response = "";
         while (true) {
             String url = String.format(GPTConstants.TONG_YI_QIAN_WEN_IMAGE_CREATE_GET_URL, task_id);
             String res = "";
             try {
-                res = okHttpService.makeGetRequest(url);
+                res = okHttpService.makeGetRequest(url, authorization);
             } catch (IOException e) {
                 throw new RuntimeException("获取作业结果接口异常！");
             }

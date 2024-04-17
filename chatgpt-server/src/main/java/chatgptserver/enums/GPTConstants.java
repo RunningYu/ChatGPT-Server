@@ -126,11 +126,12 @@ public class GPTConstants {
      * 作业提交接口调用
      */
     public static final String TONG_YI_QIAN_WEN_IMAGE_CREATE_POST_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis";
+
     /**
      * 文生图
      * 作业任务状态查询和结果获取接口
      */
-    public static final String TONG_YI_QIAN_WEN_IMAGE_CREATE_GET_URL = " https://dashscope.aliyuncs.com/api/v1/tasks/%s";
+    public static final String TONG_YI_QIAN_WEN_IMAGE_CREATE_GET_URL = "https://dashscope.aliyuncs.com/api/v1/tasks/%s";
 
 
 }

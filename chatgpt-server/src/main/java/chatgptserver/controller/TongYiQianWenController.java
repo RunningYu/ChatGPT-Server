@@ -58,9 +58,6 @@ public class TongYiQianWenController {
         return response;
     }
 
-    /**
-     * todo：模型申请ing，待审核通过再进行接口测试
-     */
     @ApiOperation("通义千问：图片生成")
     @PostMapping("/chat/tongYi/image/create")
     public JsonResult tongYiImageCreate(HttpServletRequest httpServletRequest,
