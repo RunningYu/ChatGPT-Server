@@ -14,6 +14,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,8 +28,9 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
 
-//    @Autowired
-//    private MessageService messageService;
+    @Lazy
+    @Autowired
+    private MessageService messageService;
 
     @Resource
     private RabbitTemplate rabbitTemplate;
@@ -67,9 +69,8 @@ public class UserServiceImpl implements UserService {
         response.put("chatName", chatPO.getChatName());
         response.put("functionCode", chatPO.getFunctionCode());
         log.info("UserServiceImpl createNewChat response:[{}]", response);
-
-        // todo: 新增默认预设
-//        messageService.recordHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
+        // 新增默认预设
+        messageService.recordHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
 
         return response;
     }

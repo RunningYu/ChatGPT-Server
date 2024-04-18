@@ -125,4 +125,18 @@ public class ConvertMapping {
 
         return chatAO;
     }
+
+    public static DefaultAO defaultPO2DefaultAO(DefaultPO defaultPO) {
+        if (Objects.isNull(defaultPO)) {
+            return null;
+        }
+        DefaultAO defaultAO = new DefaultAO();
+        defaultAO.setName(defaultPO.getName());
+        defaultAO.setContent(defaultPO.getContent());
+        defaultAO.setReplication(defaultPO.getReplication());
+        defaultAO.setFunctionCode(defaultPO.getFunctionCode());
+        defaultAO.setCreateTime(defaultPO.getCreateTime());
+
+        return defaultAO;
+    }
 }

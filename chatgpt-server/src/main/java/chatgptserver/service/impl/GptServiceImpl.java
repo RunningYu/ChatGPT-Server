@@ -1,5 +1,7 @@
 package chatgptserver.service.impl;
 
+import chatgptserver.Mapping.ConvertMapping;
+import chatgptserver.bean.ao.DefaultAO;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.po.DefaultPO;
 import chatgptserver.bean.po.GptPO;
@@ -9,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,8 +38,14 @@ public class GptServiceImpl implements GptService {
         log.info("GptServiceImpl defaultList");
         List<DefaultPO> list = gptMapper.defaultList();
         log.info("GptServiceImpl defaultList list:[{}]", list);
+        List<DefaultAO> response = new ArrayList<>();
+        for (DefaultPO defaultPO : list) {
+            DefaultAO defaultAO = ConvertMapping.defaultPO2DefaultAO(defaultPO);
+            defaultAO.setTotal(1);
+            response.add(defaultAO);
+        }
 
-        return JsonResult.success(list);
+        return JsonResult.success(response);
     }
 
 }
