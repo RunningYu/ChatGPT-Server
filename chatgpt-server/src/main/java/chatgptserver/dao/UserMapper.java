@@ -43,4 +43,6 @@ public interface UserMapper {
     List<ChatFunctionPO> gptChatFunctionList(String gptCode);
 
     void userInfoUpdate(UserAO request);
+
+    void updatePassword(String password, String email);
 }

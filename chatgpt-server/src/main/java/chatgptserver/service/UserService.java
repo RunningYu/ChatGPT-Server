@@ -23,9 +23,7 @@ public interface UserService {
 
     UserFeedbackListResponseAO chatUserFeedbackList(int page, int size);
 
-    JsonResult login(UserAO request);
-
-    String sendEmailVerifyCode(String email);
+    JsonResult sendEmailVerifyCode(String email);
 
     void chatDelete(String chatCode);
 
@@ -36,4 +34,12 @@ public interface UserService {
     JsonResult userInfo(String userCode);
 
     JsonResult userInfoUpdate(String token, UserAO request);
+
+    JsonResult register(UserAO request);
+
+    JsonResult loginByPassword(UserAO request);
+
+    JsonResult loginByVerifyCode(UserAO request);
+
+    JsonResult passwordForget(UserAO request);
 }

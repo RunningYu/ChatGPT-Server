@@ -12,11 +12,17 @@ import lombok.Data;
 @Data
 public class UserAO {
 
+    @ApiModelProperty("type, 0-注册 1-登录")
+    private Integer type;
+
     @ApiModelProperty("唯一code")
     private String userCode;
 
     @ApiModelProperty("邮箱")
     private String email;
+
+    @ApiModelProperty("发送验证码时的邮箱")
+    private String preEmail;
 
     @ApiModelProperty("电话号码")
     private String phone;

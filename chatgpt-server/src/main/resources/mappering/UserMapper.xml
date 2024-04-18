@@ -28,6 +28,10 @@
                                    password = #{password} where user_code = #{userCode}
     </update>
 
+    <update id="updatePassword">
+        update tb_chatgpt_user set password = #{password} where email = #{email}
+    </update>
+
     <delete id="chatDelete">
         update tb_chatgpt_chat set is_delete = 1 where chat_code = #{chatCode}
     </delete>

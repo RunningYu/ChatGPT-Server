@@ -39,12 +39,42 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @ApiOperation("用户注册、登录（首次用QQ邮箱登录，就当是注册，创建改新用户）")
+    @ApiOperation("用户注册")
     @Transactional(rollbackFor = Exception.class)
-    @PostMapping("/user/login")
-    public JsonResult login(@RequestBody UserAO request) {
-        log.info("UserController login request:[{}]", request);
-        JsonResult response = userService.login(request);
+    @PostMapping("/user/register")
+    public JsonResult register(@RequestBody UserAO request) {
+        log.info("UserController register request:[{}]", request);
+        JsonResult response = userService.register(request);
+
+        return response;
+    }
+
+    @ApiOperation("用户快捷登录，验证码登录或注册")
+    @Transactional(rollbackFor = Exception.class)
+    @PostMapping("/user/login/by/verifyCode")
+    public JsonResult loginByVerifyCode(@RequestBody UserAO request) {
+        log.info("UserController loginByVerifyCode request:[{}]", request);
+        JsonResult response = userService.loginByVerifyCode(request);
+
+        return response;
+    }
+
+    @ApiOperation("密码登录")
+    @Transactional(rollbackFor = Exception.class)
+    @PostMapping("/user/login/by/password")
+    public JsonResult loginByPassword(@RequestBody UserAO request) {
+        log.info("UserController loginByPassword request:[{}]", request);
+        JsonResult response = userService.loginByPassword(request);
+
+        return response;
+    }
+
+    @ApiOperation("忘记密码，重设密码")
+    @Transactional(rollbackFor = Exception.class)
+    @PostMapping("/user/password/forget")
+    public JsonResult passwordForget(@RequestBody UserAO request) {
+        log.info("UserController passwordForget request:[{}]", request);
+        JsonResult response = userService.passwordForget(request);
 
         return response;
     }
@@ -53,9 +83,9 @@ public class UserController {
     @GetMapping("/user/send/email")
     public JsonResult sendEmailVerifyCode(@Param("email") String email) {
         log.info("UserController sendEmailVerifyCode email:[{}]", email);
-        String verifyCode = userService.sendEmailVerifyCode(email);
+        JsonResult response = userService.sendEmailVerifyCode(email);
 
-        return JsonResult.success(verifyCode);
+        return response;
     }
 
     @ApiOperation("用户信息")

@@ -58,6 +58,10 @@ public class JsonResult<T> implements Serializable {
         return new JsonResult(200, message, data);
     }
 
+    public static <T> JsonResult<T> success(Integer code, String message) {
+        return new JsonResult(code, message);
+    }
+
     public static <T> JsonResult<T> success(Integer code, String message, T data) {
         return new JsonResult(code, message, data);
     }
