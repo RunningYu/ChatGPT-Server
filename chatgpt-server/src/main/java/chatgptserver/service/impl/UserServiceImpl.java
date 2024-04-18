@@ -69,8 +69,10 @@ public class UserServiceImpl implements UserService {
         response.put("chatName", chatPO.getChatName());
         response.put("functionCode", chatPO.getFunctionCode());
         log.info("UserServiceImpl createNewChat response:[{}]", response);
-        // 新增默认预设
-        messageService.recordHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
+        if (request.getContent() != null && !"".equals(request.getContent())) {
+            // 新增默认预设
+            messageService.recordHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
+        }
 
         return response;
     }
