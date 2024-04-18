@@ -1,7 +1,9 @@
 package chatgptserver.listener;
 
+import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.enums.mq.MessageMqConstants;
 import chatgptserver.service.MessageService;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +22,7 @@ import java.time.LocalTime;
  */
 @ApiModel(description = "Mq监听器")
 @Component
-public class UserMqListener {
+public class MessageMqListener {
 
     @Autowired
     private MessageService messageService;
@@ -32,7 +34,8 @@ public class UserMqListener {
     @RabbitListener(queues = MessageMqConstants.MESSAGE_INSERT_QUEUE)
     public void listenMessageInsertOrUpdate1(String message) {
         if (StringUtils.isNotBlank( message )){
-//            messageService.insertUserToIndexById(message);
+//            MessagesAO messagesAO = JSON.parseObject(message, MessagesAO.class);
+//            messageService.recordHistory(messagesAO.getUserCode(), messagesAO.getChatCode(), messagesAO.getQuestion(), messagesAO.getReplication());
             System.out.println("-----------【队列1】 MESSAGE_INSERT_QUEUE 同步新增 or 修改了--->" + LocalTime.now());
             logger.info("Token时效队列 监听1（String） {} 中消息： {}", MessageMqConstants.MESSAGE_INSERT_QUEUE, message);
         }
@@ -43,7 +46,8 @@ public class UserMqListener {
     @RabbitListener(queues = MessageMqConstants.MESSAGE_INSERT_QUEUE)
     public void listenMessageInsertOrUpdate2(String message) {
         if (StringUtils.isNotBlank( message )){
-//            messageService.insertUserToIndexById(message);
+//            MessagesAO messagesAO = JSON.parseObject(message, MessagesAO.class);
+//            messageService.recordHistory(messagesAO.getUserCode(), messagesAO.getChatCode(), messagesAO.getQuestion(), messagesAO.getReplication());
             System.out.println("-----------【队列2】 MESSAGE_INSERT_QUEUE 同步新增 or 修改了--->" + LocalTime.now());
             logger.info("Token时效队列 监听2（String） {} 中消息： {}", MessageMqConstants.MESSAGE_INSERT_QUEUE, message);
         }

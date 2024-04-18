@@ -6,14 +6,17 @@ import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.*;
 import chatgptserver.dao.GptMapper;
 import chatgptserver.dao.UserMapper;
+import chatgptserver.enums.mq.MessageMqConstants;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MD5Util;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -23,6 +26,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private GptMapper gptMapper;

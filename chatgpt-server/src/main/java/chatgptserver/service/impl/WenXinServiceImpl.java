@@ -209,50 +209,5 @@ public class WenXinServiceImpl implements WenXinService {
         return accessTokenResponse.getAccess_token();
     }
 
-//    OkHttpClient HTTP_CLIENT = new OkHttpClient().newBuilder().build();
-//
-//    public String getTokenResponse() throws IOException{
-//        MediaType mediaType = MediaType.parse("application/json");
-//        RequestBody body = RequestBody.create(mediaType, "");
-//        Request request = new Request.Builder()
-//                .url("https://aip.baidubce.com/oauth/2.0/token?client_id=8n7iZg2LgIZiSoFsycaGkb2z&client_secret=y4KeIGGnVAQ0nDBRjy6p3HuBGdRHk0Dv&grant_type=client_credentials")
-//                .method("POST", body)
-//                .addHeader("Content-Type", "application/json")
-//                .addHeader("Accept", "application/json")
-//                .build();
-//        Response response = HTTP_CLIENT.newCall(request).execute();
-//        String tokenResponse = response.body().string();
-//        System.out.println(tokenResponse);
-//        WXAccessTokenRspDTO accessTokenResponse = JSON.parseObject(tokenResponse, WXAccessTokenRspDTO.class);
-//        log.info("MessageServiceImpl getTokenResponse tokenResponse:[{}]", tokenResponse);
-//        log.info("MessageServiceImpl getTokenResponse access_token:[{}]", accessTokenResponse.getAccess_token());
-//        System.out.println("——————————————————————————————————————————————————————————————————————————");
-//        System.out.println(accessTokenResponse.getAccess_token());
-//        System.out.println("——————————————————————————————————————————————————————————————————————————");
-//
-//        return accessTokenResponse.getAccess_token();
-//    }
-//
-//    final String API_KEY = "aHZkdH****Sf655D";
-//    final String SECRET_KEY = "cVkrqC****wwICLs";
-//
-//    /**
-//     * 从用户的AK，SK生成鉴权签名（Access Token）
-//     *
-//     * @return 鉴权签名（Access Token）
-//     * @throws IOException IO异常
-//     */
-//    public String getAccessToken() throws IOException, JSONException {
-//        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-//        RequestBody body = RequestBody.create(mediaType, "grant_type=client_credentials&client_id=" + GPTConstants.WEN_XIN_API_KEY
-//                + "&client_secret=" + GPTConstants.WEN_XIN_SECRET_KEY);
-//        Request request = new Request.Builder()
-//                .url("https://aip.baidubce.com/oauth/2.0/token")
-//                .method("POST", body)
-//                .addHeader("Content-Type", "application/x-www-form-urlencoded")
-//                .build();
-//        Response response = HTTP_CLIENT.newCall(request).execute();
-//        return new JSONObject(response.body().string()).getString("access_token");
-//    }
 
 }
