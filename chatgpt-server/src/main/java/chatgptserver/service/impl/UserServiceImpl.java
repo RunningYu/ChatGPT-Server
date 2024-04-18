@@ -108,6 +108,9 @@ public class UserServiceImpl implements UserService {
             String userEmail = request.getEmail();
             Boolean emailIsLegal = (userEmail != null && userEmail.matches("^[1-9][0-9]{4,10}@qq\\.com$"));
             if (emailIsLegal) {
+                if (request.getVerifyCode() == null || "".equals(request.getVerifyCode())) {
+                    return JsonResult.error(500, "验证码错误");
+                }
                 if (!request.getPreEmail().equals(MD5Util.encrypt(request.getEmail()))) {
                     log.info("UserServiceImpl register 邮箱有改动，不一致！");
                     return JsonResult.error("邮箱有改动，不一致！");
@@ -200,6 +203,9 @@ public class UserServiceImpl implements UserService {
             log.info("UserServiceImpl loginByVerifyCode 邮箱格式不正确！");
             return JsonResult.error("邮箱格式不正确");
         }
+        if (request.getVerifyCode() == null || "".equals(request.getVerifyCode())) {
+            return JsonResult.error(500, "验证码错误");
+        }
         if (!request.getPreEmail().equals(MD5Util.encrypt(request.getEmail()))) {
             log.info("UserServiceImpl loginByVerifyCode 邮箱有改动，不一致！");
             return JsonResult.error("邮箱有改动，不一致！");
@@ -208,7 +214,7 @@ public class UserServiceImpl implements UserService {
         String md5Code = MD5Util.encrypt(request.getUserVerifyCode());
         if (!md5Code.equals(request.getVerifyCode())) {
             log.info("UserServiceImpl loginByVerifyCode 验证码错误！");
-            return JsonResult.error("验证码错误！");
+            return JsonResult.error(500, "验证码错误！");
         }
         UserPO userPO = userMapper.getUserByEmail(request.getEmail());
         // 如果没有注册过，则注册
@@ -239,11 +245,14 @@ public class UserServiceImpl implements UserService {
         Boolean emailIsLegal = (request.getEmail() != null && request.getEmail().matches("^[1-9][0-9]{4,10}@qq\\.com$"));
         if (emailIsLegal == false) {
             log.info("UserServiceImpl passwordForget 邮箱格式不正确！");
-            return JsonResult.error("邮箱格式不正确");
+            return JsonResult.error(500, "邮箱格式不正确");
+        }
+        if (request.getVerifyCode() == null || "".equals(request.getVerifyCode())) {
+            return JsonResult.error(500, "验证码错误");
         }
         if (!request.getPreEmail().equals(MD5Util.encrypt(request.getEmail()))) {
             log.info("UserServiceImpl passwordForget 邮箱有改动，不一致！");
-            return JsonResult.error("邮箱有改动，不一致！");
+            return JsonResult.error(500, "邮箱有改动，不一致！");
         }
         if (Objects.isNull(userPO)) {
             log.info("UserServiceImpl passwordForget email:[{}] 该账号还没注册过，请先注册！", request.getEmail());
@@ -254,17 +263,17 @@ public class UserServiceImpl implements UserService {
             String md5Code = MD5Util.encrypt(request.getUserVerifyCode());
             if (!md5Code.equals(request.getVerifyCode())) {
                 log.info("UserServiceImpl passwordForget 输入的验证码错误");
-                return JsonResult.error("输入的验证码错误");
+                return JsonResult.error(500, "输入的验证码错误");
             }
             //数字+字母，6-20位. 返回true 否则false
             boolean isLegal = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,20}$");
             if (isLegal == false) {
                 log.info("UserServiceImpl passwordForget 密码请输入数字+字母，6-20位");
-                return JsonResult.error("密码请输入数字+字母，6-20位");
+                return JsonResult.error(500, "密码请输入数字+字母，6-20位");
             }
             if (!request.getPassword().equals(request.getAgainPassword())) {
                 log.info("UserServiceImpl passwordForget 前后密码不对应");
-                return JsonResult.error("前后密码不对应");
+                return JsonResult.error(500, "前后密码不对应");
             }
             String newPassword = MD5Util.encrypt(request.getPassword());
             userMapper.updatePassword(newPassword, request.getEmail());
