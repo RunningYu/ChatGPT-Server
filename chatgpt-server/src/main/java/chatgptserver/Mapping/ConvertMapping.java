@@ -112,4 +112,17 @@ public class ConvertMapping {
 
         return functionAO;
     }
+
+    public static ChatAO chatAddRequestAO2ChatAO(ChatAddRequestAO addRequestAO) {
+        if (Objects.isNull(addRequestAO)) {
+            return null;
+        }
+        ChatAO chatAO = new ChatAO();
+        chatAO.setChatName(addRequestAO.getChatName());
+        chatAO.setGptCode(addRequestAO.getGptCode());
+        chatAO.setFunctionCode(addRequestAO.getFunctionCode());
+        chatAO.setUserCode(addRequestAO.getUserCode());
+
+        return chatAO;
+    }
 }

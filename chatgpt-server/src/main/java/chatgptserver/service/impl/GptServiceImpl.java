@@ -1,6 +1,7 @@
 package chatgptserver.service.impl;
 
 import chatgptserver.bean.ao.JsonResult;
+import chatgptserver.bean.po.DefaultPO;
 import chatgptserver.bean.po.GptPO;
 import chatgptserver.dao.GptMapper;
 import chatgptserver.service.GptService;
@@ -25,6 +26,15 @@ public class GptServiceImpl implements GptService {
     public JsonResult gptList() {
         List<GptPO> list = gptMapper.gptList();
         log.info("GptServiceImpl gptList list:[{}]", list);
+
+        return JsonResult.success(list);
+    }
+
+    @Override
+    public JsonResult defaultList() {
+        log.info("GptServiceImpl defaultList");
+        List<DefaultPO> list = gptMapper.defaultList();
+        log.info("GptServiceImpl defaultList list:[{}]", list);
 
         return JsonResult.success(list);
     }

@@ -2,10 +2,7 @@ package chatgptserver.service.impl;
 
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
-import chatgptserver.bean.po.ChatPO;
-import chatgptserver.bean.po.GptPO;
-import chatgptserver.bean.po.MessagesPO;
-import chatgptserver.bean.po.UserPO;
+import chatgptserver.bean.po.*;
 import chatgptserver.dao.GptMapper;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
@@ -107,15 +104,15 @@ public class MessageServiceImpl implements MessageService {
         List<ChatAO> response = new ArrayList<>();
         if (list.size() == 0) {
             // 创建默认的聊天
-            ChatPO chatPO = new ChatPO();
-            chatPO.setChatName("默认聊天");
-            chatPO.setGptCode(gptCode);
-            chatPO.setUserCode(userCode);
-            chatPO.setFunctionCode(functionCode);
-            chatPO.setFunctionCode("function_1");
-            Map<String, String> map = userService.createNewChat(chatPO);
+            ChatAddRequestAO chatNew = new ChatAddRequestAO();
+            chatNew.setChatName("文本问答");
+            chatNew.setGptCode(gptCode);
+            chatNew.setUserCode(userCode);
+            chatNew.setFunctionCode("function_1");
+            Map<String, String> map = userService.createNewChat(chatNew);
             String chatCode = map.get("chatCode");
-            ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);
+            ChatAO chatAO = ConvertMapping.chatAddRequestAO2ChatAO(chatNew);
+            chatAO.setFunctionName("文本问答");
             chatAO.setChatCode(chatCode);
             chatAO.setChatAmount(0);
             chatAO.setLastChatTime(new Date());
@@ -128,6 +125,8 @@ public class MessageServiceImpl implements MessageService {
             int chatAmount = messageMapper.getChatAmount(chatPO.getChatCode());
             ChatAO chatAO = ConvertMapping.chatPO2ChatAO(chatPO);
             chatAO.setChatAmount(chatAmount);
+            String functionName = gptMapper.getFunctionNameInfo(chatPO.getFunctionCode());
+            chatAO.setFunctionName(functionName);
             Date lastChatTime = messageMapper.getLastChatTime(chatPO.getChatCode());
             lastChatTime = lastChatTime == null ? new Date() : lastChatTime;
             chatAO.setLastChatTime(lastChatTime);

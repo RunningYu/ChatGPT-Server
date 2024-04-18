@@ -10,4 +10,6 @@ import chatgptserver.bean.po.GptPO;
 public interface GptService {
 
     JsonResult gptList();
+
+    JsonResult defaultList();
 }

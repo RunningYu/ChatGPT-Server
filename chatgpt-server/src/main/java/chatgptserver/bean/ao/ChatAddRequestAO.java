@@ -24,4 +24,10 @@ public class ChatAddRequestAO {
     @ApiModelProperty(value = "新建的对话的名字", required = true)
     private String chatName;
 
+    @ApiModelProperty(value = "预设问题", required = false)
+    private String content;
+
+    @ApiModelProperty(value = "预设回答", required = false)
+    private String replication;
+
 }

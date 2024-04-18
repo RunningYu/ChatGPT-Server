@@ -17,7 +17,7 @@ public interface UserService {
 
     UserPO getUserByCode(String senderCode);
 
-    Map<String, String> createNewChat(ChatPO chatPO);
+    Map<String, String> createNewChat(ChatAddRequestAO request);
 
     void chatUserFeedback(UserFeedbackRequestAO request);
 

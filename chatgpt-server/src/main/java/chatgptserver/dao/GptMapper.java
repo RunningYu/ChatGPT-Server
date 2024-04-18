@@ -1,8 +1,6 @@
 package chatgptserver.dao;
 
-import chatgptserver.bean.po.ChatPO;
-import chatgptserver.bean.po.GptPO;
-import chatgptserver.bean.po.UserPO;
+import chatgptserver.bean.po.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,4 +16,8 @@ public interface GptMapper {
     GptPO getGptByCode(String gptCode);
 
     List<GptPO> gptList();
+
+    List<DefaultPO> defaultList();
+
+    String getFunctionNameInfo(String functionCode);
 }

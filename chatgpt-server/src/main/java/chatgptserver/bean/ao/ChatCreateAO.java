@@ -13,32 +13,28 @@ import java.util.Date;
  */
 @ApiModel("新建对话请求体")
 @Data
-public class ChatAO {
+public class ChatCreateAO {
 
-    @ApiModelProperty(value = "新建聊天的唯一code")
+    @ApiModelProperty(value = "新建聊天的唯一code", required = true)
     private String chatCode;
 
-    @ApiModelProperty(value = "用户的code")
+    @ApiModelProperty(value = "用户的code", required = false)
     private String userCode;
 
-    @ApiModelProperty(value = "新建的对话的名字")
+    @ApiModelProperty(value = "新建的对话的名字", required = true)
     private String chatName;
 
-    @ApiModelProperty(value = "大模型code")
+    @ApiModelProperty(value = "大模型code", required = true)
     private String gptCode;
 
-    @ApiModelProperty(value = "功能code")
+    @ApiModelProperty(value = "功能code", required = true)
     private String functionCode;
 
-    @ApiModelProperty(value = "功能名称", required = true)
-    private String functionName;
+    @ApiModelProperty(value = "预设问题", required = false)
+    private String content;
 
-    @ApiModelProperty(value = "聊天数量")
-    private Integer chatAmount;
-
-    @ApiModelProperty(value = "上一次聊天的时间")
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss", timezone = "GMT+8")
-    private Date lastChatTime;
+    @ApiModelProperty(value = "预设回答", required = false)
+    private String replication;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss", timezone = "GMT+8")

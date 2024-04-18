@@ -6,7 +6,7 @@ import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.*;
 import chatgptserver.dao.GptMapper;
 import chatgptserver.dao.UserMapper;
-import chatgptserver.enums.mq.MessageMqConstants;
+import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MD5Util;
@@ -27,6 +27,9 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
 
+//    @Autowired
+//    private MessageService messageService;
+
     @Resource
     private RabbitTemplate rabbitTemplate;
 
@@ -42,6 +45,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+
     @Override
     public UserPO getUserByCode(String senderCode) {
         log.info("UserServiceImpl getUserByCode senderCode:[{}]", senderCode);
@@ -52,8 +56,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, String> createNewChat(ChatPO chatPO) {
-        log.info("UserServiceImpl createNewChat chatPO:[{}]", chatPO);
+    public Map<String, String> createNewChat(ChatAddRequestAO request) {
+        log.info("UserServiceImpl createNewChat request:[{}]", request);
+        ChatPO chatPO = ConvertMapping.ChatAddRequestAO2ChatPO(request);
         int id = userMapper.newChat(chatPO);
         String chatCode = "chat_" + chatPO.getId();
         userMapper.updateChatCode(chatCode, chatPO.getId());
@@ -62,6 +67,9 @@ public class UserServiceImpl implements UserService {
         response.put("chatName", chatPO.getChatName());
         response.put("functionCode", chatPO.getFunctionCode());
         log.info("UserServiceImpl createNewChat response:[{}]", response);
+
+        // todo: 新增默认预设
+//        messageService.recordHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
 
         return response;
     }
@@ -318,6 +326,7 @@ public class UserServiceImpl implements UserService {
             UserPO userPO = jwtUtils.getUserFromToken(token);
             userCode = userPO.getUserCode();
         }
+
         return userCode;
     }
 
@@ -340,7 +349,7 @@ public class UserServiceImpl implements UserService {
     public JsonResult userInfo(String userCode) {
         log.info("UserServiceImpl userInfo userCode:[{}]", userCode);
         if (userCode == null) {
-            return JsonResult.error("token失效或过期");
+            return JsonResult.error(401, "token失效或过期");
         }
         UserPO userPO = userMapper.getUserByCode(userCode);
 
@@ -351,11 +360,11 @@ public class UserServiceImpl implements UserService {
     public JsonResult userInfoUpdate(String token, UserAO request) {
         log.info("UserServiceImpl userInfoUpdate token:[{}], request:[{}]", token, request);
         if (token == null || "".equals(token)) {
-            return JsonResult.error("请先登录");
+            return JsonResult.error(401, "请先登录");
         }
         String userCode = getUserCodeByToken(token);
         if (userCode == null) {
-            return JsonResult.error("token失效或过期");
+            return JsonResult.error(401, "token失效或过期");
         }
         Boolean emailIsLegal = request.getEmail().matches("^[1-9][0-9]{4,10}@qq\\.com$");
         if (emailIsLegal == false) {

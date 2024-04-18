@@ -94,7 +94,7 @@ public class UserController {
         String token = httpServletRequest.getHeader("token");
         log.info("userController userInfo token:[{}]", token);
         if (token == null || "".equals(token)) {
-            return JsonResult.error("请先登录");
+            return JsonResult.error(401, "请先登录");
         }
         String userCode = userService.getUserCodeByToken(token);
         JsonResult response = userService.userInfo(userCode);
@@ -121,12 +121,14 @@ public class UserController {
         log.info("UserController chatAdd request:[{}]", request);
         String token = httpServletRequest.getHeader("token");
         if (token == null || "".equals(token)) {
-            return JsonResult.success("请先登录");
+            return JsonResult.error(401, "请先登录");
         }
         String userCode = userService.getUserCodeByToken(token);
+        if (userCode == null) {
+            return JsonResult.error(401, "token过期");
+        }
         request.setUserCode(userCode);
-        ChatPO chatPO = ConvertMapping.ChatAddRequestAO2ChatPO(request);
-        Map<String, String> response = userService.createNewChat(chatPO);
+        Map<String, String> response = userService.createNewChat(request);
 
         return JsonResult.success(response);
     }
@@ -169,7 +171,7 @@ public class UserController {
         String token = httpServletRequest.getHeader("token");
         String userCode = userService.getUserCodeByToken(token);
         if (userCode == null || "".equals(userCode)) {
-            return JsonResult.error("token无效或过期");
+            return JsonResult.error(401, "token无效或过期");
         }
         log.info("UserController chatUserFeedback userCode:[{}]", userCode);
         request.setUserCode(userCode);

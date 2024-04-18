@@ -10,5 +10,13 @@
         select * from tb_chatgpt_gpt
     </select>
 
+    <select id="defaultList" resultType="chatgptserver.bean.po.DefaultPO">
+        select * from tb_chatgpt_default
+    </select>
+
+    <select id="getFunctionNameInfo" resultType="String">
+        select function_name from tb_chatgpt_chat_functions where function_code = #{functionCode} limit 0, 1
+    </select>
+
 
 </mapper>
