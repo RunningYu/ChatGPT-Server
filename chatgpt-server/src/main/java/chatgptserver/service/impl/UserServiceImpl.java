@@ -285,7 +285,7 @@ public class UserServiceImpl implements UserService {
         }
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put("preEmail", MD5Util.encrypt(email));
-        responseMap.put("verifyCode", verifyCode);
+        responseMap.put("verifyCode", MD5Util.encrypt(verifyCode));
         log.info("UserServiceImpl sendEmailVerifyCode responseMap:[{}]", responseMap);
 
         return JsonResult.success(responseMap);
