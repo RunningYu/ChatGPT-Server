@@ -58,6 +58,8 @@ public class TongYiServiceImpl implements TongYiService {
         String imageUrl = "";
         if (image != null) {
             imageUrl = minioUtil.upLoadFileToURL(image);
+        } else {
+            imageUrl = content.split("\n")[0];
         }
         String userCode = userService.getUserCodeByToken(token);
         // 构建多轮对话请求体

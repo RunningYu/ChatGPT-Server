@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
@@ -163,7 +164,14 @@ public class WenXinServiceImpl implements WenXinService {
         } catch (Exception e) {
             return JsonResult.error("获取access_token异常！");
         }
-        String base64Image = ImageUtil.imageMultipartFileToBase64(image);
+        String base64Image = "";
+        // todo：如果是重新生成，则需要将图片url转成base64
+        if (image != null) {
+            base64Image = ImageUtil.imageMultipartFileToBase64(image);
+        } else {
+            String iUrl = content.split("\n")[0];
+            base64Image = ImageUtil.imageUrlToBase64(iUrl);
+        }
         WenXinImageUnderstandDTO request = new WenXinImageUnderstandDTO(content, base64Image);
         log.info("WenXinServiceImpl wenXinImageUnderstand request:[{}]", request);
         String requestJson = JSON.toJSONString(request);
@@ -179,11 +187,13 @@ public class WenXinServiceImpl implements WenXinService {
         WenXinImageUnderstandResponseDTO response = JSON.parseObject(responseStr, WenXinImageUnderstandResponseDTO.class);
         log.info("WenXinServiceImpl wenXinImageUnderstand response:[{}]", response);
         String imageUrl = "";
-        try {
-            UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
-            imageUrl = uploadResponse.getMinIoUrl();
-        } catch (Exception e) {
-            return JsonResult.error("图片处理异常！");
+        if (image != null) {
+            try {
+                UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
+                imageUrl = uploadResponse.getMinIoUrl();
+            } catch (Exception e) {
+                return JsonResult.error("图片处理异常！");
+            }
         }
         String question = imageUrl + "\n\n" + content;
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult());

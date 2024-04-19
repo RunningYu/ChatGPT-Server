@@ -169,7 +169,12 @@ public class XunFeiServiceImpl implements XunFeiService {
                 requestList.add(new Text("assistant", history.getReplication(), "text"));
             }
         } else {
-            base64Image = ImageUtil.imageMultipartFileToBase64(image);
+            if (image != null) {
+                base64Image = ImageUtil.imageMultipartFileToBase64(image);
+            } else {
+                String iUrl = content.split("\n")[0];
+                base64Image = ImageUtil.imageUrlToBase64(iUrl);
+            }
             requestList.add(new Text("user", base64Image, "image"));
         }
         requestList.add(new Text("user", content, "text"));

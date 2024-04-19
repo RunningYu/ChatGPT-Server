@@ -62,7 +62,7 @@ public class WenXinYiYanController {
     @ApiOperation("文心一言：图片理解【不支持多轮对话】")
     @PostMapping("/chat/wenXin/image/understand")
     public JsonResult wenXinImageUnderstand(HttpServletRequest httpServletRequest,
-                                            @RequestParam("image") MultipartFile image,
+                                            @RequestParam(value = "image", required = false) MultipartFile image,
                                             @RequestParam("chatCode") String chatCode,
                                             @RequestParam("content") String content,
                                             @RequestParam("isRebuild") Boolean isRebuild) {
