@@ -34,9 +34,9 @@ public class GptServiceImpl implements GptService {
     }
 
     @Override
-    public JsonResult defaultList() {
-        log.info("GptServiceImpl defaultList");
-        List<DefaultPO> list = gptMapper.defaultList();
+    public JsonResult defaultList(String gptCode) {
+        log.info("GptServiceImpl defaultList gptCode:[{}]", gptCode);
+        List<DefaultPO> list = gptMapper.defaultList(gptCode);
         log.info("GptServiceImpl defaultList list:[{}]", list);
         List<DefaultAO> response = new ArrayList<>();
         for (DefaultPO defaultPO : list) {

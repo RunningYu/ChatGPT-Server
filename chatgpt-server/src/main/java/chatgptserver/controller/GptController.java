@@ -4,8 +4,10 @@ import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.service.GptService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,9 +23,9 @@ public class GptController {
 
     @ApiOperation("预设列表")
     @GetMapping("/chat/default/list")
-    public JsonResult defaultList() {
-        log.info("GptController defaultList");
-        JsonResult response = gptService.defaultList();
+    public JsonResult defaultList(@Param("gptCode") String gptCode) {
+        log.info("GptController defaultList gptCode:[{}]", gptCode);
+        JsonResult response = gptService.defaultList(gptCode);
 
         return response;
     }
