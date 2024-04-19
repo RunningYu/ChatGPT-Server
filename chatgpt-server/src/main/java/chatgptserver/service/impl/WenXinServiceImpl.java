@@ -156,6 +156,9 @@ public class WenXinServiceImpl implements WenXinService {
         if (userCode == null) {
             return JsonResult.error("token失效或过期！");
         }
+        if (image == null && isRebuild == false) {
+            return JsonResult.error(500, "文心一言的图片理解不支持多轮对话");
+        }
         String url = String.format(GPTConstants.WEN_XIN_GET_ACCESS_TOKEN_URL, GPT_KEY_MAP.get(GPTConstants.WEN_XIN_API_KEY_NAME), GPT_KEY_MAP.get(GPTConstants.WEN_XIN_SECRET_KEY_NAME));
         // 获取accessToken
         String accessToken = null;
@@ -187,15 +190,16 @@ public class WenXinServiceImpl implements WenXinService {
         WenXinImageUnderstandResponseDTO response = JSON.parseObject(responseStr, WenXinImageUnderstandResponseDTO.class);
         log.info("WenXinServiceImpl wenXinImageUnderstand response:[{}]", response);
         String imageUrl = "";
+        String question = content;
         if (image != null) {
             try {
                 UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
                 imageUrl = uploadResponse.getMinIoUrl();
+                question = imageUrl + "\n\n" + content;
             } catch (Exception e) {
                 return JsonResult.error("图片处理异常！");
             }
         }
-        String question = imageUrl + "\n\n" + content;
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult());
         messageService.recordHistory(userCode, chatCode, question, response.getResult(), isRebuild);
 //        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, content, response.getResult());

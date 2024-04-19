@@ -102,7 +102,7 @@ public class XunFeiServiceImpl implements XunFeiService {
             String url = authUrl.toString().replace("http://", "ws://").replace("https://", "wss://");
             Request request = new Request.Builder().url(url).build();
             // 封装多轮对话的请求body
-            List<Text> imageUnderstandRequest = buildImageUnderstandRequest(chatCode, image, content);
+            List<Text> imageUnderstandRequest = buildImageUnderstandRequest(chatCode, image, content, isRebuild);
             for (int i = 0; i < 1; i++) {
                 WebSocket webSocket = client.newWebSocket(request, new BigModelNew(threadId, imageUnderstandRequest, i + "", false));
             }
@@ -129,10 +129,10 @@ public class XunFeiServiceImpl implements XunFeiService {
                             messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, question, totalResponse);
                         }
                     } else {
+                        question = content;
                         if (isRebuild) {
                             messageService.recordHistory("", chatCode, "", totalResponse, isRebuild);
                         } else {
-                            question = content;
                             messageService.recordHistoryWithImage(userCode, chatCode, "0", question, totalResponse);
                         }
                     }
@@ -147,11 +147,12 @@ public class XunFeiServiceImpl implements XunFeiService {
 
     }
 
-    private List<Text> buildImageUnderstandRequest(String chatCode, MultipartFile image, String content) {
+    private List<Text> buildImageUnderstandRequest(String chatCode, MultipartFile image, String content, Boolean isRebuild) {
         List<Text> requestList = new ArrayList<>();
         String base64Image = "";
+        String[] contentsSplit = content.split("\n");
         // 如果图片为空，则表示多轮对话
-        if (Objects.isNull(image)) {
+        if (Objects.isNull(image) && !contentsSplit[0].contains("http://124.71.110.30:9000/")) {
             // 获取第一轮对话
             MessagesPO messagesFistChat = messageMapper.getTongYiQuestionFistChat(chatCode);
             log.info("XunFeiServiceImpl buildImageUnderstandRequest messagesFistChat:[{}]", messagesFistChat);
