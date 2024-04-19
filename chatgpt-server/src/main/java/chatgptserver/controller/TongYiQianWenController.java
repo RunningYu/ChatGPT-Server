@@ -40,7 +40,7 @@ public class TongYiQianWenController {
                                      @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("WenXinYiYanController tongYiQuestion token:[{}], request:[{}]", token, request);
-        JsonResult response = tongYiService.tyQuestion(token, request.getChatCode(), request.getContent());
+        JsonResult response = tongYiService.tyQuestion(token, request.getChatCode(), request.getContent(), request.getIsRebuild());
 
         return response;
     }
@@ -50,10 +50,11 @@ public class TongYiQianWenController {
     public JsonResult tongYiImageUnderstand(HttpServletRequest httpServletRequest,
                                             @RequestParam(value = "image", required = false) MultipartFile image,
                                             @RequestParam("content") String content,
-                                            @RequestParam("chatCode") String chatCode) {
+                                            @RequestParam("chatCode") String chatCode,
+                                            @RequestParam(value = "isRebuild", defaultValue = "false") Boolean isRebuild) {
         String token = httpServletRequest.getHeader("token");
-        log.info("WenXinYiYanController tongYiImageUnderstand token:[{}], image:[{}] content:[{}], token:[{}], chatCode:[{}]", token, image, content, token, chatCode);
-        JsonResult response = tongYiService.tyImageUnderstand(image, content, token, chatCode);
+        log.info("WenXinYiYanController tongYiImageUnderstand token:[{}], image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}]", token, image, content, token, chatCode, isRebuild);
+        JsonResult response = tongYiService.tyImageUnderstand(image, content, token, chatCode, isRebuild);
 
         return response;
     }
@@ -66,7 +67,7 @@ public class TongYiQianWenController {
         log.info("WenXinYiYanController tongYiImageUnderstand token:[{}]", token);
         String userCode = userService.getUserCodeByToken(token);
         log.info("WenXinYiYanController tongYiImageCreate userCode:[{}], request:[{}]", userCode, request);
-        JsonResult response = tongYiService.tyImageCreate(userCode, request.getChatCode(), request.getContent());
+        JsonResult response = tongYiService.tyImageCreate(userCode, request.getChatCode(), request.getContent(), request.getIsRebuild());
 
         return response;
     }

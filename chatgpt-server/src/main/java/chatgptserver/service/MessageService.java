@@ -3,6 +3,7 @@ package chatgptserver.service;
 import chatgptserver.bean.ao.ChatAO;
 import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.MessagesResponseAO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface MessageService {
     MessagesAO buildMessageAO(String userCode, String chatCode, String content, String totalResponse);
 
     void recordHistoryWithReplyImage(String userCode, String chatCode, String content, String replication, String replyImage);
+
+    void recordHistory(String userCode, String chatCode, String content, String response, Boolean isRebuild);
 }

@@ -108,12 +108,13 @@ public class XunFeiXingHuoController {
     public JsonResult xfImageUnderstand(HttpServletRequest httpServletRequest,
                                         @RequestParam(value = "image", required = false) MultipartFile image,
                                         @RequestParam("content") String content,
-                                        @RequestParam("chatCode") String chatCode) {
+                                        @RequestParam("chatCode") String chatCode,
+                                        @RequestParam("isRebuild") Boolean isRebuild) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfPictureUnderstand token:[{}]", token);
-        log.info("ChatGptController xfPictureUnderstand token:[{}], image:[{}], content[{}], chatCode:[{}]", token, image, content, chatCode);
+        log.info("ChatGptController xfPictureUnderstand token:[{}], image:[{}], content[{}], chatCode:[{}], isRebuild:[{}]", token, image, content, chatCode, isRebuild);
         Long threadId = Thread.currentThread().getId();
-        JsonResult response = xunFeiService.xfImageUnderstand(threadId, image, content, token, chatCode);
+        JsonResult response = xunFeiService.xfImageUnderstand(threadId, image, content, token, chatCode, isRebuild);
 
         return response;
     }
@@ -124,7 +125,7 @@ public class XunFeiXingHuoController {
                                     @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfImageCreate token:[{}], request:[{}]", token, request);
-        JsonResult response = xunFeiService.xfImageCreate(request.getContent(), token, request.getChatCode());
+        JsonResult response = xunFeiService.xfImageCreate(request.getContent(), token, request.getChatCode(), request.getIsRebuild());
 
         return response;
     }
@@ -161,7 +162,7 @@ public class XunFeiXingHuoController {
                                   @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfPptCreate token:[{}], request:[{}]", token, request);
-        JsonResult response = xunFeiService.xfPptCreate(request.getContent(), token, request.getChatCode());
+        JsonResult response = xunFeiService.xfPptCreate(request.getContent(), token, request.getChatCode(), request.getIsRebuild());
 
         return response;
     }

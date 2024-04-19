@@ -7,6 +7,12 @@
             values (#{role}, #{userCode}, #{chatCode}, #{username}, #{chatName}, #{image}, #{question}, #{replication}, #{replyImage})
     </insert>
 
+    <update id="rebuildQuestion">
+        update tb_chatgpt_messages
+        set replication = #{replication}
+        where id = #{id}
+    </update>
+
 
     <select id="getWenXinHistory" resultType="chatgptserver.bean.po.MessagesPO">
         select * from tb_chatgpt_messages where chat_code = #{chatCode} order by id DESC limit 0, 10
@@ -52,6 +58,10 @@
 
     <select id="getLastChatTime" resultType="java.util.Date">
         select create_time from tb_chatgpt_messages where chat_code = #{chatCode} order by create_time DESC limit 0, 1
+    </select>
+
+    <select id="getUpdateMessageId" resultType="java.lang.Integer">
+        SELECT MAX(id) FROM tb_chatgpt_messages WHERE chat_code = #{chatCode}
     </select>
 
 </mapper>

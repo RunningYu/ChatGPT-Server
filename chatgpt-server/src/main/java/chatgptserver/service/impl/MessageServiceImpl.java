@@ -186,6 +186,37 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public void recordHistory(String userCode, String chatCode, String content, String result, Boolean isRebuild) {
+        log.info("MessageServiceImpl recordHistory userCode:[{}], chatCode:[{}], content:[{}], result:[{}], isRebuild:[{}]", userCode, chatCode, content, result, isRebuild);
+        if (isRebuild != null && isRebuild) {
+            int id = messageMapper.getUpdateMessageId(chatCode);
+            messageMapper.rebuildQuestion(chatCode, result, id);
+
+            return;
+        }
+        String userName = "";
+        ChatPO target = userMapper.getChatByCode(chatCode);
+        if (userCode != null && !userCode.equals("")) {
+            UserPO sender = userMapper.getUserByCode(userCode);
+            userName = sender.getUsername();
+        } else {
+            chatCode = "x_" + chatCode;
+        }
+
+        MessagesPO messagesPO = new MessagesPO();
+        messagesPO.setRole(RoleTypeEnums.WEN_XIN_USER.getType());
+        messagesPO.setUserCode(userCode);
+        messagesPO.setChatCode(chatCode);
+        messagesPO.setUsername(userName);
+        messagesPO.setChatName(target.getChatName());
+        messagesPO.setQuestion(content);
+        result = (result == null || result.equals("")) ? "没有生成相应的结果" : result;
+        messagesPO.setReplication(result);
+
+        messageMapper.insertMessage(messagesPO);
+    }
+
+    @Override
     public MessagesResponseAO historyList(String chatCode, int page, int size) {
         log.info("MessageServiceImpl historyList chatCode:[{}], page:[{}], size:[{}]", chatCode, page, size);
         page = (page > 0 ? page : 1);

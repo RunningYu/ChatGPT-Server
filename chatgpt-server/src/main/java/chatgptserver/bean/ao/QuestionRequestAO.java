@@ -1,5 +1,6 @@
 package chatgptserver.bean.ao;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -19,5 +20,8 @@ public class QuestionRequestAO {
 
     @ApiModelProperty("聊天code")
     private String chatCode;
+
+    @ApiModelProperty("是否重新生成")
+    private Boolean isRebuild;
 
 }

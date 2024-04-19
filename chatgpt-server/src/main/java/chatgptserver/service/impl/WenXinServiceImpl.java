@@ -59,7 +59,7 @@ public class WenXinServiceImpl implements WenXinService {
     private OkHttpService okHttpService;
 
     @Override
-    public JsonResult getMessageFromWenXin(String userCode, String chatCode, String message) {
+    public JsonResult getMessageFromWenXin(String userCode, String chatCode, String message, Boolean isRebuild) {
         log.info("MessageServiceImpl getMessageFromWenXin");
         String url = String.format(GPTConstants.WEN_XIN_GET_ACCESS_TOKEN_URL, GPT_KEY_MAP.get(GPTConstants.WEN_XIN_API_KEY_NAME), GPT_KEY_MAP.get(GPTConstants.WEN_XIN_SECRET_KEY_NAME));
 
@@ -96,7 +96,7 @@ public class WenXinServiceImpl implements WenXinService {
             WenXinRspDTO wenXinRspDTO = JSON.parseObject(responseStr, WenXinRspDTO.class);
             log.info("MessageServiceImpl getMessageFromWenXin response:[{}]", wenXinRspDTO);
 
-            messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult());
+            messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult(), isRebuild);
             String response = ( (wenXinRspDTO.getResult() == null || wenXinRspDTO.getResult().equals("")) ? "[没有生成相应的结果]" : wenXinRspDTO.getResult() );
             MessagesAO messagesAO = messageService.buildMessageAO(userCode, chatCode, message, response);
 
@@ -108,7 +108,7 @@ public class WenXinServiceImpl implements WenXinService {
     }
 
     @Override
-    public JsonResult wxImageCreate(String userCode, String chatCode, String content) {
+    public JsonResult wxImageCreate(String userCode, String chatCode, String content, Boolean isRebuild) {
         log.info("WenXinServiceImpl wxImageCreate userCode:[{}], chatCode:[{}], content:[{}]", userCode, chatCode, content);
         String accessToken = null;
         try {
@@ -140,7 +140,7 @@ public class WenXinServiceImpl implements WenXinService {
             String replication = uploadResponse.getMinIoUrl() + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
             MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
             // 记录历史记录
-            messageService.recordHistory(userCode, chatCode, content, replication);
+            messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
 //            messageService.recordHistory(userCode, chatCode, content, uploadResponse.getMinIoUrl());
 
             return JsonResult.success(result);
@@ -150,7 +150,7 @@ public class WenXinServiceImpl implements WenXinService {
     }
 
     @Override
-    public JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content) {
+    public JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild) {
         String userCode = userService.getUserCodeByToken(token);
         if (userCode == null) {
             return JsonResult.error("token失效或过期！");
@@ -187,7 +187,7 @@ public class WenXinServiceImpl implements WenXinService {
         }
         String question = imageUrl + "\n\n" + content;
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult());
-        messageService.recordHistory(userCode, chatCode, question, response.getResult());
+        messageService.recordHistory(userCode, chatCode, question, response.getResult(), isRebuild);
 //        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, content, response.getResult());
 
         return JsonResult.success(result);

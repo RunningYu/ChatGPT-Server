@@ -41,7 +41,7 @@ public class WenXinYiYanController {
         log.info("ChatGptController wenXinChat token:[{}]", token);
         String userCode = userService.getUserCodeByToken(token);
         log.info("WenXinYiYanController wenXinChat requestAO:[{}]", requestAO);
-        JsonResult response = wenXinService.getMessageFromWenXin(userCode, requestAO.getChatCode(), requestAO.getContent());
+        JsonResult response = wenXinService.getMessageFromWenXin(userCode, requestAO.getChatCode(), requestAO.getContent(), requestAO.getIsRebuild());
 
         return response;
     }
@@ -54,7 +54,7 @@ public class WenXinYiYanController {
         log.info("WenXinYiYanController wenXinImageCreate token:[{}]", token);
         UserPO tokenUser = jwtUtils.getUserFromToken(token);
         log.info("WenXinYiYanController wenXinImageCreate tokenUser:[{}] request:[{}]", tokenUser, request);
-        JsonResult response = wenXinService.wxImageCreate(tokenUser.getUserCode(), request.getChatCode(), request.getContent());
+        JsonResult response = wenXinService.wxImageCreate(tokenUser.getUserCode(), request.getChatCode(), request.getContent(), request.getIsRebuild());
 
         return response;
     }
@@ -64,11 +64,12 @@ public class WenXinYiYanController {
     public JsonResult wenXinImageUnderstand(HttpServletRequest httpServletRequest,
                                             @RequestParam("image") MultipartFile image,
                                             @RequestParam("chatCode") String chatCode,
-                                            @RequestParam("content") String content) {
-        log.info("WenXinYiYanController wenXinImageUnderstand chatCode:[{}], image:[{}], content:[{}]", chatCode, image, content);
+                                            @RequestParam("content") String content,
+                                            @RequestParam("isRebuild") Boolean isRebuild) {
+        log.info("WenXinYiYanController wenXinImageUnderstand chatCode:[{}], image:[{}], content:[{}], isRebuild:[{}]", chatCode, image, content, isRebuild);
         String token = httpServletRequest.getHeader("token");
         log.info("WenXinYiYanController wenXinImageUnderstand token:[{}]", token);
-        JsonResult response = wenXinService.wenXinImageUnderstand(token, chatCode, image, content);
+        JsonResult response = wenXinService.wenXinImageUnderstand(token, chatCode, image, content, isRebuild);
 
         return response;
     }

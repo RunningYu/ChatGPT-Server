@@ -10,9 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface TongYiService {
 
-    JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode);
+    JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode, Boolean isRebuild);
 
-    JsonResult tyQuestion(String token, String chatCode, String content);
+    JsonResult tyQuestion(String token, String chatCode, String content, Boolean isRebuild);
 
-    JsonResult tyImageCreate(String userCode, String chatCode, String content);
+    JsonResult tyImageCreate(String userCode, String chatCode, String content, Boolean isRebuild);
 }

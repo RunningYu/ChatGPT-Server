@@ -18,7 +18,6 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -54,8 +53,8 @@ public class TongYiServiceImpl implements TongYiService {
     private MessageMapper messageMapper;
 
     @Override
-    public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode) {
-        log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}]", image, content, token, chatCode);
+    public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode, Boolean isRebuild) {
+        log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}]", image, content, token, chatCode, isRebuild);
         String imageUrl = "";
         if (image != null) {
             imageUrl = minioUtil.upLoadFileToURL(image);
@@ -78,15 +77,19 @@ public class TongYiServiceImpl implements TongYiService {
         String response = responseDTO.getOutput().getChoices().get(0).getMessage().getContent().get(0).get("text");
         log.info("TongYiServiceImpl tyImageUnderstand response:[{}]", response);
         String question = imageUrl.equals("") ? content : (imageUrl + "\n\n" + content);
-        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl.equals("") ? "0" : imageUrl, question, response);
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response);
+        if (isRebuild) {
+            messageService.recordHistory("", chatCode, "", response, isRebuild);
+        } else {
+            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl.equals("") ? "0" : imageUrl, question, response);
+        }
 
         return JsonResult.success(result);
     }
 
     @Override
-    public JsonResult tyQuestion(String token, String chatCode, String content) {
-        log.info("TongYiServiceImpl getMessageFromWenXin token:[{}] chatCode:[{}], content:[{}]", token, chatCode, content);
+    public JsonResult tyQuestion(String token, String chatCode, String content, Boolean isRebuild) {
+        log.info("TongYiServiceImpl getMessageFromWenXin token:[{}] chatCode:[{}], content:[{}], isRebuild:[{}]", token, chatCode, content, isRebuild);
         Text text = new Text("user", content);
         List<Text> textList = new ArrayList<>();
         textList.add(text);
@@ -116,15 +119,15 @@ public class TongYiServiceImpl implements TongYiService {
         }
         QuestionResponseDTO responseDTO = JSON.parseObject(responseStr, QuestionResponseDTO.class);
         String response = responseDTO.getOutput().getText();
-        messageService.recordHistory(userCode, chatCode, content, response);
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, response);
+        messageService.recordHistory(userCode, chatCode, content, response, isRebuild);
 
         return JsonResult.success(result);
     }
 
     @Override
-    public JsonResult tyImageCreate(String userCode, String chatCode, String content) {
-        log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}]", userCode, chatCode, chatCode);
+    public JsonResult tyImageCreate(String userCode, String chatCode, String content, Boolean isRebuild) {
+        log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}], isRebuild:[{}]", userCode, chatCode, chatCode, isRebuild);
         TongYiImageCreateRequestDTO request = TongYiImageCreateRequestDTO.buildTongYiImageCreateRequestDTO(content);
         log.info("TongYiServiceImpl tyImageCreate request:[{}]", JSON.toJSONString(request));
 
@@ -162,7 +165,7 @@ public class TongYiServiceImpl implements TongYiService {
         }
         log.info("TongYiServiceImpl tyImageCreate response:[{}]", response);
         String replication = response + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
-        messageService.recordHistory(userCode, chatCode, content, replication);
+        messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
 
         return JsonResult.success(result);
