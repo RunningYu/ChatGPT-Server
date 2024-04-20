@@ -40,7 +40,7 @@ public interface UserService {
 
     JsonResult passwordForget(UserAO request);
 
-    JsonResult loginByScan(String pid, String did);
+    JsonResult loginByScan(String pid, String did, String createTime);
 
-    JsonResult loginByScanListen(String pid);
+    JsonResult loginByScanListen(String pid, String createTime);
 }

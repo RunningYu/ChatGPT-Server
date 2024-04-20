@@ -40,7 +40,7 @@ public class TongYiQianWenController {
                                      @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("WenXinYiYanController tongYiQuestion token:[{}], request:[{}]", token, request);
-        JsonResult response = tongYiService.tyQuestion(token, request.getChatCode(), request.getContent(), request.getIsRebuild());
+        JsonResult response = tongYiService.tyQuestion(token, request.getChatCode(), request.getContent(), request.getIsRebuild(), request.getCid());
 
         return response;
     }

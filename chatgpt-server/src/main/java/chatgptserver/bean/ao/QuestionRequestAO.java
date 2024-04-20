@@ -24,4 +24,7 @@ public class QuestionRequestAO {
     @ApiModelProperty("是否重新生成")
     private Boolean isRebuild;
 
+    @ApiModelProperty("停止生成的标识")
+    private String cid;
+
 }

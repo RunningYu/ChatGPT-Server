@@ -1,7 +1,6 @@
 package chatgptserver.service.impl;
 
 import chatgptserver.Common.MailUtil;
-import chatgptserver.Common.SseUtils;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.*;
@@ -12,18 +11,14 @@ import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MD5Util;
 import chatgptserver.utils.StorageUtils;
-import com.alibaba.fastjson.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -300,7 +295,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public JsonResult loginByScan(String pid, String did) {
+    public JsonResult loginByScan(String pid, String did, String createTime) {
+        log.info("UserServiceImpl loginByScan pid:[{}], did:[{}], createTime:[{}]", pid, did, createTime);
         // 查询数据库是否存在该用户（有则直接登录，并生成token）
         UserPO havaUser = userMapper.getUserByEmail(did);
         // 如果没有注册过，则注册
@@ -322,23 +318,23 @@ public class UserServiceImpl implements UserService {
         userLoginReqAO.setToken(token);
         caffeineCache.put(token, userLoginReqAO);
         // 存进中间缓存层
-        StorageUtils.loginMap.put(pid, JsonResult.success(userLoginReqAO));
+        StorageUtils.loginMap.put(createTime, JsonResult.success(userLoginReqAO));
 
         return JsonResult.success(userLoginReqAO);
     }
 
     @Override
-    public JsonResult loginByScanListen(String pid) {
-        log.info("UserServiceImpl loginByScanListen pid:[{}]", pid);
+    public JsonResult loginByScanListen(String pid, String createTime) {
+        log.info("UserServiceImpl loginByScanListen pid:[{}], createTime:[{}]", pid, createTime);
         JsonResult response = null;
         int timeCount = 0;
         while (true) {
             System.out.println("---------->" + StorageUtils.loginMap);
             // 监听pid的登录
-            if (StorageUtils.loginMap.containsKey(pid)) {
+            if (StorageUtils.loginMap.containsKey(createTime)) {
                 System.out.println();
-                response = StorageUtils.loginMap.get(pid);
-                StorageUtils.loginMap.remove(pid);
+                response = StorageUtils.loginMap.get(createTime);
+                StorageUtils.loginMap.remove(createTime);
                 log.info("UserServiceImpl loginByScanListen --> 去除结果 -> response:[{}]", response);
 
                 return response;

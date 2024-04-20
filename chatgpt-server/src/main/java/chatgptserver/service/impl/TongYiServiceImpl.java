@@ -1,6 +1,5 @@
 package chatgptserver.service.impl;
 
-import chatgptserver.Common.FileUtil;
 import chatgptserver.Common.ImageUtil;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.MessagesAO;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,8 +97,8 @@ public class TongYiServiceImpl implements TongYiService {
     }
 
     @Override
-    public JsonResult tyQuestion(String token, String chatCode, String content, Boolean isRebuild) {
-        log.info("TongYiServiceImpl getMessageFromWenXin token:[{}] chatCode:[{}], content:[{}], isRebuild:[{}]", token, chatCode, content, isRebuild);
+    public JsonResult tyQuestion(String token, String chatCode, String content, Boolean isRebuild, String cid) {
+        log.info("TongYiServiceImpl getMessageFromWenXin token:[{}] chatCode:[{}], content:[{}], isRebuild:[{}], cid:[{}]", token, chatCode, content, isRebuild, cid);
         Text text = new Text("user", content);
         List<Text> textList = new ArrayList<>();
         textList.add(text);
@@ -131,6 +129,8 @@ public class TongYiServiceImpl implements TongYiService {
         QuestionResponseDTO responseDTO = JSON.parseObject(responseStr, QuestionResponseDTO.class);
         String response = responseDTO.getOutput().getText();
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, response);
+
+        //todo：检查是否
         messageService.recordHistory(userCode, chatCode, content, response, isRebuild);
 
         return JsonResult.success(result);

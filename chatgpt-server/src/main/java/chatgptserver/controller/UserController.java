@@ -55,19 +55,19 @@ public class UserController {
 
     @ApiOperation("扫码登录")
     @GetMapping("/user/login/by/scan")
-    public JsonResult loginByScan(@RequestParam("pid") String pid, @RequestParam("did") String did) {
-        log.info("UserController loginByScan pid:[{}], did:[{}]", pid, did);
-        JsonResult response = userService.loginByScan(pid, did);
+    public JsonResult loginByScan(@RequestParam(value = "pid", required = false) String pid, @RequestParam(value = "did", required = false) String did, @RequestParam(value = "createTime", required = false) String createTime) {
+        log.info("UserController loginByScan pid:[{}], did:[{}], createTime:[{}]", pid, did, createTime);
+        JsonResult response = userService.loginByScan(pid, did, createTime);
 
         return response;
     }
 
     @ApiOperation("监听扫码登录")
     @GetMapping(value = "/user/login/by/scan/listen")
-    public SseEmitter loginByScanListen(@RequestParam("pid") String pid) {
-        log.info("UserController loginByScanListen pid:[{}]", pid);
+    public SseEmitter loginByScanListen(@RequestParam(value = "pid", required = false) String pid, @RequestParam(value = "createTime", required = false) String createTime) {
+        log.info("UserController loginByScanListen pid:[{}], createTime:[{}]", pid, createTime);
         SseEmitter sseEmitter = new SseEmitter();
-        JsonResult response = userService.loginByScanListen(pid);
+        JsonResult response = userService.loginByScanListen(pid, createTime);
         try {
             System.out.println("-------response-------->" + response);
             sseEmitter.send(SseEmitter.event().data(JSON.toJSONString(response)));
