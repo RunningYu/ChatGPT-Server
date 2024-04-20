@@ -42,5 +42,5 @@ public interface UserService {
 
     JsonResult loginByScan(String pid, String did);
 
-    JsonResult loginByScanListen(Long threadId, String pid);
+    JsonResult loginByScanListen(String pid);
 }

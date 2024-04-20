@@ -4,6 +4,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -187,23 +188,12 @@ public class ImageUtil {
         return base64Image;
     }
 
-    public static MultipartFile imageUrlToMultipartFile(String url) {
-        byte[] bytes = downloadPicture(url);
+    public static MultipartFile imageUrlToMultipartFile(String url) throws IOException {
+        String base64 = ImageUtil.imageUrlToBase64(url);
+        File imageFile = ImageUtil.convertBase64StrToImage(base64, System.currentTimeMillis() + "AiPicture.jpg");
+        MultipartFile multipartFile = new MockMultipartFile("file", imageFile.getName(), "image/png", new FileInputStream(imageFile));
 
-        MultipartFile mfile = null;
-        ByteArrayInputStream in = null;
-        try {
-            in = new ByteArrayInputStream(bytes);
-            FileItemFactory factory = new DiskFileItemFactory(16, null);
-            FileItem fileItem = factory.createItem("mainFile", "text/plain", false, "name");
-            IOUtils.copy(new ByteArrayInputStream(bytes), fileItem.getOutputStream());
-            mfile = new CommonsMultipartFile(fileItem);
-            in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return mfile;
+        return multipartFile;
     }
 
 

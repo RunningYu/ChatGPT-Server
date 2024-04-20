@@ -165,7 +165,15 @@ public class TongYiServiceImpl implements TongYiService {
             if (responseDTO.getOutput().getTask_status().equals("SUCCEEDED")) {
                 log.info("TongYiServiceImpl tyImageCreate res:[{}]", res);
                 response = responseDTO.getOutput().getResults().get(0).get("url");
-                // todo: 将图片上传到自己的服务器上
+                log.info("TongYiServiceImpl tyImageCreate before minio response:[{}]", response);
+                try {
+                    MultipartFile multipartFile = ImageUtil.imageUrlToMultipartFile(response);
+                    UploadResponse uploadResponse = minioUtil.uploadFile(multipartFile, "file");
+                    response = uploadResponse.getMinIoUrl();
+                    log.info("TongYiServiceImpl tyImageCreate after minio response:[{}]", response);
+                } catch (Exception e) {
+                    return JsonResult.error(500, "图片处理异常");
+                }
                 break;
             } else {
                 try {

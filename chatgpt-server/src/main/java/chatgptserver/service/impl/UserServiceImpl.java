@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -314,6 +315,7 @@ public class UserServiceImpl implements UserService {
             log.info("UserServiceImpl loginByScan user:[{}]", user);
             userMapper.updateUserCode(userCode, user.getId());
         }
+
         // 生成token，存token进redis
         String token = jwtUtils.createToken(havaUser);
         UserLoginReqAO userLoginReqAO = ConvertMapping.userPO2UserLoginReqAO(havaUser);
@@ -326,20 +328,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public JsonResult loginByScanListen(Long threadId, String pid) {
+    public JsonResult loginByScanListen(String pid) {
+        log.info("UserServiceImpl loginByScanListen pid:[{}]", pid);
         JsonResult response = null;
+        int timeCount = 0;
         while (true) {
             System.out.println("---------->" + StorageUtils.loginMap);
             // 监听pid的登录
             if (StorageUtils.loginMap.containsKey(pid)) {
+                System.out.println();
                 response = StorageUtils.loginMap.get(pid);
                 StorageUtils.loginMap.remove(pid);
-                break;
+                log.info("UserServiceImpl loginByScanListen --> 去除结果 -> response:[{}]", response);
+
+                return response;
             }
             try {
                 Thread.sleep(200);
+                timeCount += 200;
             } catch (InterruptedException e) {
                 throw new RuntimeException();
+            }
+            if (timeCount > 120000) {
+                break;
             }
         }
 

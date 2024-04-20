@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SseUtils {
 
-    public static ConcurrentHashMap<Long, SseEmitter> sseEmittersMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, SseEmitter> sseEmittersMap = new ConcurrentHashMap<>();
 
     public static ThreadLocal<SseEmitter> sseEmitterThreadLocal = new ThreadLocal<>();
 
