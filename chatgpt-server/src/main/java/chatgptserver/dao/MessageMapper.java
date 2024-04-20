@@ -39,4 +39,6 @@ public interface MessageMapper {
     void rebuildQuestion(@Param("chatCode") String chatCode, @Param("replication") String replication, @Param("id") int id);
 
     int getUpdateMessageId(String chatCode);
+
+    MessagesPO getUpdateMessagePO(String chatCode);
 }

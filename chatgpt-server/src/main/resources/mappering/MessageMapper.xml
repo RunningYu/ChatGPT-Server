@@ -64,4 +64,8 @@
         SELECT MAX(id) FROM tb_chatgpt_messages WHERE chat_code = #{chatCode}
     </select>
 
+    <select id="getUpdateMessagePO" resultType="chatgptserver.bean.po.MessagesPO">
+        SELECT * FROM tb_chatgpt_messages WHERE chat_code = #{chatCode} order by create_time DESC limit 0, 1
+    </select>
+
 </mapper>

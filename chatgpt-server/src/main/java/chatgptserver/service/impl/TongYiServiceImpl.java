@@ -58,8 +58,12 @@ public class TongYiServiceImpl implements TongYiService {
         String imageUrl = "";
         if (image != null) {
             imageUrl = minioUtil.upLoadFileToURL(image);
-        } else if (isRebuild && content.split("\n")[0].contains("http://124.71.110.30")){
-            imageUrl = content.split("\n")[0];
+        } else if (isRebuild){
+//            imageUrl = content.split("\n")[0];
+            MessagesPO messagesPO = messageMapper.getUpdateMessagePO(chatCode);
+            if (messagesPO.getImage() != null && messagesPO.getImage().contains("http")) {
+                imageUrl = messagesPO.getImage();
+            }
         }
         log.info("TongYiServiceImpl tyImageUnderstand imageUrl:[{}]", imageUrl);
         String userCode = userService.getUserCodeByToken(token);
