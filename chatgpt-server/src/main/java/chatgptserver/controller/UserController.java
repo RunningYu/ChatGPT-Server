@@ -1,5 +1,6 @@
 package chatgptserver.controller;
 
+import chatgptserver.Common.SseUtils;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.ChatPO;
@@ -13,8 +14,10 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +42,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
     @ApiOperation("用户注册")
     @Transactional(rollbackFor = Exception.class)
     @PostMapping("/user/register")
@@ -48,6 +52,34 @@ public class UserController {
 
         return response;
     }
+
+    @ApiOperation("扫码登录")
+    @GetMapping("/user/login/by/scan")
+    public JsonResult loginByScan(@RequestParam("pid") String pid, @RequestParam("did") String did) {
+        log.info("UserController loginByScan pid:[{}], did:[{}]", pid, did);
+        JsonResult response = userService.loginByScan(pid, did);
+
+        return response;
+    }
+
+    @ApiOperation("监听扫码登录")
+    @GetMapping("/user/login/by/scan/listen")
+    public SseEmitter loginByScanListen(@RequestParam("pid") String pid) {
+        log.info("UserController loginByScanListen pid:[{}]", pid);
+        SseEmitter sseEmitter = new SseEmitter();
+        Long threadId = Thread.currentThread().getId();
+        SseUtils.sseEmittersMap.put(threadId, sseEmitter);
+        JsonResult response = userService.loginByScanListen(threadId, pid);
+        try {
+            sseEmitter.send(SseEmitter.event().data(response));
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+        log.info("over");
+
+        return sseEmitter;
+    }
+
 
     @ApiOperation("用户快捷登录，验证码登录或注册")
     @Transactional(rollbackFor = Exception.class)

@@ -1,6 +1,7 @@
 package chatgptserver.service.impl;
 
 import chatgptserver.Common.MailUtil;
+import chatgptserver.Common.SseUtils;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.*;
@@ -10,14 +11,18 @@ import chatgptserver.service.MessageService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MD5Util;
+import chatgptserver.utils.StorageUtils;
+import com.alibaba.fastjson.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -291,6 +296,54 @@ public class UserServiceImpl implements UserService {
         }
 
         return JsonResult.success(200, "密码重置成功！");
+    }
+
+    @Override
+    public JsonResult loginByScan(String pid, String did) {
+        // 查询数据库是否存在该用户（有则直接登录，并生成token）
+        UserPO havaUser = userMapper.getUserByEmail(did);
+        // 如果没有注册过，则注册
+        if (Objects.isNull(havaUser)) {
+            UserPO user = new UserPO();
+            user.setEmail(did);
+            user.setUsername(did);
+            int id = userMapper.userAdd(user);
+            String userCode = "user_" + user.getId();
+            user.setUserCode(userCode);
+            havaUser = user;
+            log.info("UserServiceImpl loginByScan user:[{}]", user);
+            userMapper.updateUserCode(userCode, user.getId());
+        }
+        // 生成token，存token进redis
+        String token = jwtUtils.createToken(havaUser);
+        UserLoginReqAO userLoginReqAO = ConvertMapping.userPO2UserLoginReqAO(havaUser);
+        userLoginReqAO.setToken(token);
+        caffeineCache.put(token, userLoginReqAO);
+        // 存进中间缓存层
+        StorageUtils.loginMap.put(pid, JsonResult.success(userLoginReqAO));
+
+        return JsonResult.success(userLoginReqAO);
+    }
+
+    @Override
+    public JsonResult loginByScanListen(Long threadId, String pid) {
+        JsonResult response = null;
+        while (true) {
+            System.out.println("---------->" + StorageUtils.loginMap);
+            // 监听pid的登录
+            if (StorageUtils.loginMap.containsKey(pid)) {
+                response = StorageUtils.loginMap.get(pid);
+                StorageUtils.loginMap.remove(pid);
+                break;
+            }
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException();
+            }
+        }
+
+        return response;
     }
 
     @Override

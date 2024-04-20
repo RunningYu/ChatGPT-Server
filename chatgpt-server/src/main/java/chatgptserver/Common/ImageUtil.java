@@ -187,6 +187,25 @@ public class ImageUtil {
         return base64Image;
     }
 
+    public static MultipartFile imageUrlToMultipartFile(String url) {
+        byte[] bytes = downloadPicture(url);
+
+        MultipartFile mfile = null;
+        ByteArrayInputStream in = null;
+        try {
+            in = new ByteArrayInputStream(bytes);
+            FileItemFactory factory = new DiskFileItemFactory(16, null);
+            FileItem fileItem = factory.createItem("mainFile", "text/plain", false, "name");
+            IOUtils.copy(new ByteArrayInputStream(bytes), fileItem.getOutputStream());
+            mfile = new CommonsMultipartFile(fileItem);
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return mfile;
+    }
+
 
 
 }

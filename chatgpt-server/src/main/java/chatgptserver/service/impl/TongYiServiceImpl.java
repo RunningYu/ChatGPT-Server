@@ -1,7 +1,10 @@
 package chatgptserver.service.impl;
 
+import chatgptserver.Common.FileUtil;
+import chatgptserver.Common.ImageUtil;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.MessagesAO;
+import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.dto.XunFeiXingHuo.imageCreate.Text;
 import chatgptserver.bean.dto.tongYiQianWen.*;
 import chatgptserver.bean.po.MessagesPO;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,6 +165,7 @@ public class TongYiServiceImpl implements TongYiService {
             if (responseDTO.getOutput().getTask_status().equals("SUCCEEDED")) {
                 log.info("TongYiServiceImpl tyImageCreate res:[{}]", res);
                 response = responseDTO.getOutput().getResults().get(0).get("url");
+                // todo: 将图片上传到自己的服务器上
                 break;
             } else {
                 try {

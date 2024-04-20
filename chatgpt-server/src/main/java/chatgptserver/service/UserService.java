@@ -1,11 +1,8 @@
 package chatgptserver.service;
 
 import chatgptserver.bean.ao.*;
-import chatgptserver.bean.po.ChatPO;
-import chatgptserver.bean.po.UserFeedbackPO;
 import chatgptserver.bean.po.UserPO;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,4 +39,8 @@ public interface UserService {
     JsonResult loginByVerifyCode(UserAO request);
 
     JsonResult passwordForget(UserAO request);
+
+    JsonResult loginByScan(String pid, String did);
+
+    JsonResult loginByScanListen(Long threadId, String pid);
 }
