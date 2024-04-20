@@ -30,4 +30,13 @@ public class GptController {
         return response;
     }
 
+
+    @GetMapping("/chat/request/stop")
+    public JsonResult requestStop(@Param("cid") String cid) {
+        log.info("GptController requestStop cid:[{}]", cid);
+        JsonResult response = gptService.requestStop(cid);
+
+        return response;
+    }
+
 }

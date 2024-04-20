@@ -84,29 +84,6 @@ public class UserController {
         return sseEmitter;
     }
 
-//    @ApiOperation("监听扫码登录")
-//    @GetMapping(value = "/user/login/by/scan/listen")
-//    public JsonResult loginByScanListen(@RequestParam("pid") String pid) {
-//        log.info("UserController loginByScanListen pid:[{}]", pid);
-//        SseEmitter sseEmitter = new SseEmitter();
-//        JsonResult response = userService.loginByScanListen(pid);
-//        try {
-//            System.out.println("-------response-------->" + response);
-//            sseEmitter.send(SseEmitter.event().data(JSON.toJSONString(response)));
-//            sseEmitter.complete();
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException();
-//        }
-//        sseEmitter.onTimeout(() -> {
-//
-//        });
-//        log.info("UserController loginByScanListen --> over");
-//
-//        return sseEmitter;
-//    }
-
-
     @ApiOperation("用户快捷登录，验证码登录或注册")
     @Transactional(rollbackFor = Exception.class)
     @PostMapping("/user/login/by/verifyCode")

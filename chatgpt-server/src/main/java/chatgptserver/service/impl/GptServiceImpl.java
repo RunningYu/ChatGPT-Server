@@ -7,6 +7,7 @@ import chatgptserver.bean.po.DefaultPO;
 import chatgptserver.bean.po.GptPO;
 import chatgptserver.dao.GptMapper;
 import chatgptserver.service.GptService;
+import chatgptserver.utils.StorageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,14 @@ public class GptServiceImpl implements GptService {
         }
 
         return JsonResult.success(response);
+    }
+
+    @Override
+    public JsonResult requestStop(String cid) {
+        log.info("GptServiceImpl requestStop cid:[{}]", cid);
+        StorageUtils.stopRequestMap.put(cid, cid);
+
+        return JsonResult.success();
     }
 
 }

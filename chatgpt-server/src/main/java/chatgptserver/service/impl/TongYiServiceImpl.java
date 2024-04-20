@@ -16,6 +16,7 @@ import chatgptserver.service.TongYiService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MinioUtil;
+import chatgptserver.utils.StorageUtils;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,8 @@ public class TongYiServiceImpl implements TongYiService {
     private MessageMapper messageMapper;
 
     @Override
-    public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode, Boolean isRebuild) {
-        log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}]", image, content, token, chatCode, isRebuild);
+    public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
+        log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", image, content, token, chatCode, isRebuild, cid);
         String imageUrl = "";
         if (image != null) {
             imageUrl = minioUtil.upLoadFileToURL(image);
@@ -82,11 +83,23 @@ public class TongYiServiceImpl implements TongYiService {
         } catch (IOException e) {
             throw new RuntimeException("请求通义千问接口异常");
         }
+        // 检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
         TongYiImageUnderstandResponseDTO responseDTO = JSON.parseObject(responseStr, TongYiImageUnderstandResponseDTO.class);
         String response = responseDTO.getOutput().getChoices().get(0).getMessage().getContent().get(0).get("text");
         log.info("TongYiServiceImpl tyImageUnderstand response:[{}]", response);
         String question = imageUrl.equals("") ? content : (imageUrl + "\n\n" + content);
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response);
+        // 再次检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
         if (isRebuild) {
             messageService.recordHistory("", chatCode, "", response, isRebuild);
         } else {
@@ -128,17 +141,22 @@ public class TongYiServiceImpl implements TongYiService {
         }
         QuestionResponseDTO responseDTO = JSON.parseObject(responseStr, QuestionResponseDTO.class);
         String response = responseDTO.getOutput().getText();
-        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, response);
 
-        //todo：检查是否
+        // 检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
         messageService.recordHistory(userCode, chatCode, content, response, isRebuild);
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, response);
 
         return JsonResult.success(result);
     }
 
     @Override
-    public JsonResult tyImageCreate(String userCode, String chatCode, String content, Boolean isRebuild) {
-        log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}], isRebuild:[{}]", userCode, chatCode, chatCode, isRebuild);
+    public JsonResult tyImageCreate(String userCode, String chatCode, String content, Boolean isRebuild, String cid) {
+        log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}], isRebuild:[{}], cid:[{}]", userCode, chatCode, chatCode, isRebuild, cid);
         TongYiImageCreateRequestDTO request = TongYiImageCreateRequestDTO.buildTongYiImageCreateRequestDTO(content);
         log.info("TongYiServiceImpl tyImageCreate request:[{}]", JSON.toJSONString(request));
 
@@ -154,6 +172,12 @@ public class TongYiServiceImpl implements TongYiService {
         String task_id = resultOutput.getOutput().getTask_id();
         String response = "";
         while (true) {
+            // 检查是否要取消生成
+            if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                StorageUtils.stopRequestMap.remove(cid);
+
+                return JsonResult.success();
+            }
             String url = String.format(GPTConstants.TONG_YI_QIAN_WEN_IMAGE_CREATE_GET_URL, task_id);
             String res = "";
             try {
@@ -185,6 +209,12 @@ public class TongYiServiceImpl implements TongYiService {
         }
         log.info("TongYiServiceImpl tyImageCreate response:[{}]", response);
         String replication = response + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
+        // 再次检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
         messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
 

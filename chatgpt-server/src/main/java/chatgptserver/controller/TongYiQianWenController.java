@@ -51,10 +51,11 @@ public class TongYiQianWenController {
                                             @RequestParam(value = "image", required = false) MultipartFile image,
                                             @RequestParam("content") String content,
                                             @RequestParam("chatCode") String chatCode,
-                                            @RequestParam(value = "isRebuild", defaultValue = "false") Boolean isRebuild) {
+                                            @RequestParam(value = "isRebuild", defaultValue = "false") Boolean isRebuild,
+                                            @RequestParam(value = "cid", required = false) String cid) {
         String token = httpServletRequest.getHeader("token");
-        log.info("WenXinYiYanController tongYiImageUnderstand token:[{}], image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}]", token, image, content, token, chatCode, isRebuild);
-        JsonResult response = tongYiService.tyImageUnderstand(image, content, token, chatCode, isRebuild);
+        log.info("WenXinYiYanController tongYiImageUnderstand token:[{}], image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", token, image, content, token, chatCode, isRebuild, cid);
+        JsonResult response = tongYiService.tyImageUnderstand(image, content, token, chatCode, isRebuild, cid);
 
         return response;
     }
@@ -67,7 +68,7 @@ public class TongYiQianWenController {
         log.info("WenXinYiYanController tongYiImageUnderstand token:[{}]", token);
         String userCode = userService.getUserCodeByToken(token);
         log.info("WenXinYiYanController tongYiImageCreate userCode:[{}], request:[{}]", userCode, request);
-        JsonResult response = tongYiService.tyImageCreate(userCode, request.getChatCode(), request.getContent(), request.getIsRebuild());
+        JsonResult response = tongYiService.tyImageCreate(userCode, request.getChatCode(), request.getContent(), request.getIsRebuild(), request.getCid());
 
         return response;
     }

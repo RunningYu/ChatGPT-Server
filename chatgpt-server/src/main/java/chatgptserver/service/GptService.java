@@ -11,4 +11,6 @@ public interface GptService {
     JsonResult gptList();
 
     JsonResult defaultList(String gptCode);
+
+    JsonResult requestStop(String cid);
 }

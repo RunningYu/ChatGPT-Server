@@ -318,9 +318,16 @@ public class UserServiceImpl implements UserService {
         userLoginReqAO.setToken(token);
         caffeineCache.put(token, userLoginReqAO);
         // 存进中间缓存层
-        StorageUtils.loginMap.put(createTime, JsonResult.success(userLoginReqAO));
+        Map<String, Boolean> map = new HashMap<>();
+        if (StorageUtils.loginMap.containsKey(createTime)) {
+            map.put("loginStatus", false);
 
-        return JsonResult.success(userLoginReqAO);
+            return JsonResult.success(map);
+        }
+        StorageUtils.loginMap.put(createTime, JsonResult.success(userLoginReqAO));
+        map.put("loginStatus", true);
+
+        return JsonResult.success(map);
     }
 
     @Override
