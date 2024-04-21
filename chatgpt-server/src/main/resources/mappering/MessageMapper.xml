@@ -3,13 +3,13 @@
 <mapper namespace="chatgptserver.dao.MessageMapper">
 
     <insert id="insertMessage">
-        insert into tb_chatgpt_messages(role, user_code, chat_code, username, chat_name, image, question, replication, reply_image)
-            values (#{role}, #{userCode}, #{chatCode}, #{username}, #{chatName}, #{image}, #{question}, #{replication}, #{replyImage})
+        insert into tb_chatgpt_messages(role, user_code, chat_code, username, chat_name, image, question, replication, reply_image, update_time)
+            values (#{role}, #{userCode}, #{chatCode}, #{username}, #{chatName}, #{image}, #{question}, #{replication}, #{replyImage}, now())
     </insert>
 
     <update id="rebuildQuestion">
         update tb_chatgpt_messages
-        set replication = #{replication}
+        set replication = #{replication}, update_time = now()
         where id = #{id}
     </update>
 

@@ -15,6 +15,7 @@ import chatgptserver.service.OkHttpService;
 import chatgptserver.service.TongYiService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
+import chatgptserver.utils.MessageUtils;
 import chatgptserver.utils.MinioUtil;
 import chatgptserver.utils.StorageUtils;
 import com.alibaba.fastjson.JSON;
@@ -58,6 +59,11 @@ public class TongYiServiceImpl implements TongYiService {
     @Override
     public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", image, content, token, chatCode, isRebuild, cid);
+        if (content == null || "".equals(content)) {
+            log.info("TongYiServiceImpl tyImageUnderstand 请输入图片理解的问题");
+
+            return JsonResult.error(500, "请输入图片理解的问题");
+        }
         String imageUrl = "";
         if (image != null) {
             imageUrl = minioUtil.upLoadFileToURL(image);
@@ -70,6 +76,7 @@ public class TongYiServiceImpl implements TongYiService {
         }
         log.info("TongYiServiceImpl tyImageUnderstand imageUrl:[{}]", imageUrl);
         String userCode = userService.getUserCodeByToken(token);
+        content = MessageUtils.buildContent(content);
         // 构建多轮对话请求体
         TongYiImageUnderStandRequestDTO request = buildTongYiImageUnderstandRequestDTO(chatCode, imageUrl, content);
         log.info("WenXinServiceImpl tyImageUnderstand request:[{}]", request);

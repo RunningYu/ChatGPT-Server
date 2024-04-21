@@ -21,10 +21,7 @@ import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.enums.CharacterConstants;
 import chatgptserver.service.*;
-import chatgptserver.utils.JwtUtils;
-import chatgptserver.utils.MinioUtil;
-import chatgptserver.utils.StorageUtils;
-import chatgptserver.utils.XunFeiUtils;
+import chatgptserver.utils.*;
 import chatgptserver.utils.xunfei.BigModelNew;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.utils.xunfei.XunFeiWenDaBigModelNew;
@@ -89,6 +86,11 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfImageUnderstand(Long threadId, MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}], token:[{}], chatCode:[{}]", threadId, image, content, token, chatCode);
+        if (content == null || "".equals(content)) {
+            log.info("XunFeiServiceImpl xfImageUnderstand 请输入图片理解的问题");
+
+            return JsonResult.error(500, "请输入图片理解的问题");
+        }
         XunFeiUtils.imageUnderstandFlagMap.put(threadId, false);
         XunFeiUtils.imageUnderstandResponseMap.put(threadId, "");
         SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
@@ -167,9 +169,20 @@ public class XunFeiServiceImpl implements XunFeiService {
     private List<Text> buildImageUnderstandRequest(String chatCode, MultipartFile image, String content, Boolean isRebuild) {
         List<Text> requestList = new ArrayList<>();
         String base64Image = "";
-        String[] contentsSplit = content.split("\n");
+        content = MessageUtils.buildContent(content);
+        String iUrl = null;
+        if (isRebuild) {
+            MessagesPO messagesPO = messageMapper.getUpdateMessagePO(chatCode);
+            if (messagesPO.getImage() != null && messagesPO.getImage().contains("http")) {
+                iUrl = messagesPO.getImage();
+                log.info("WenXinServiceImpl wenXinImageUnderstand iUrl:[{}]", iUrl);
+//                String iUrl = content.split("\n")[0];
+                base64Image = ImageUtil.imageUrlToBase64(iUrl);
+            }
+        }
         // 如果图片为空，则表示多轮对话
-        if (Objects.isNull(image) && !contentsSplit[0].contains("http://124.71.110.30:9000/")) {
+//        if (Objects.isNull(image) && !contentsSplit[0].contains("http://124.71.110.30:9000/")) {
+        if (Objects.isNull(image) && iUrl == null) {
             // 获取第一轮对话
             MessagesPO messagesFistChat = messageMapper.getTongYiQuestionFistChat(chatCode);
             log.info("XunFeiServiceImpl buildImageUnderstandRequest messagesFistChat:[{}]", messagesFistChat);
@@ -189,10 +202,11 @@ public class XunFeiServiceImpl implements XunFeiService {
         } else {
             if (image != null) {
                 base64Image = ImageUtil.imageMultipartFileToBase64(image);
-            } else {
-                String iUrl = content.split("\n")[0];
-                base64Image = ImageUtil.imageUrlToBase64(iUrl);
             }
+//            } else {
+//                String iUrl = content.split("\n")[0];
+//                base64Image = ImageUtil.imageUrlToBase64(iUrl);
+//            }
             requestList.add(new Text("user", base64Image, "image"));
         }
         requestList.add(new Text("user", content, "text"));

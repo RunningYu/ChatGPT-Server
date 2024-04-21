@@ -18,6 +18,7 @@ import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
 import chatgptserver.service.UserService;
 import chatgptserver.service.WenXinService;
+import chatgptserver.utils.MessageUtils;
 import chatgptserver.utils.MinioUtil;
 import chatgptserver.utils.StorageUtils;
 import com.alibaba.fastjson.JSON;
@@ -170,6 +171,11 @@ public class WenXinServiceImpl implements WenXinService {
 
     @Override
     public JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild, String cid) {
+        if (content == null || "".equals(content)) {
+            log.info("WenXinServiceImpl wenXinImageUnderstand 请输入图片理解的问题");
+
+            return JsonResult.error(500, "请输入图片理解的问题");
+        }
         String userCode = userService.getUserCodeByToken(token);
         if (userCode == null) {
             return JsonResult.error("token失效或过期！");
@@ -190,10 +196,16 @@ public class WenXinServiceImpl implements WenXinService {
         if (image != null) {
             base64Image = ImageUtil.imageMultipartFileToBase64(image);
         } else {
-            String iUrl = content.split("\n")[0];
-            base64Image = ImageUtil.imageUrlToBase64(iUrl);
+            MessagesPO messagesPO = messageMapper.getUpdateMessagePO(chatCode);
+            if (messagesPO.getImage() != null && messagesPO.getImage().contains("http")) {
+                String iUrl = messagesPO.getImage();
+                log.info("WenXinServiceImpl wenXinImageUnderstand iUrl:[{}]", iUrl);
+//                String iUrl = content.split("\n")[0];
+                base64Image = ImageUtil.imageUrlToBase64(iUrl);
+            }
         }
-        WenXinImageUnderstandDTO request = new WenXinImageUnderstandDTO(content, base64Image);
+        String question = MessageUtils.buildContent(content);
+        WenXinImageUnderstandDTO request = new WenXinImageUnderstandDTO(question, base64Image);
         log.info("WenXinServiceImpl wenXinImageUnderstand request:[{}]", request);
         String requestJson = JSON.toJSONString(request);
         String responseStr = "";
@@ -214,7 +226,7 @@ public class WenXinServiceImpl implements WenXinService {
         WenXinImageUnderstandResponseDTO response = JSON.parseObject(responseStr, WenXinImageUnderstandResponseDTO.class);
         log.info("WenXinServiceImpl wenXinImageUnderstand response:[{}]", response);
         String imageUrl = "";
-        String question = content;
+        question = content;
         if (image != null) {
             try {
                 UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
@@ -231,7 +243,11 @@ public class WenXinServiceImpl implements WenXinService {
             return JsonResult.success();
         }
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult());
-        messageService.recordHistory(userCode, chatCode, question, response.getResult(), isRebuild);
+        if (isRebuild) {
+            messageService.recordHistory(userCode, chatCode, question, response.getResult(), isRebuild);
+        } else {
+            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, question, response.getResult());
+        }
 
         return JsonResult.success(result);
     }
