@@ -86,6 +86,7 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfImageUnderstand(Long threadId, MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}], token:[{}], chatCode:[{}]", threadId, image, content, token, chatCode);
+        Date questionTime = new Date();
         String realContent = content;
         if (image == null && (content == null || "".equals(content)) && isRebuild == false) {
             log.info("XunFeiServiceImpl xfImageUnderstand 图片和文字不能同时为空");
@@ -125,7 +126,7 @@ public class XunFeiServiceImpl implements XunFeiService {
                     totalResponse = XunFeiUtils.imageUnderstandTotalResponseMap.get(threadId);
                     log.info("XunFeiServiceImpl xfImageUnderstand totalResponse:[{}]", totalResponse);
                     String userCode = userService.getUserCodeByToken(token);
-                    MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, totalResponse);
+                    MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, totalResponse, questionTime);
                     String question = "";
                     // 再次检查是否要取消生成
                     if (StorageUtils.stopRequestMap.containsKey(cid)) {
@@ -150,19 +151,19 @@ public class XunFeiServiceImpl implements XunFeiService {
                         }
 
                         if (isRebuild) {
-                            messageService.recordHistory("", chatCode, "", totalResponse, isRebuild);
+                            messageService.recordHistory("", chatCode, "", totalResponse, isRebuild, questionTime);
                         } else {
-                            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, question, totalResponse);
+                            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, question, totalResponse, questionTime);
                         }
                     } else {
                         question = content;
                         if (isRebuild) {
-                            messageService.recordHistory("", chatCode, "", totalResponse, isRebuild);
+                            messageService.recordHistory("", chatCode, "", totalResponse, isRebuild, questionTime);
                         } else {
-                            messageService.recordHistoryWithImage(userCode, chatCode, "0", question, totalResponse);
+                            messageService.recordHistoryWithImage(userCode, chatCode, "0", question, totalResponse, questionTime);
                         }
                     }
-                    MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, totalResponse);
+                    MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, totalResponse, questionTime);
 
                     return JsonResult.success(result);
                 }
@@ -225,6 +226,7 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfPptCreate(String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfPptCreate content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", content, token, chatCode, isRebuild, cid);
+        Date questionTime = new Date();
         if (isRebuild == false && (content == null || "".equals(content))) {
             log.info("XunFeiServiceImpl xfPptCreate 请先输入文字描述");
 
@@ -364,14 +366,14 @@ public class XunFeiServiceImpl implements XunFeiService {
                 }
             }
             String replication = outLineStr + "\n" + coverImgSrc + "\n\n" + pptUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
-            MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, replication);
+            MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, replication, questionTime);
             // 再次检查是否要取消生成
             if (StorageUtils.stopRequestMap.containsKey(cid)) {
                 StorageUtils.stopRequestMap.remove(cid);
 
                 return JsonResult.success();
             }
-            messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
+            messageService.recordHistory(userCode, chatCode, content, replication, isRebuild, questionTime);
 
             return JsonResult.success(responseAO);
         } catch (Exception e) {
@@ -412,6 +414,7 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfImageCreate(String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfImageCreate content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", content, token, chatCode, isRebuild, cid);
+        Date questionTime = new Date();
         if (isRebuild == false && (content == null || "".equals(content))) {
             log.info("XunFeiServiceImpl xfImageCreate 请先输入文字描述");
 
@@ -465,9 +468,9 @@ public class XunFeiServiceImpl implements XunFeiService {
         }
         String userCode = userService.getUserCodeByToken(token);
         String replication = imageUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
-        MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, replication);
+        MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, replication, questionTime);
         // 保存聊天记录
-        messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
+        messageService.recordHistory(userCode, chatCode, content, replication, isRebuild, questionTime);
 
         return JsonResult.success(response);
     }
@@ -478,6 +481,7 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfQuestion(Long threadId, QuestionRequestAO requestAO) {
         log.info("XunFeiServiceImpl xfQuestion threadId:[{}], requestAO:[{}]", threadId, requestAO);
+        Date questionTime = new Date();
         if (requestAO.getIsRebuild() == false && (requestAO.getContent() == null || "".equals(requestAO.getContent()))) {
             log.info("XunFeiServiceImpl xfQuestion 请先输入文字描述");
 
@@ -518,7 +522,7 @@ public class XunFeiServiceImpl implements XunFeiService {
             } else {
                 totalResponse = XunFeiUtils.questionTotalResponseMap.get(threadId);
                 log.info("XunFeiServiceImpl xfQuestion totalResponse:[{}]", totalResponse);
-                response = messageService.buildMessageAO(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse);
+                response = messageService.buildMessageAO(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse, questionTime);
                 log.info("XunFeiServiceImpl xfQuestion response:[{}]", response);
                 // 再次检查是否要取消生成
                 if (StorageUtils.stopRequestMap.containsKey(requestAO.getCid())) {
@@ -526,7 +530,7 @@ public class XunFeiServiceImpl implements XunFeiService {
 
                     return null;
                 }
-                messageService.recordHistory(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse, requestAO.getIsRebuild());
+                messageService.recordHistory(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse, requestAO.getIsRebuild(), questionTime);
 
                 break;
             }

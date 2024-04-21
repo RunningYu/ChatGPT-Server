@@ -26,8 +26,9 @@ public class ConvertMapping {
         messagesAO.setQuestion(messagesPO.getQuestion());
         messagesAO.setReplication(messagesPO.getReplication());
         messagesAO.setReplyImage(messagesPO.getReplyImage());
-        messagesAO.setCreateTime(messagesPO.getCreateTime());
         messagesAO.setIsDefault(messagesPO.getIsDefault());
+        messagesAO.setCreateTime(messagesPO.getCreateTime());
+        messagesAO.setUpdateTime(messagesPO.getUpdateTime());
 
         return messagesAO;
     }

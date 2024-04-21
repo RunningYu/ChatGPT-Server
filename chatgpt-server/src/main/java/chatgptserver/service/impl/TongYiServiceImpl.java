@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -60,6 +57,7 @@ public class TongYiServiceImpl implements TongYiService {
     @Override
     public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", image, content, token, chatCode, isRebuild, cid);
+        Date questionTime = new Date();
         String realContent = content;
         if (image == null && (content == null || "".equals(content)) && isRebuild == false) {
             log.info("TongYiServiceImpl tyImageUnderstand 图片和文字不能同时为空");
@@ -110,7 +108,6 @@ public class TongYiServiceImpl implements TongYiService {
         } else {
             question = imageUrl.equals("") ? realContent : (imageUrl + "\n\n" + realContent);
         }
-        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response);
         // 再次检查是否要取消生成
         if (StorageUtils.stopRequestMap.containsKey(cid)) {
             StorageUtils.stopRequestMap.remove(cid);
@@ -118,10 +115,11 @@ public class TongYiServiceImpl implements TongYiService {
             return JsonResult.success();
         }
         if (isRebuild) {
-            messageService.recordHistory("", chatCode, "", response, isRebuild);
+            messageService.recordHistory("", chatCode, "", response, isRebuild, questionTime);
         } else {
-            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl.equals("") ? "0" : imageUrl, question, response);
+            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl.equals("") ? "0" : imageUrl, question, response, questionTime);
         }
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response, questionTime);
 
         return JsonResult.success(result);
     }
@@ -129,6 +127,7 @@ public class TongYiServiceImpl implements TongYiService {
     @Override
     public JsonResult tyQuestion(String token, String chatCode, String content, Boolean isRebuild, String cid) {
         log.info("TongYiServiceImpl tyQuestion token:[{}] chatCode:[{}], content:[{}], isRebuild:[{}], cid:[{}]", token, chatCode, content, isRebuild, cid);
+        Date questionTime = new Date();
         if (isRebuild == false && (content == null || "".equals(content))) {
             log.info("TongYiServiceImpl tyQuestion 请先输入文字描述");
 
@@ -170,8 +169,8 @@ public class TongYiServiceImpl implements TongYiService {
 
             return JsonResult.success();
         }
-        messageService.recordHistory(userCode, chatCode, content, response, isRebuild);
-        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, response);
+        messageService.recordHistory(userCode, chatCode, content, response, isRebuild, questionTime);
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, response, questionTime);
 
         return JsonResult.success(result);
     }
@@ -179,6 +178,7 @@ public class TongYiServiceImpl implements TongYiService {
     @Override
     public JsonResult tyImageCreate(String userCode, String chatCode, String content, Boolean isRebuild, String cid) {
         log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}], isRebuild:[{}], cid:[{}]", userCode, chatCode, chatCode, isRebuild, cid);
+        Date questionTime = new Date();
         if (isRebuild == false && (content == null || "".equals(content))) {
             log.info("TongYiServiceImpl tyImageCreate 请先输入文字描述");
 
@@ -242,8 +242,8 @@ public class TongYiServiceImpl implements TongYiService {
 
             return JsonResult.success();
         }
-        messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
-        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
+        messageService.recordHistory(userCode, chatCode, content, replication, isRebuild, questionTime);
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication, questionTime);
 
         return JsonResult.success(result);
     }

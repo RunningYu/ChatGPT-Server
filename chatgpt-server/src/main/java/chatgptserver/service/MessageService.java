@@ -3,8 +3,8 @@ package chatgptserver.service;
 import chatgptserver.bean.ao.ChatAO;
 import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.MessagesResponseAO;
-import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,15 +17,15 @@ public interface MessageService {
 
     MessagesResponseAO historyList(String chatCode, int page, int size);
 
-    void recordHistoryWithImage(String userCode, String chatCode, String imageUrl, String content, String totalResponse);
+    void recordHistoryWithImage(String userCode, String chatCode, String imageUrl, String content, String totalResponse, Date questionTime);
 
     List<ChatAO> chatCreateList(String token, String gptCode, String functionCode);
 
-    MessagesAO buildMessageAO(String userCode, String chatCode, String content, String totalResponse);
+    MessagesAO buildMessageAO(String userCode, String chatCode, String content, String totalResponse, Date questionTime);
 
     void recordHistoryWithReplyImage(String userCode, String chatCode, String content, String replication, String replyImage);
 
-    void recordHistory(String userCode, String chatCode, String content, String response, Boolean isRebuild);
+    void recordHistory(String userCode, String chatCode, String content, String response, Boolean isRebuild, Date questionTime);
 
     void recordDefaultHistory(String userCode, String chatCode, String content, String replication);
 }

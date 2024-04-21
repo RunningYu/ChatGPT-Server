@@ -66,8 +66,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void recordHistoryWithImage(String userCode, String chatCode, String imageUrl, String content, String result) {
-        log.info("MessageServiceImpl recordHistoryWithImage userCode:[{}], chatCode:[{}], content:[{}], result:[{}]", userCode, chatCode, content, result);
+    public void recordHistoryWithImage(String userCode, String chatCode, String imageUrl, String content, String result, Date questionTime) {
+        log.info("MessageServiceImpl recordHistoryWithImage userCode:[{}], chatCode:[{}], content:[{}], result:[{}], questionTime:[{}]", userCode, chatCode, content, result, questionTime);
         MessagesPO messagesPO = new MessagesPO();
         messagesPO.setRole(RoleTypeEnums.WEN_XIN_USER.getType());
         messagesPO.setUserCode(userCode);
@@ -76,6 +76,7 @@ public class MessageServiceImpl implements MessageService {
         messagesPO.setImage(imageUrl);
         messagesPO.setQuestion(content);
         messagesPO.setReplication(result);
+        messagesPO.setCreateTime(questionTime);
 
         messageMapper.insertMessage(messagesPO);
     }
@@ -148,7 +149,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public MessagesAO buildMessageAO(String userCode, String chatCode, String content, String totalResponse) {
+    public MessagesAO buildMessageAO(String userCode, String chatCode, String content, String totalResponse, Date questionTime) {
         MessagesAO response = new MessagesAO();
         response.setQuestion(content);
         response.setReplication(totalResponse);
@@ -165,7 +166,8 @@ public class MessageServiceImpl implements MessageService {
             response.setChatHeadshot(gptPO.getHeadshot());
         }
         response.setChatCode(chatCode);
-        response.setCreateTime(new Date());
+        response.setUpdateTime(new Date());
+        response.setCreateTime(questionTime);
 
         return response;
     }
@@ -186,8 +188,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void recordHistory(String userCode, String chatCode, String content, String result, Boolean isRebuild) {
-        log.info("MessageServiceImpl recordHistory userCode:[{}], chatCode:[{}], content:[{}], result:[{}], isRebuild:[{}]", userCode, chatCode, content, result, isRebuild);
+    public void recordHistory(String userCode, String chatCode, String content, String result, Boolean isRebuild, Date questionTime) {
+        log.info("MessageServiceImpl recordHistory userCode:[{}], chatCode:[{}], content:[{}], result:[{}], isRebuild:[{}], questionTime:[{}]", userCode, chatCode, content, result, isRebuild, questionTime);
         if (isRebuild != null && isRebuild) {
             int id = messageMapper.getUpdateMessageId(chatCode);
             messageMapper.rebuildQuestion(chatCode, result, id);
@@ -212,6 +214,7 @@ public class MessageServiceImpl implements MessageService {
         messagesPO.setQuestion(content);
         result = (result == null || result.equals("")) ? "没有生成相应的结果" : result;
         messagesPO.setReplication(result);
+        messagesPO.setCreateTime(questionTime);
 
         messageMapper.insertMessage(messagesPO);
     }

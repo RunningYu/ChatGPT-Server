@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
@@ -64,6 +65,7 @@ public class WenXinServiceImpl implements WenXinService {
     @Override
     public JsonResult getMessageFromWenXin(String userCode, String chatCode, String message, Boolean isRebuild, String cid) {
         log.info("MessageServiceImpl getMessageFromWenXin");
+        Date questionTime = new Date();
         if (isRebuild == false && (message == null || "".equals(message))) {
             log.info("MessageServiceImpl getMessageFromWenXin 请先输入文字描述");
 
@@ -110,9 +112,9 @@ public class WenXinServiceImpl implements WenXinService {
                 return JsonResult.success();
             }
 
-            messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult(), isRebuild);
+            messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult(), isRebuild, questionTime);
             String response = ( (wenXinRspDTO.getResult() == null || wenXinRspDTO.getResult().equals("")) ? "[没有生成相应的结果]" : wenXinRspDTO.getResult() );
-            MessagesAO messagesAO = messageService.buildMessageAO(userCode, chatCode, message, response);
+            MessagesAO messagesAO = messageService.buildMessageAO(userCode, chatCode, message, response, questionTime);
 
             return JsonResult.success(messagesAO);
         } catch (Exception e) {
@@ -124,6 +126,7 @@ public class WenXinServiceImpl implements WenXinService {
     @Override
     public JsonResult wxImageCreate(String userCode, String chatCode, String content, Boolean isRebuild, String cid) {
         log.info("WenXinServiceImpl wxImageCreate userCode:[{}], chatCode:[{}], content:[{}], cid:[{}]", userCode, chatCode, content, cid);
+        Date questionTime = new Date();
         if (isRebuild == false && (content == null || "".equals(content))) {
             log.info("MessageServiceImpl wxImageCreate 请先输入文字描述");
 
@@ -163,7 +166,7 @@ public class WenXinServiceImpl implements WenXinService {
             // 将AI生成的图片上传到MinIO返回Url
             UploadResponse uploadResponse = minioUtil.uploadFile(multipartFile, "file");
             String replication = uploadResponse.getMinIoUrl() + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
-            MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
+            MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication, questionTime);
             // 再次检查是否要取消生成
             if (StorageUtils.stopRequestMap.containsKey(cid)) {
                 StorageUtils.stopRequestMap.remove(cid);
@@ -171,7 +174,7 @@ public class WenXinServiceImpl implements WenXinService {
                 return JsonResult.success();
             }
             // 记录历史记录
-            messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
+            messageService.recordHistory(userCode, chatCode, content, replication, isRebuild, questionTime);
 //            messageService.recordHistory(userCode, chatCode, content, uploadResponse.getMinIoUrl());
 
             return JsonResult.success(result);
@@ -182,6 +185,7 @@ public class WenXinServiceImpl implements WenXinService {
 
     @Override
     public JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild, String cid) {
+        Date questionTime = new Date();
         String realContent = content;
         if (image == null && (content == null || "".equals(content)) && isRebuild == false) {
             log.info("WenXinServiceImpl wenXinImageUnderstand 图片和文字不能同时为空");
@@ -259,11 +263,11 @@ public class WenXinServiceImpl implements WenXinService {
 
             return JsonResult.success();
         }
-        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult());
+        MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult(), questionTime);
         if (isRebuild) {
-            messageService.recordHistory(userCode, chatCode, question, response.getResult(), isRebuild);
+            messageService.recordHistory(userCode, chatCode, question, response.getResult(), isRebuild, questionTime);
         } else {
-            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, question, response.getResult());
+            messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, question, response.getResult(), questionTime);
         }
 
         return JsonResult.success(result);
