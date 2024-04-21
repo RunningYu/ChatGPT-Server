@@ -74,7 +74,8 @@ public class UserServiceImpl implements UserService {
         log.info("UserServiceImpl createNewChat response:[{}]", response);
         if (request.getContent() != null && !"".equals(request.getContent())) {
             // 新增默认预设
-            messageService.recordHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
+//            messageService.recordHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
+            messageService.recordDefaultHistory(request.getUserCode(), chatCode, request.getContent(), request.getReplication());
         }
 
         return response;

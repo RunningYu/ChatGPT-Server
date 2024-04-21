@@ -41,4 +41,6 @@ public interface MessageMapper {
     int getUpdateMessageId(String chatCode);
 
     MessagesPO getUpdateMessagePO(String chatCode);
+
+    void insertDefaultMessage(MessagesPO messagesPO);
 }

@@ -142,9 +142,9 @@ public class XunFeiXingHuoController {
         request.setUserCode(userCode);
         log.info("ChatGptController xfQuestion userCode:[{}], request:[{}]", userCode, request);
         Long threadId = Thread.currentThread().getId();
-        MessagesAO response = xunFeiService.xfQuestion(threadId, request);
+        JsonResult response = xunFeiService.xfQuestion(threadId, request);
 
-        return JsonResult.success(response);
+        return response;
     }
 
     @ApiOperation("讯飞星火：PPT生成")

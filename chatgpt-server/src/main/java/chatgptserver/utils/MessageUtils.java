@@ -8,7 +8,7 @@ package chatgptserver.utils;
 public class MessageUtils {
     public static String buildContent(String content) {
         if (content == null || "".equals(content)) {
-            throw new RuntimeException("问题不能为空");
+            return "";
         }
 
         String[] contents = content.split("\n");

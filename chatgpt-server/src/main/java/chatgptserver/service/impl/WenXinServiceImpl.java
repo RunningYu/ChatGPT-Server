@@ -12,6 +12,7 @@ import chatgptserver.bean.dto.WenXin.imageUnderstand.WenXinImageUnderstandRespon
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.dao.UserMapper;
+import chatgptserver.enums.CharacterConstants;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.enums.RoleTypeEnums;
 import chatgptserver.service.MessageService;
@@ -63,6 +64,11 @@ public class WenXinServiceImpl implements WenXinService {
     @Override
     public JsonResult getMessageFromWenXin(String userCode, String chatCode, String message, Boolean isRebuild, String cid) {
         log.info("MessageServiceImpl getMessageFromWenXin");
+        if (isRebuild == false && (message == null || "".equals(message))) {
+            log.info("MessageServiceImpl getMessageFromWenXin 请先输入文字描述");
+
+            return JsonResult.error(500, "请先输入文字描述");
+        }
         String url = String.format(GPTConstants.WEN_XIN_GET_ACCESS_TOKEN_URL, GPT_KEY_MAP.get(GPTConstants.WEN_XIN_API_KEY_NAME), GPT_KEY_MAP.get(GPTConstants.WEN_XIN_SECRET_KEY_NAME));
 
         try {
@@ -118,6 +124,11 @@ public class WenXinServiceImpl implements WenXinService {
     @Override
     public JsonResult wxImageCreate(String userCode, String chatCode, String content, Boolean isRebuild, String cid) {
         log.info("WenXinServiceImpl wxImageCreate userCode:[{}], chatCode:[{}], content:[{}], cid:[{}]", userCode, chatCode, content, cid);
+        if (isRebuild == false && (content == null || "".equals(content))) {
+            log.info("MessageServiceImpl wxImageCreate 请先输入文字描述");
+
+            return JsonResult.error(500, "请先输入文字描述");
+        }
         String accessToken = null;
         try {
 //            accessToken = getAccessToken();
@@ -171,10 +182,11 @@ public class WenXinServiceImpl implements WenXinService {
 
     @Override
     public JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild, String cid) {
-        if (content == null || "".equals(content)) {
-            log.info("WenXinServiceImpl wenXinImageUnderstand 请输入图片理解的问题");
+        String realContent = content;
+        if (image == null && (content == null || "".equals(content)) && isRebuild == false) {
+            log.info("WenXinServiceImpl wenXinImageUnderstand 图片和文字不能同时为空");
 
-            return JsonResult.error(500, "请输入图片理解的问题");
+            return JsonResult.error(500, "图片和文字不能同时为空");
         }
         String userCode = userService.getUserCodeByToken(token);
         if (userCode == null) {
@@ -205,7 +217,8 @@ public class WenXinServiceImpl implements WenXinService {
             }
         }
         String question = MessageUtils.buildContent(content);
-        WenXinImageUnderstandDTO request = new WenXinImageUnderstandDTO(question, base64Image);
+        content = question.equals("") ? CharacterConstants.DEFAULT_CONTENT : question;
+        WenXinImageUnderstandDTO request = new WenXinImageUnderstandDTO(content, base64Image);
         log.info("WenXinServiceImpl wenXinImageUnderstand request:[{}]", request);
         String requestJson = JSON.toJSONString(request);
         String responseStr = "";
@@ -231,7 +244,11 @@ public class WenXinServiceImpl implements WenXinService {
             try {
                 UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
                 imageUrl = uploadResponse.getMinIoUrl();
-                question = imageUrl + "\n\n" + content;
+                if (realContent == null || "".equals(realContent)) {
+                    question = imageUrl;
+                } else {
+                    question = imageUrl + "\n\n" + realContent;
+                }
             } catch (Exception e) {
                 return JsonResult.error("图片处理异常！");
             }

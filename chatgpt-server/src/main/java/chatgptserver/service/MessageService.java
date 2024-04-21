@@ -26,4 +26,6 @@ public interface MessageService {
     void recordHistoryWithReplyImage(String userCode, String chatCode, String content, String replication, String replyImage);
 
     void recordHistory(String userCode, String chatCode, String content, String response, Boolean isRebuild);
+
+    void recordDefaultHistory(String userCode, String chatCode, String content, String replication);
 }

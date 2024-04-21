@@ -48,6 +48,9 @@ public class MessagesPO {
     @ApiModelProperty("回答附加的照片")
     private String replyImage;
 
+    @ApiModelProperty("0-不是预设 1-是预设")
+    private Integer isDefault;
+
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

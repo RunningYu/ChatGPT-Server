@@ -86,10 +86,11 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfImageUnderstand(Long threadId, MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}], token:[{}], chatCode:[{}]", threadId, image, content, token, chatCode);
-        if (content == null || "".equals(content)) {
-            log.info("XunFeiServiceImpl xfImageUnderstand 请输入图片理解的问题");
+        String realContent = content;
+        if (image == null && (content == null || "".equals(content)) && isRebuild == false) {
+            log.info("XunFeiServiceImpl xfImageUnderstand 图片和文字不能同时为空");
 
-            return JsonResult.error(500, "请输入图片理解的问题");
+            return JsonResult.error(500, "图片和文字不能同时为空");
         }
         XunFeiUtils.imageUnderstandFlagMap.put(threadId, false);
         XunFeiUtils.imageUnderstandResponseMap.put(threadId, "");
@@ -142,7 +143,12 @@ public class XunFeiServiceImpl implements XunFeiService {
                         UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
                         String imageUrl = uploadResponse.getMinIoUrl();
                         response.setImage(uploadResponse.getMinIoUrl());
-                        question = imageUrl + "\n\n" + content;
+                        if (realContent == null || "".equals(realContent)) {
+                            question = imageUrl;
+                        } else {
+                            question = imageUrl + "\n\n" + realContent;
+                        }
+
                         if (isRebuild) {
                             messageService.recordHistory("", chatCode, "", totalResponse, isRebuild);
                         } else {
@@ -170,6 +176,7 @@ public class XunFeiServiceImpl implements XunFeiService {
         List<Text> requestList = new ArrayList<>();
         String base64Image = "";
         content = MessageUtils.buildContent(content);
+        content = ("".equals(content) ? CharacterConstants.DEFAULT_CONTENT : content);
         String iUrl = null;
         if (isRebuild) {
             MessagesPO messagesPO = messageMapper.getUpdateMessagePO(chatCode);
@@ -218,6 +225,11 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfPptCreate(String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfPptCreate content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", content, token, chatCode, isRebuild, cid);
+        if (isRebuild == false && (content == null || "".equals(content))) {
+            log.info("XunFeiServiceImpl xfPptCreate 请先输入文字描述");
+
+            return JsonResult.error(500, "请先输入文字描述");
+        }
         String pptUrl = "", coverImgSrc = "", outLineStr = "";
         String userCode = userService.getUserCodeByToken(token);
         // 输入个人appId
@@ -400,6 +412,11 @@ public class XunFeiServiceImpl implements XunFeiService {
     @Override
     public JsonResult xfImageCreate(String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfImageCreate content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", content, token, chatCode, isRebuild, cid);
+        if (isRebuild == false && (content == null || "".equals(content))) {
+            log.info("XunFeiServiceImpl xfImageCreate 请先输入文字描述");
+
+            return JsonResult.error(500, "请先输入文字描述");
+        }
         JsonRootBean jsonRootBean = new JsonRootBean();
         jsonRootBean.setHeader(new Header(GPT_KEY_MAP.get(GPTConstants.XF_XH_APPID_KEY)));
         String imageUrl = "";
@@ -459,8 +476,13 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：文本问答
      */
     @Override
-    public MessagesAO xfQuestion(Long threadId, QuestionRequestAO requestAO) {
+    public JsonResult xfQuestion(Long threadId, QuestionRequestAO requestAO) {
         log.info("XunFeiServiceImpl xfQuestion threadId:[{}], requestAO:[{}]", threadId, requestAO);
+        if (requestAO.getIsRebuild() == false && (requestAO.getContent() == null || "".equals(requestAO.getContent()))) {
+            log.info("XunFeiServiceImpl xfQuestion 请先输入文字描述");
+
+            return JsonResult.error(500, "请先输入文字描述");
+        }
         String totalResponse = "";
         XunFeiUtils.questionFlagMap.put(threadId, false);
         XunFeiUtils.questionTotalResponseMap.put(threadId, "");
@@ -510,7 +532,7 @@ public class XunFeiServiceImpl implements XunFeiService {
             }
         }
 
-        return response;
+        return JsonResult.success(response);
     }
 
     public static String getPicAuthUrl(String hostUrl, String apiKey, String apiSecret) throws Exception {

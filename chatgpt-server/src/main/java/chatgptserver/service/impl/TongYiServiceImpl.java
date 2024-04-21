@@ -9,6 +9,7 @@ import chatgptserver.bean.dto.tongYiQianWen.*;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.MessageMapper;
+import chatgptserver.enums.CharacterConstants;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.OkHttpService;
@@ -59,10 +60,11 @@ public class TongYiServiceImpl implements TongYiService {
     @Override
     public JsonResult tyImageUnderstand(MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("TongYiServiceImpl tyImageUnderstand image:[{}] content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", image, content, token, chatCode, isRebuild, cid);
-        if (content == null || "".equals(content)) {
-            log.info("TongYiServiceImpl tyImageUnderstand 请输入图片理解的问题");
+        String realContent = content;
+        if (image == null && (content == null || "".equals(content)) && isRebuild == false) {
+            log.info("TongYiServiceImpl tyImageUnderstand 图片和文字不能同时为空");
 
-            return JsonResult.error(500, "请输入图片理解的问题");
+            return JsonResult.error(500, "图片和文字不能同时为空");
         }
         String imageUrl = "";
         if (image != null) {
@@ -77,6 +79,7 @@ public class TongYiServiceImpl implements TongYiService {
         log.info("TongYiServiceImpl tyImageUnderstand imageUrl:[{}]", imageUrl);
         String userCode = userService.getUserCodeByToken(token);
         content = MessageUtils.buildContent(content);
+        content = ("".equals(content) ? CharacterConstants.DEFAULT_CONTENT : chatCode);
         // 构建多轮对话请求体
         TongYiImageUnderStandRequestDTO request = buildTongYiImageUnderstandRequestDTO(chatCode, imageUrl, content);
         log.info("WenXinServiceImpl tyImageUnderstand request:[{}]", request);
@@ -99,7 +102,14 @@ public class TongYiServiceImpl implements TongYiService {
         TongYiImageUnderstandResponseDTO responseDTO = JSON.parseObject(responseStr, TongYiImageUnderstandResponseDTO.class);
         String response = responseDTO.getOutput().getChoices().get(0).getMessage().getContent().get(0).get("text");
         log.info("TongYiServiceImpl tyImageUnderstand response:[{}]", response);
-        String question = imageUrl.equals("") ? content : (imageUrl + "\n\n" + content);
+        String question = "";
+        if (isRebuild) {
+            question = realContent;
+        } else if (isRebuild == false && (realContent == null || "".equals(realContent))) {
+            question = imageUrl.equals("") ? realContent : imageUrl;
+        } else {
+            question = imageUrl.equals("") ? realContent : (imageUrl + "\n\n" + realContent);
+        }
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response);
         // 再次检查是否要取消生成
         if (StorageUtils.stopRequestMap.containsKey(cid)) {
@@ -118,7 +128,12 @@ public class TongYiServiceImpl implements TongYiService {
 
     @Override
     public JsonResult tyQuestion(String token, String chatCode, String content, Boolean isRebuild, String cid) {
-        log.info("TongYiServiceImpl getMessageFromWenXin token:[{}] chatCode:[{}], content:[{}], isRebuild:[{}], cid:[{}]", token, chatCode, content, isRebuild, cid);
+        log.info("TongYiServiceImpl tyQuestion token:[{}] chatCode:[{}], content:[{}], isRebuild:[{}], cid:[{}]", token, chatCode, content, isRebuild, cid);
+        if (isRebuild == false && (content == null || "".equals(content))) {
+            log.info("TongYiServiceImpl tyQuestion 请先输入文字描述");
+
+            return JsonResult.error(500, "请先输入文字描述");
+        }
         Text text = new Text("user", content);
         List<Text> textList = new ArrayList<>();
         textList.add(text);
@@ -164,6 +179,11 @@ public class TongYiServiceImpl implements TongYiService {
     @Override
     public JsonResult tyImageCreate(String userCode, String chatCode, String content, Boolean isRebuild, String cid) {
         log.info("TongYiServiceImpl tyImageCreate userCode:[{}] chatCode:[{}], content:[{}], isRebuild:[{}], cid:[{}]", userCode, chatCode, chatCode, isRebuild, cid);
+        if (isRebuild == false && (content == null || "".equals(content))) {
+            log.info("TongYiServiceImpl tyImageCreate 请先输入文字描述");
+
+            return JsonResult.error(500, "请先输入文字描述");
+        }
         TongYiImageCreateRequestDTO request = TongYiImageCreateRequestDTO.buildTongYiImageCreateRequestDTO(content);
         log.info("TongYiServiceImpl tyImageCreate request:[{}]", JSON.toJSONString(request));
 

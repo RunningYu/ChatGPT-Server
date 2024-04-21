@@ -12,4 +12,6 @@ public class CharacterConstants {
 
     public static final String BLACK_SPOTS = "   - ";
 
+    public static final String DEFAULT_CONTENT = "解读一下这张图片";
+
 }

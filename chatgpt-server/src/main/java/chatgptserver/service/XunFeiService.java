@@ -13,7 +13,7 @@ public interface XunFeiService {
 
     JsonResult xfImageCreate(String content, String token, String chatCode, Boolean isRebuild, String cid);
 
-    MessagesAO xfQuestion(Long threadId, QuestionRequestAO request);
+    JsonResult xfQuestion(Long threadId, QuestionRequestAO request);
 
     JsonResult xfImageUnderstand(Long threadId, MultipartFile file, String content, String token, String chatCode, Boolean isRebuild, String cid);
 
