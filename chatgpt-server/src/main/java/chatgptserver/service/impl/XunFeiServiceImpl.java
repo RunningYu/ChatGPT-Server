@@ -23,6 +23,7 @@ import chatgptserver.enums.CharacterConstants;
 import chatgptserver.service.*;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MinioUtil;
+import chatgptserver.utils.StorageUtils;
 import chatgptserver.utils.XunFeiUtils;
 import chatgptserver.utils.xunfei.BigModelNew;
 import chatgptserver.enums.GPTConstants;
@@ -86,13 +87,12 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：图片理解
      */
     @Override
-    public JsonResult xfImageUnderstand(Long threadId, MultipartFile image, String content, String token, String chatCode, Boolean isRebuild) {
+    public JsonResult xfImageUnderstand(Long threadId, MultipartFile image, String content, String token, String chatCode, Boolean isRebuild, String cid) {
         log.info("XunFeiServiceImpl xfImageUnderstand threadId:[{}], image:[{}], question:[{}], token:[{}], chatCode:[{}]", threadId, image, content, token, chatCode);
         XunFeiUtils.imageUnderstandFlagMap.put(threadId, false);
         XunFeiUtils.imageUnderstandResponseMap.put(threadId, "");
         SseEmitter sseEmitter = SseUtils.sseEmittersMap.get(threadId);
         String totalResponse = "";
-
         try {
             // 构建鉴权url
             String authUrl = getAuthUrl(GPTConstants.XF_XH_PICTURE_UNDERSTAND_URL,
@@ -108,6 +108,12 @@ public class XunFeiServiceImpl implements XunFeiService {
             }
 
             while (true) {
+                // 再次检查是否要取消生成
+                if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                    StorageUtils.stopRequestMap.remove(cid);
+
+                    return JsonResult.success();
+                }
                 boolean closeFlag = XunFeiUtils.imageUnderstandFlagMap.get(Thread.currentThread().getId());
                 XunFeiUtils.imageUnderstandFlagMap.put(Thread.currentThread().getId(), false);
                 if (!closeFlag) {
@@ -118,7 +124,19 @@ public class XunFeiServiceImpl implements XunFeiService {
                     String userCode = userService.getUserCodeByToken(token);
                     MessagesAO response = messageService.buildMessageAO(userCode, chatCode, content, totalResponse);
                     String question = "";
+                    // 再次检查是否要取消生成
+                    if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                        StorageUtils.stopRequestMap.remove(cid);
+
+                        return JsonResult.success();
+                    }
                     if (image != null) {
+                        // 三次检查是否要取消生成
+                        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                            StorageUtils.stopRequestMap.remove(cid);
+
+                            return JsonResult.success();
+                        }
                         UploadResponse uploadResponse = minioUtil.uploadFile(image, "file");
                         String imageUrl = uploadResponse.getMinIoUrl();
                         response.setImage(uploadResponse.getMinIoUrl());
@@ -144,7 +162,6 @@ public class XunFeiServiceImpl implements XunFeiService {
         } catch (Exception e) {
             throw new RuntimeException();
         }
-
     }
 
     private List<Text> buildImageUnderstandRequest(String chatCode, MultipartFile image, String content, Boolean isRebuild) {
@@ -185,8 +202,8 @@ public class XunFeiServiceImpl implements XunFeiService {
     }
 
     @Override
-    public JsonResult xfPptCreate(String content, String token, String chatCode, Boolean isRebuild) {
-        log.info("XunFeiServiceImpl xfPptCreate content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}]", content, token, chatCode, isRebuild);
+    public JsonResult xfPptCreate(String content, String token, String chatCode, Boolean isRebuild, String cid) {
+        log.info("XunFeiServiceImpl xfPptCreate content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", content, token, chatCode, isRebuild, cid);
         String pptUrl = "", coverImgSrc = "", outLineStr = "";
         String userCode = userService.getUserCodeByToken(token);
         // 输入个人appId
@@ -201,6 +218,12 @@ public class XunFeiServiceImpl implements XunFeiService {
 
         // 建立链接
         ApiClient client = new ApiClient(GPTConstants.XF_XH_PPT_CREATE_URL);
+        // 检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
 
         try {
             // 查询PPT模板信息
@@ -221,6 +244,12 @@ public class XunFeiServiceImpl implements XunFeiService {
             int progress = 0;
             ProgressResponse progressResponse;
             while (progress < 100) {
+                // 再次检查是否要取消生成
+                if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                    StorageUtils.stopRequestMap.remove(cid);
+
+                    return JsonResult.success();
+                }
                 String progressResult = client.checkProgress(appId, ts, signature, response.getData().getSid());
                 progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
                 progress = progressResponse.getData().getProcess();
@@ -245,7 +274,6 @@ public class XunFeiServiceImpl implements XunFeiService {
 //            log.info("XunFeiServiceImpl xfPptCreate Outline:[{}]", outlineResponse.getData().getOutline());
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
 
-
             // 基于sid和大纲生成ppt
             String sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
@@ -262,6 +290,12 @@ public class XunFeiServiceImpl implements XunFeiService {
             // 利用sid查询PPT生成进度
             progress = 0;
             while (progress < 100) {
+                // 再次检查是否要取消生成
+                if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                    StorageUtils.stopRequestMap.remove(cid);
+
+                    return JsonResult.success();
+                }
                 String progressResult = client.checkProgress(appId, ts, signature, sidResponse.getData().getSid());
                 progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
                 progress = progressResponse.getData().getProcess();
@@ -270,7 +304,12 @@ public class XunFeiServiceImpl implements XunFeiService {
                     Thread.sleep(5000);
                 }
             }
+            // 再次检查是否要取消生成
+            if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                StorageUtils.stopRequestMap.remove(cid);
 
+                return JsonResult.success();
+            }
             // 基于大纲生成ppt
             String pptResp = client.createPptByOutline(appId, ts, signature, outlineQuery, outlineResponse.getData().getOutline());
             // 解析 PPT封面
@@ -283,6 +322,12 @@ public class XunFeiServiceImpl implements XunFeiService {
             // 利用sid查询PPT生成进度
             progress = 0;
             while (progress < 100) {
+                // 再次检查是否要取消生成
+                if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                    StorageUtils.stopRequestMap.remove(cid);
+
+                    return JsonResult.success();
+                }
                 String progressResult = client.checkProgress(appId, ts, signature, pptResponse.getData().getSid());
                 progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
                 progress = progressResponse.getData().getProcess();
@@ -294,6 +339,12 @@ public class XunFeiServiceImpl implements XunFeiService {
             }
             String replication = outLineStr + "\n" + coverImgSrc + "\n\n" + pptUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
             MessagesAO responseAO = messageService.buildMessageAO(userCode, chatCode, content, replication);
+            // 再次检查是否要取消生成
+            if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                StorageUtils.stopRequestMap.remove(cid);
+
+                return JsonResult.success();
+            }
             messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
 
             return JsonResult.success(responseAO);
@@ -333,8 +384,8 @@ public class XunFeiServiceImpl implements XunFeiService {
      * 讯飞星火：图片生成
      */
     @Override
-    public JsonResult xfImageCreate(String content, String token, String chatCode, Boolean isRebuild) {
-        log.info("XunFeiServiceImpl xfImageCreate content:[{}], token:[{}], chatCode:[{}]", content, token, chatCode);
+    public JsonResult xfImageCreate(String content, String token, String chatCode, Boolean isRebuild, String cid) {
+        log.info("XunFeiServiceImpl xfImageCreate content:[{}], token:[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", content, token, chatCode, isRebuild, cid);
         JsonRootBean jsonRootBean = new JsonRootBean();
         jsonRootBean.setHeader(new Header(GPT_KEY_MAP.get(GPTConstants.XF_XH_APPID_KEY)));
         String imageUrl = "";
@@ -358,17 +409,28 @@ public class XunFeiServiceImpl implements XunFeiService {
             log.info("XunFeiServiceImpl pictureCreate jsonRootBean:[{}]", jsonRootBean);
 
             String responseStr = okHttpService.makePostRequest(authUrl, JSON.toJSONString(jsonRootBean));
+            // 检查是否要取消生成
+            if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                StorageUtils.stopRequestMap.remove(cid);
+
+                return JsonResult.success();
+            }
             ImageResponse imageResponse = XunFeiUtils.buildImageResponse();
             imageResponse = JSON.parseObject(responseStr, ImageResponse.class);
             String imageBase64Str = imageResponse.getPayload().getChoices().getText().get(0).getContent();
             File imageFile = ImageUtil.convertBase64StrToImage(imageBase64Str, System.currentTimeMillis() + "AiPicture.jpg");
             MultipartFile multipartFile = new MockMultipartFile("file", imageFile.getName(), "image/png", new FileInputStream(imageFile));
-
             UploadResponse imageUrlResponse = minioUtil.uploadFile(multipartFile, "file");
             imageUrl = imageUrlResponse.getMinIoUrl();
             log.info("XunFeiServiceImpl pictureCreate imageUrl:[{}]", imageUrl);
         } catch (Exception e) {
             throw new RuntimeException("调通义千问图片生成接口异常！");
+        }
+        // 再次检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
         }
         String userCode = userService.getUserCodeByToken(token);
         String replication = imageUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
@@ -408,6 +470,12 @@ public class XunFeiServiceImpl implements XunFeiService {
             throw new RuntimeException();
         }
         while (true) {
+            // 检查是否要取消生成
+            if (StorageUtils.stopRequestMap.containsKey(requestAO.getCid())) {
+                StorageUtils.stopRequestMap.remove(requestAO.getCid());
+
+                return null;
+            }
             boolean closeFlag = XunFeiUtils.questionFlagMap.get(threadId);
             if (!closeFlag) {
                 // Thread.sleep(200);
@@ -416,6 +484,12 @@ public class XunFeiServiceImpl implements XunFeiService {
                 log.info("XunFeiServiceImpl xfQuestion totalResponse:[{}]", totalResponse);
                 response = messageService.buildMessageAO(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse);
                 log.info("XunFeiServiceImpl xfQuestion response:[{}]", response);
+                // 再次检查是否要取消生成
+                if (StorageUtils.stopRequestMap.containsKey(requestAO.getCid())) {
+                    StorageUtils.stopRequestMap.remove(requestAO.getCid());
+
+                    return null;
+                }
                 messageService.recordHistory(requestAO.getUserCode(), requestAO.getChatCode(), requestAO.getContent(), totalResponse, requestAO.getIsRebuild());
 
                 break;

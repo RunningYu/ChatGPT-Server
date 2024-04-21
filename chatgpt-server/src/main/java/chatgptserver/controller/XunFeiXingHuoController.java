@@ -109,12 +109,13 @@ public class XunFeiXingHuoController {
                                         @RequestParam(value = "image", required = false) MultipartFile image,
                                         @RequestParam("content") String content,
                                         @RequestParam("chatCode") String chatCode,
-                                        @RequestParam("isRebuild") Boolean isRebuild) {
+                                        @RequestParam("isRebuild") Boolean isRebuild,
+                                        @RequestParam("cid") String cid) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfPictureUnderstand token:[{}]", token);
-        log.info("ChatGptController xfPictureUnderstand token:[{}], image:[{}], content[{}], chatCode:[{}], isRebuild:[{}]", token, image, content, chatCode, isRebuild);
+        log.info("ChatGptController xfPictureUnderstand token:[{}], image:[{}], content[{}], chatCode:[{}], isRebuild:[{}], cid:[{}]", token, image, content, chatCode, isRebuild, chatCode);
         Long threadId = Thread.currentThread().getId();
-        JsonResult response = xunFeiService.xfImageUnderstand(threadId, image, content, token, chatCode, isRebuild);
+        JsonResult response = xunFeiService.xfImageUnderstand(threadId, image, content, token, chatCode, isRebuild, cid);
 
         return response;
     }
@@ -125,7 +126,7 @@ public class XunFeiXingHuoController {
                                     @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfImageCreate token:[{}], request:[{}]", token, request);
-        JsonResult response = xunFeiService.xfImageCreate(request.getContent(), token, request.getChatCode(), request.getIsRebuild());
+        JsonResult response = xunFeiService.xfImageCreate(request.getContent(), token, request.getChatCode(), request.getIsRebuild(), request.getCid());
 
         return response;
     }
@@ -162,7 +163,7 @@ public class XunFeiXingHuoController {
                                   @RequestBody QuestionRequestAO request) {
         String token = httpServletRequest.getHeader("token");
         log.info("ChatGptController xfPptCreate token:[{}], request:[{}]", token, request);
-        JsonResult response = xunFeiService.xfPptCreate(request.getContent(), token, request.getChatCode(), request.getIsRebuild());
+        JsonResult response = xunFeiService.xfPptCreate(request.getContent(), token, request.getChatCode(), request.getIsRebuild(), request.getCid());
 
         return response;
     }

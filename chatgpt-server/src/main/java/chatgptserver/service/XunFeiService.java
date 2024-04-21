@@ -11,11 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface XunFeiService {
 
-    JsonResult xfImageCreate(String content, String token, String chatCode, Boolean isRebuild);
+    JsonResult xfImageCreate(String content, String token, String chatCode, Boolean isRebuild, String cid);
 
     MessagesAO xfQuestion(Long threadId, QuestionRequestAO request);
 
-    JsonResult xfImageUnderstand(Long threadId, MultipartFile file, String content, String token, String chatCode, Boolean isRebuild);
+    JsonResult xfImageUnderstand(Long threadId, MultipartFile file, String content, String token, String chatCode, Boolean isRebuild, String cid);
 
-    JsonResult xfPptCreate(String content, String token, String chatCode, Boolean isRebuild);
+    JsonResult xfPptCreate(String content, String token, String chatCode, Boolean isRebuild, String cid);
 }
