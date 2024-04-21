@@ -19,6 +19,7 @@ import chatgptserver.service.OkHttpService;
 import chatgptserver.service.UserService;
 import chatgptserver.service.WenXinService;
 import chatgptserver.utils.MinioUtil;
+import chatgptserver.utils.StorageUtils;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static chatgptserver.enums.GPTConstants.GPT_KEY_MAP;
@@ -60,7 +60,7 @@ public class WenXinServiceImpl implements WenXinService {
     private OkHttpService okHttpService;
 
     @Override
-    public JsonResult getMessageFromWenXin(String userCode, String chatCode, String message, Boolean isRebuild) {
+    public JsonResult getMessageFromWenXin(String userCode, String chatCode, String message, Boolean isRebuild, String cid) {
         log.info("MessageServiceImpl getMessageFromWenXin");
         String url = String.format(GPTConstants.WEN_XIN_GET_ACCESS_TOKEN_URL, GPT_KEY_MAP.get(GPTConstants.WEN_XIN_API_KEY_NAME), GPT_KEY_MAP.get(GPTConstants.WEN_XIN_SECRET_KEY_NAME));
 
@@ -96,6 +96,12 @@ public class WenXinServiceImpl implements WenXinService {
             String responseStr = okHttpService.makePostRequest(url1, requestBody);
             WenXinRspDTO wenXinRspDTO = JSON.parseObject(responseStr, WenXinRspDTO.class);
             log.info("MessageServiceImpl getMessageFromWenXin response:[{}]", wenXinRspDTO);
+            // 再次检查是否要取消生成
+            if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                StorageUtils.stopRequestMap.remove(cid);
+
+                return JsonResult.success();
+            }
 
             messageService.recordHistory(userCode, chatCode, message, wenXinRspDTO.getResult(), isRebuild);
             String response = ( (wenXinRspDTO.getResult() == null || wenXinRspDTO.getResult().equals("")) ? "[没有生成相应的结果]" : wenXinRspDTO.getResult() );
@@ -109,8 +115,8 @@ public class WenXinServiceImpl implements WenXinService {
     }
 
     @Override
-    public JsonResult wxImageCreate(String userCode, String chatCode, String content, Boolean isRebuild) {
-        log.info("WenXinServiceImpl wxImageCreate userCode:[{}], chatCode:[{}], content:[{}]", userCode, chatCode, content);
+    public JsonResult wxImageCreate(String userCode, String chatCode, String content, Boolean isRebuild, String cid) {
+        log.info("WenXinServiceImpl wxImageCreate userCode:[{}], chatCode:[{}], content:[{}], cid:[{}]", userCode, chatCode, content, cid);
         String accessToken = null;
         try {
 //            accessToken = getAccessToken();
@@ -129,6 +135,12 @@ public class WenXinServiceImpl implements WenXinService {
         } catch (IOException e) {
             throw new RuntimeException("图片生成失败");
         }
+        // 检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
         log.info("WenXinServiceImpl wxImageCreate responseStr:[{}]", responseStr);
         WenXinImageResponse response = JSON.parseObject(responseStr, WenXinImageResponse.class);
         String B64_image = response.getData().get(0).getB64_image();
@@ -140,6 +152,12 @@ public class WenXinServiceImpl implements WenXinService {
             UploadResponse uploadResponse = minioUtil.uploadFile(multipartFile, "file");
             String replication = uploadResponse.getMinIoUrl() + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
             MessagesAO result = messageService.buildMessageAO(userCode, chatCode, content, replication);
+            // 再次检查是否要取消生成
+            if (StorageUtils.stopRequestMap.containsKey(cid)) {
+                StorageUtils.stopRequestMap.remove(cid);
+
+                return JsonResult.success();
+            }
             // 记录历史记录
             messageService.recordHistory(userCode, chatCode, content, replication, isRebuild);
 //            messageService.recordHistory(userCode, chatCode, content, uploadResponse.getMinIoUrl());
@@ -151,7 +169,7 @@ public class WenXinServiceImpl implements WenXinService {
     }
 
     @Override
-    public JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild) {
+    public JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild, String cid) {
         String userCode = userService.getUserCodeByToken(token);
         if (userCode == null) {
             return JsonResult.error("token失效或过期！");
@@ -168,7 +186,7 @@ public class WenXinServiceImpl implements WenXinService {
             return JsonResult.error("获取access_token异常！");
         }
         String base64Image = "";
-        // todo：如果是重新生成，则需要将图片url转成base64
+        // 如果是重新生成，则需要将图片url转成base64
         if (image != null) {
             base64Image = ImageUtil.imageMultipartFileToBase64(image);
         } else {
@@ -187,6 +205,12 @@ public class WenXinServiceImpl implements WenXinService {
         } catch (IOException e) {
             return JsonResult.error("调用文心一言接口异常！");
         }
+        // 检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
         WenXinImageUnderstandResponseDTO response = JSON.parseObject(responseStr, WenXinImageUnderstandResponseDTO.class);
         log.info("WenXinServiceImpl wenXinImageUnderstand response:[{}]", response);
         String imageUrl = "";
@@ -200,9 +224,14 @@ public class WenXinServiceImpl implements WenXinService {
                 return JsonResult.error("图片处理异常！");
             }
         }
+        // 再次检查是否要取消生成
+        if (StorageUtils.stopRequestMap.containsKey(cid)) {
+            StorageUtils.stopRequestMap.remove(cid);
+
+            return JsonResult.success();
+        }
         MessagesAO result = messageService.buildMessageAO(userCode, chatCode, question, response.getResult());
         messageService.recordHistory(userCode, chatCode, question, response.getResult(), isRebuild);
-//        messageService.recordHistoryWithImage(userCode, chatCode, imageUrl, content, response.getResult());
 
         return JsonResult.success(result);
     }

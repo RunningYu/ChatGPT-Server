@@ -10,9 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface WenXinService {
 
-    JsonResult getMessageFromWenXin(String userCode, String chatCode, String message, Boolean isRebuild);
+    JsonResult getMessageFromWenXin(String userCode, String chatCode, String message, Boolean isRebuild, String cid);
 
-    JsonResult wxImageCreate(String userCode, String chatCode, String content, Boolean isRebuild);
+    JsonResult wxImageCreate(String userCode, String chatCode, String content, Boolean isRebuild, String cid);
 
-    JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild);
+    JsonResult wenXinImageUnderstand(String token, String chatCode, MultipartFile image, String content, Boolean isRebuild, String cid);
 }
