@@ -17,6 +17,11 @@ public class StorageUtils {
     public static ConcurrentHashMap<String, JsonResult> loginMap = new ConcurrentHashMap<>();
 
     /**
+     * 存储【扫码冲突】的标识
+     */
+    public static ConcurrentHashSet<String> scanLoginConflictMap = new ConcurrentHashSet<>();
+
+    /**
      * 存储【监听停止请求】的标识
      */
     public static ConcurrentHashMap<String, String> stopRequestMap = new ConcurrentHashMap<>();

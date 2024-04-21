@@ -29,6 +29,8 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private Object lock = new Object();
+
     @Lazy
     @Autowired
     private MessageService messageService;
@@ -297,37 +299,41 @@ public class UserServiceImpl implements UserService {
     @Override
     public JsonResult loginByScan(String pid, String did, String createTime) {
         log.info("UserServiceImpl loginByScan pid:[{}], did:[{}], createTime:[{}]", pid, did, createTime);
-        // 查询数据库是否存在该用户（有则直接登录，并生成token）
-        UserPO havaUser = userMapper.getUserByEmail(did);
-        // 如果没有注册过，则注册
-        if (Objects.isNull(havaUser)) {
-            UserPO user = new UserPO();
-            user.setEmail(did);
-            user.setUsername(did);
-            int id = userMapper.userAdd(user);
-            String userCode = "user_" + user.getId();
-            user.setUserCode(userCode);
-            havaUser = user;
-            log.info("UserServiceImpl loginByScan user:[{}]", user);
-            userMapper.updateUserCode(userCode, user.getId());
-        }
-
-        // 生成token，存token进redis
-        String token = jwtUtils.createToken(havaUser);
-        UserLoginReqAO userLoginReqAO = ConvertMapping.userPO2UserLoginReqAO(havaUser);
-        userLoginReqAO.setToken(token);
-        caffeineCache.put(token, userLoginReqAO);
         // 存进中间缓存层
         Map<String, Boolean> map = new HashMap<>();
-        if (StorageUtils.loginMap.containsKey(createTime)) {
-            map.put("loginStatus", false);
+        synchronized (lock) {
+            if (StorageUtils.scanLoginConflictMap.contains(createTime)) {
+                map.put("loginStatus", false);
+
+                return JsonResult.success(map);
+            }
+            StorageUtils.scanLoginConflictMap.add(createTime);
+            // 查询数据库是否存在该用户（有则直接登录，并生成token）
+            UserPO havaUser = userMapper.getUserByEmail(did);
+            // 如果没有注册过，则注册
+            if (Objects.isNull(havaUser)) {
+                UserPO user = new UserPO();
+                user.setEmail(did);
+                user.setUsername(did);
+                int id = userMapper.userAdd(user);
+                String userCode = "user_" + user.getId();
+                user.setUserCode(userCode);
+                havaUser = user;
+                log.info("UserServiceImpl loginByScan user:[{}]", user);
+                userMapper.updateUserCode(userCode, user.getId());
+            }
+
+            // 生成token，存token进redis
+            String token = jwtUtils.createToken(havaUser);
+            UserLoginReqAO userLoginReqAO = ConvertMapping.userPO2UserLoginReqAO(havaUser);
+            userLoginReqAO.setToken(token);
+            caffeineCache.put(token, userLoginReqAO);
+            StorageUtils.loginMap.put(createTime, JsonResult.success(userLoginReqAO));
+            StorageUtils.scanLoginConflictMap.add(createTime);
+            map.put("loginStatus", true);
 
             return JsonResult.success(map);
         }
-        StorageUtils.loginMap.put(createTime, JsonResult.success(userLoginReqAO));
-        map.put("loginStatus", true);
-
-        return JsonResult.success(map);
     }
 
     @Override
