@@ -166,7 +166,7 @@ public class MessageServiceImpl implements MessageService {
             response.setChatHeadshot(gptPO.getHeadshot());
         }
         response.setChatCode(chatCode);
-        response.setUpdateTime(new Date());
+        response.setReplyTime(new Date());
         response.setCreateTime(questionTime);
 
         return response;
@@ -192,7 +192,7 @@ public class MessageServiceImpl implements MessageService {
         log.info("MessageServiceImpl recordHistory userCode:[{}], chatCode:[{}], content:[{}], result:[{}], isRebuild:[{}], questionTime:[{}]", userCode, chatCode, content, result, isRebuild, questionTime);
         if (isRebuild != null && isRebuild) {
             int id = messageMapper.getUpdateMessageId(chatCode);
-            messageMapper.rebuildQuestion(chatCode, result, id);
+            messageMapper.rebuildQuestion(chatCode, result, id, questionTime);
 
             return;
         }

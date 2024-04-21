@@ -36,7 +36,7 @@ public interface MessageMapper {
 
     Date getLastChatTime(String chatCode);
 
-    void rebuildQuestion(@Param("chatCode") String chatCode, @Param("replication") String replication, @Param("id") int id);
+    void rebuildQuestion(@Param("chatCode") String chatCode, @Param("replication") String replication, @Param("id") int id, @Param("questionTime") Date questionTime);
 
     int getUpdateMessageId(String chatCode);
 

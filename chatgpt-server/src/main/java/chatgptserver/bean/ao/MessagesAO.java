@@ -51,12 +51,12 @@ public class MessagesAO {
     @ApiModelProperty("0-不是预设 1-是预设")
     private Integer isDefault;
 
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty("问题时间")
     @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
-    @ApiModelProperty("更新时间")
+    @ApiModelProperty("回答时间")
     @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTime;
+    private Date replyTime;
 
 }

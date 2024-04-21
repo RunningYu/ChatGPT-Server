@@ -14,7 +14,7 @@
 
     <update id="rebuildQuestion">
         update tb_chatgpt_messages
-        set replication = #{replication}, update_time = now()
+        set replication = #{replication}, create_time = #{questionTime}, update_time = now()
         where id = #{id}
     </update>
 
