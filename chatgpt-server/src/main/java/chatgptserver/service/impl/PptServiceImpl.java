@@ -296,17 +296,19 @@ public class PptServiceImpl implements PptService {
                 }
                 log.info("PptServiceImpl pptColorList select from OPEN_API");
             } else {
-                List<PptColor> list1 = new ArrayList<>();
-                for (PptColorPO pptColorPO : pptColors) {
-//                    PptColor pptColor = ConvertMapping.pptColorPO2PptColor(pptColorPO);
-//                    list1.add(pptColor);
-                }
                 log.info("PptServiceImpl pptColorList select from DB");
             }
-            caffeineCache.put("color", pptColors);
+            List<PptColor> pptColorList = new ArrayList<>();
+            for (PptColorPO pptColorPO : pptColors) {
+                System.out.println("----------------" + pptColorPO);
+                PptColor pptColor = ConvertMapping.pptColorPO2PptColor(pptColorPO);
+                pptColorList.add(pptColor);
+            }
 
             return pptColors;
         });
+        caffeineCache.put("color", list);
+        log.info("PptServiceImpl pptCreateByOutline list:[{}]", list);
 
         return JsonResult.success(list);
     }

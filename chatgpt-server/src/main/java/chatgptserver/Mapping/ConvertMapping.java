@@ -1,6 +1,7 @@
 package chatgptserver.Mapping;
 
 import chatgptserver.bean.ao.*;
+import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.po.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -140,5 +141,17 @@ public class ConvertMapping {
         defaultAO.setCreateTime(defaultPO.getCreateTime());
 
         return defaultAO;
+    }
+
+    public static PptColor pptColorPO2PptColor(PptColorPO pptColorPO) {
+        if (Objects.isNull(pptColorPO)) {
+            return null;
+        }
+        PptColor pptColor = new PptColor();
+        pptColor.setKey(pptColorPO.getColorKey());
+        pptColor.setName(pptColorPO.getColorName());
+        pptColor.setThumbnail(pptColorPO.getThumbnail());
+
+        return pptColor;
     }
 }
