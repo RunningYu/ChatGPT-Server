@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chatgptserver.dao.PptMapper">
+
+
+    <insert id="remainColor">
+        insert into tb_ppt_color (color_key, color_name, thumbnail) values (#{key}, #{name}, #{thumbnail})
+    </insert>
+
+    <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
+        select * from tb_ppt_color
+    </select>
+</mapper>

@@ -26,4 +26,9 @@ public class StorageUtils {
      */
     public static ConcurrentHashMap<String, String> stopRequestMap = new ConcurrentHashMap<>();
 
+    /**
+     * ppt大纲query
+     */
+    public static ConcurrentHashMap<String, String> outlineQueryMap = new ConcurrentHashMap<>();
+
 }

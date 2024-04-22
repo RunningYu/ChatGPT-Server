@@ -78,9 +78,22 @@ public class GPTConstants {
     public static final String XF_XH_API_SECRET_KEY = "APISecret";
     public static final String XF_XH_API_KEY = "APIKey";
     static {
-        GPT_KEY_MAP.put(XF_XH_APPID_KEY, "f6b93318");
-        GPT_KEY_MAP.put(XF_XH_API_SECRET_KEY, "NjU2ZTc5ZmNkZWI5NmQwYWI1MDJiMzg4");
-        GPT_KEY_MAP.put(XF_XH_API_KEY, "df704f2ff951c364c9bac34536811256");
+        // 我的
+//        GPT_KEY_MAP.put(XF_XH_APPID_KEY, "f6b93318");
+        // 刘jh的
+        GPT_KEY_MAP.put(XF_XH_APPID_KEY, "6e5e8cfc");
+
+        // 我的
+//        GPT_KEY_MAP.put(XF_XH_API_SECRET_KEY, "NjU2ZTc5ZmNkZWI5NmQwYWI1MDJiMzg4");
+        // 刘jh的
+        GPT_KEY_MAP.put(XF_XH_API_SECRET_KEY, "Njc4Mzk4NTNmMDVmMWIxZTljZDYwMjYx");
+
+        // 我的
+//        GPT_KEY_MAP.put(XF_XH_API_KEY, "df704f2ff951c364c9bac34536811256");
+        // 刘jh
+        GPT_KEY_MAP.put(XF_XH_API_KEY, "325cca6aaef908e86ee022dc0c5752b9");
+
+
     }
 
     /**
