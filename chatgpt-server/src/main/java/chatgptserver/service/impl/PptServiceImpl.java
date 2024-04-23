@@ -300,7 +300,6 @@ public class PptServiceImpl implements PptService {
             }
             List<PptColor> pptColorList = new ArrayList<>();
             for (PptColorPO pptColorPO : pptColors) {
-                System.out.println("----------------" + pptColorPO);
                 PptColor pptColor = ConvertMapping.pptColorPO2PptColor(pptColorPO);
                 pptColorList.add(pptColor);
             }
