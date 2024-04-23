@@ -218,7 +218,6 @@ public class PptServiceImpl implements PptService {
             }
             String outline = JSON.toJSONString(request.getOutline());
             // 基于大纲生成ppt
-//            String pptResp = client.createPptByOutline(appId, ts, signature, outlineQuery, outlineResponse.getData().getOutline());
             String pptResp = client.createPptByOutline(appId, ts, signature, request.getContent(), outline, request.getColorTheme());
             // 解析 PPT封面
             PptCoverResponseDTO coverRes = JSON.parseObject(pptResp, PptCoverResponseDTO.class);
