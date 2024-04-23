@@ -159,11 +159,13 @@ public class MessageServiceImpl implements MessageService {
             response.setUsername(userPO.getUsername());
             response.setUserHeadshot(userPO.getHeadshot());
         }
-        ChatPO chat = userMapper.getChatByCode(chatCode);
-        response.setChatName(chat.getChatName());
-        GptPO gptPO = gptMapper.getGptByCode(chat.getGptCode());
-        if (!Objects.isNull(gptPO)) {
-            response.setChatHeadshot(gptPO.getHeadshot());
+        if (chatCode != null && chatCode.equals("")) {
+            ChatPO chat = userMapper.getChatByCode(chatCode);
+            response.setChatName(chat.getChatName());
+            GptPO gptPO = gptMapper.getGptByCode(chat.getGptCode());
+            if (!Objects.isNull(gptPO)) {
+                response.setChatHeadshot(gptPO.getHeadshot());
+            }
         }
         response.setChatCode(chatCode);
         response.setReplyTime(new Date());
@@ -197,7 +199,7 @@ public class MessageServiceImpl implements MessageService {
             return;
         }
         String userName = "";
-        ChatPO target = userMapper.getChatByCode(chatCode);
+//        ChatPO target = userMapper.getChatByCode(chatCode);
         if (userCode != null && !userCode.equals("")) {
             UserPO sender = userMapper.getUserByCode(userCode);
             userName = sender.getUsername();
@@ -210,7 +212,7 @@ public class MessageServiceImpl implements MessageService {
         messagesPO.setUserCode(userCode);
         messagesPO.setChatCode(chatCode);
         messagesPO.setUsername(userName);
-        messagesPO.setChatName(target.getChatName());
+//        messagesPO.setChatName(target.getChatName());
         messagesPO.setQuestion(content);
         result = (result == null || result.equals("")) ? "没有生成相应的结果" : result;
         messagesPO.setReplication(result);

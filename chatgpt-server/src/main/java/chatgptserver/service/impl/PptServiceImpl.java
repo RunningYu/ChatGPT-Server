@@ -219,7 +219,7 @@ public class PptServiceImpl implements PptService {
             String outline = JSON.toJSONString(request.getOutline());
             // 基于大纲生成ppt
 //            String pptResp = client.createPptByOutline(appId, ts, signature, outlineQuery, outlineResponse.getData().getOutline());
-            String pptResp = client.createPptByOutline(appId, ts, signature, request.getContent(), outline);
+            String pptResp = client.createPptByOutline(appId, ts, signature, request.getContent(), outline, request.getColorTheme());
             // 解析 PPT封面
             PptCoverResponseDTO coverRes = JSON.parseObject(pptResp, PptCoverResponseDTO.class);
             coverImgSrc = coverRes.getData().getCoverImgSrc();
@@ -247,7 +247,7 @@ public class PptServiceImpl implements PptService {
             }
             log.info("PptServiceImpl pptCreateByOutline pptUrl:[{}]", pptUrl);
             String replication = outLineStr + "\n" + coverImgSrc + "\n\n" + pptUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
-            MessagesAO responseAO = messageService.buildMessageAO(userCode, request.getUserCode(), request.getContent(), replication, questionTime);
+            MessagesAO responseAO = messageService.buildMessageAO(userCode, null, request.getContent(), replication, questionTime);
             // 再次检查是否要取消生成
             if (StorageUtils.stopRequestMap.containsKey(request.getCid())) {
                 StorageUtils.stopRequestMap.remove(request.getCid());

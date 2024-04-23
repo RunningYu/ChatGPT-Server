@@ -85,6 +85,26 @@ public class ApiClient {
         return executeRequest(request);
     }
 
+    /**
+     * @param colorTheme: 颜色主题
+     */
+    public String createPptByOutline(String appId, String ts, String signature, String query, String outline, String colorTheme) throws IOException {
+        validateParameters(appId, ts, signature, outline);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("query", query);
+        jsonObject.put("outline", outline);
+        if (colorTheme != null && !"".equals(colorTheme)) {
+            jsonObject.put("theme", colorTheme);
+        }
+        jsonObject.put("is_card_note", true);
+
+        RequestBody body = RequestBody.create(jsonObject.toString(), MediaType.get(MEDIA_TYPE_JSON));
+
+        Request request = buildPostRequest(baseUrl + "/api/aippt/createByOutline", appId, ts, signature, body);
+        return executeRequest(request);
+    }
+
     public String checkProgress(String appId, String timestamp, String signature, String sid) throws IOException {
         validateParameters(appId, timestamp, signature, sid);
 

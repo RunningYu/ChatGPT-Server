@@ -1,6 +1,7 @@
 package chatgptserver.bean.ao.ppt;
 
 import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptOutlineResponse;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,15 +15,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PptCreateRequestAO {
 
+    @ApiModelProperty("大纲")
     private PptOutlineResponse outline;
 
-    private Boolean isRebuild;
+    @ApiModelProperty("颜色主题")
+    private String colorTheme;
 
-    private String cid;
+    @ApiModelProperty("问题")
+    private String content;
 
+    @ApiModelProperty("ppt生成监听的sid")
     private String sid;
 
-    private String content;
+    @ApiModelProperty("true：重新生成")
+    private Boolean isRebuild;
+
+    @ApiModelProperty("停止请求标识（时间戳）")
+    private String cid;
 
     private String userCode;
 }
