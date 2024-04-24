@@ -3,11 +3,7 @@ package chatgptserver.service.impl;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.MessagesAO;
-import chatgptserver.bean.ao.UploadResponse;
-import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
-import chatgptserver.bean.ao.ppt.PptKindResponseAO;
-import chatgptserver.bean.ao.ppt.PptOutlineResponseAO;
-import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
+import chatgptserver.bean.ao.ppt.*;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
@@ -37,6 +33,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
 
 /**
@@ -355,6 +353,22 @@ public class PptServiceImpl implements PptService {
             response.add(responseAO);
         }
         log.info("PptServiceImpl pptKindList response:[{}]", response);
+
+        return JsonResult.success(response);
+    }
+
+    @Override
+    public JsonResult pptListByKind(String firstKind, String secondKind, int page, int size, String userCode) {
+        log.info("PptServiceImpl pptList firstKind:[{}], secondKind:[{}], page:[{}], size:[{}], userCode:[{}]", firstKind, secondKind, page, size, userCode);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptList 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        int startIndex = (page - 1) * size;
+        List<PptPO> pptPOList = pptMapper.pptListByKind(firstKind, secondKind, startIndex, size);
+        int total = pptMapper.totalOfpptListByKind(firstKind, secondKind);
+        PptKindListResponseAO response = new PptKindListResponseAO(total, pptPOList);
+        log.info("PptServiceImpl pptListByKind pptPOList:[{}]", pptPOList);
 
         return JsonResult.success(response);
     }

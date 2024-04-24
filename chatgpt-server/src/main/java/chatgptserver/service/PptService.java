@@ -19,4 +19,7 @@ public interface PptService {
     JsonResult pptUpload(PptUploadRequestAO request);
 
     JsonResult pptKindList();
+
+    JsonResult pptListByKind(String firstKind, String secondKind, int page, int size, String userCode);
+
 }

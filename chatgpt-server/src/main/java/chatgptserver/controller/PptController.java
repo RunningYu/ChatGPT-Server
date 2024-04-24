@@ -95,11 +95,16 @@ public class PptController {
 
 
     @ApiOperation("PPT分类查询")
-    @GetMapping("/ppt/list")
-    public JsonResult pptList() {
+    @GetMapping("/ppt/list/by/kind")
+    public JsonResult pptListByKind(HttpServletRequest httpServletRequest,
+                                    @RequestParam(value = "firstKind", required = false) String firstKind, @RequestParam(value = "secondKind", required = false) String secondKind,
+                                    @RequestParam("page") int page, @RequestParam("size") int size) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptList firstKind:[{}], secondKind:[{}], page:[{}], size:[{}], token:[{}]", firstKind, secondKind, page, size, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptListByKind(firstKind, secondKind, page, size, userCode);
 
-
-        return null;
+        return response;
     }
 
     @ApiOperation("PPT收藏")

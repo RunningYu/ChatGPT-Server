@@ -27,4 +27,32 @@
     <select id="secondListByFirstKind" resultType="java.lang.String">
         select DISTINCT(second_kind) from tb_ppt_kind where first_kind = #{firstKind}
     </select>
+
+    <select id="pptListByKind" resultType="chatgptserver.bean.po.PptPO">
+        select *
+        from tb_ppt_info
+        <where>
+            <if test="firstKind != null and firstKind != ''">
+                and first_kind = #{firstKind}
+            </if>
+            <if test="secondKind != null and secondKind != ''">
+                and second_kind = #{secondKind}
+            </if>
+        </where>
+        order by create_time DESC limit #{startIndex}, #{size}
+    </select>
+
+    <select id="totalOfpptListByKind" resultType="java.lang.Integer">
+        select count(*)
+        from tb_ppt_info
+        <where>
+            <if test="firstKind != null and firstKind != ''">
+                and first_kind = #{firstKind}
+            </if>
+            <if test="secondKind != null and secondKind != ''">
+                and second_kind = #{secondKind}
+            </if>
+        </where>
+    </select>
+
 </mapper>

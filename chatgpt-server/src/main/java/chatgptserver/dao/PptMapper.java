@@ -27,4 +27,9 @@ public interface PptMapper {
     List<String> firstKindList();
 
     List<String> secondListByFirstKind(String firstKind);
+
+    List<PptPO> pptListByKind(@Param("firstKind") String firstKind, @Param("secondKind") String secondKind,
+                              @Param("startIndex") int startIndex, @Param("size") int size);
+
+    int totalOfpptListByKind(@Param("firstKind") String firstKind, @Param("secondKind") String secondKind);
 }
