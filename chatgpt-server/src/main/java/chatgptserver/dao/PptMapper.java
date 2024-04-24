@@ -2,6 +2,7 @@ package chatgptserver.dao;
 
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.po.PptColorPO;
+import chatgptserver.bean.po.PptPO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface PptMapper {
     void remainColor(PptColor color);
 
     List<PptColorPO> pptColorList();
+
+    int pptUpload(PptPO pptPO);
 }

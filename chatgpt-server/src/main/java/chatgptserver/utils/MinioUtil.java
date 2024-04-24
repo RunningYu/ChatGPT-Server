@@ -53,44 +53,37 @@ public class MinioUtil {
         }
     }
 
-    @ApiOperation("上传文件")
-    public UploadResponse uploadFile(MultipartFile file, String bucketName) throws Exception {
+    /**
+     * 上传文件
+     */
+    public UploadResponse uploadFile(MultipartFile file, String bucketName) {
         log.info("MinioUtil uploadFile bucketName:[{}]", bucketName);
         //判断文件是否为空
         if (null == file || 0 == file.getSize()) {
             return null;
         }
-        //判断存储桶是否存在  不存在则创建
-        createBucket(bucketName);
-        //文件名
-        String originalFilename = file.getOriginalFilename();
-        //新的文件名 = 时间戳_随机数.后缀名
-        assert originalFilename != null;
-        long now = System.currentTimeMillis() / 1000;
-        String fileName = DateUtil.format(DateUtil.date(),"yyyyMMdd")+"_"+ now + "_" + new Random().nextInt(1000) +
-                originalFilename.substring(originalFilename.lastIndexOf("."));
+        try {
+            //判断存储桶是否存在  不存在则创建
+            createBucket(bucketName);
+            //文件名
+            String originalFilename = file.getOriginalFilename();
+            //新的文件名 = 时间戳_随机数.后缀名
+            assert originalFilename != null;
+            long now = System.currentTimeMillis() / 1000;
+            String fileName = DateUtil.format(DateUtil.date(),"yyyyMMdd")+"_"+ now + "_" + new Random().nextInt(1000) +
+                    originalFilename.substring(originalFilename.lastIndexOf("."));
 
-        //开始上传
-        log.info("file压缩前大小:{}",file.getSize());
+            minioClient.putObject(
+                    PutObjectArgs.builder().bucket(bucketName).object(fileName).stream(
+                                    file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build());
 
-        if (file.getSize() > maxSize) {
-            FileItemFactory fileItemFactory = new DiskFileItemFactory();
-            FileItem fileItem = fileItemFactory.createItem(fileName, "text/plain", true, fileName);
-            OutputStream outputStream = fileItem.getOutputStream();
-            Thumbnails.of(file.getInputStream()).scale(1f).outputFormat(originalFilename.substring(originalFilename.lastIndexOf(".")+1)).outputQuality(0.25f).toOutputStream(outputStream);
+            String url = minioProperties.getEndpoint() + "/" + bucketName + "/" + fileName;
+            return new UploadResponse(url);
+        } catch (Exception e) {
+            throw new RuntimeException("文件上传失败！");
         }
-
-        log.info("file压缩后大小:{}",file.getSize());
-
-        minioClient.putObject(
-                PutObjectArgs.builder().bucket(bucketName).object(fileName).stream(
-                                file.getInputStream(), file.getSize(), -1)
-                        .contentType(file.getContentType())
-                        .build());
-
-        String url = minioProperties.getEndpoint() + "/" + bucketName + "/" + fileName;
-        String urlHost = minioProperties.getNginxHost() + "/" + bucketName + "/" + fileName;
-        return new UploadResponse(url, urlHost);
     }
 
 

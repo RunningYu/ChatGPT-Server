@@ -7,6 +7,11 @@
         insert into tb_ppt_color (color_key, color_name, thumbnail) values (#{key}, #{name}, #{thumbnail})
     </insert>
 
+    <insert id="pptUpload" parameterType="chatgptserver.bean.po.PptPO" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_ppt_info(first_kind, second_kind, color_theme, cover_url, ppt_url, create_time, update_time)
+        values (#{firstKind}, #{secondKind}, #{colorTheme}, #{coverUrl}, #{pptUrl}, now(), now())
+    </insert>
+
     <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
         select * from tb_ppt_color
     </select>

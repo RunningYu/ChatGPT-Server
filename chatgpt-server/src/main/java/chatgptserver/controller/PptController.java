@@ -3,14 +3,17 @@ package chatgptserver.controller;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
+import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.service.PptService;
 import chatgptserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -60,15 +63,23 @@ public class PptController {
     }
 
     @ApiOperation("PPT上传")
-    @GetMapping("/ppt/upload")
-    public JsonResult pptUpload() {
+    @PostMapping("/ppt/upload")
+    public JsonResult pptUpload(HttpServletRequest httpServletRequest,
+                                @Validated PptUploadRequestAO request) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptUpload request:[{}], token:[{}]", request, token);
+        String userCode = userService.getUserCodeByToken(token);
+        request.setUserCode(userCode);
+        JsonResult response = pptService.pptUpload(request);
 
-        return null;
+        return response;
     }
 
     @ApiOperation("PPT评分")
     @GetMapping("/ppt/scoring")
-    public JsonResult pptScoring() {
+    public JsonResult pptScoring(HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptScoring token:[{}]", token);
 
         return null;
     }

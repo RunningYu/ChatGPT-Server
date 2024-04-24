@@ -19,4 +19,9 @@ public class UploadResponse {
     private String minIoUrl;
 
     private String nginxUrl;
+
+    public UploadResponse(String url) {
+        this.minIoUrl = url;
+    }
+
 }

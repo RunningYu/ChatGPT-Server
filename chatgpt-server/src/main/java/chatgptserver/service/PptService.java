@@ -2,6 +2,7 @@ package chatgptserver.service;
 
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
+import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -14,4 +15,6 @@ public interface PptService {
     JsonResult pptCreateByOutline(PptCreateRequestAO request);
 
     JsonResult pptColorList();
+
+    JsonResult pptUpload(PptUploadRequestAO request);
 }

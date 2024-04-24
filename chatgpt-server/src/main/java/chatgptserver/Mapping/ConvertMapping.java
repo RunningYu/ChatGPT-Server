@@ -1,9 +1,12 @@
 package chatgptserver.Mapping;
 
 import chatgptserver.bean.ao.*;
+import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.po.*;
+import chatgptserver.utils.MinioUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
 
@@ -14,6 +17,9 @@ import java.util.Objects;
  */
 @Slf4j
 public class ConvertMapping {
+
+    @Autowired
+    private MinioUtil minioUtil;
 
 
     public static MessagesAO messagesPO2MessagesResponseAO(MessagesPO messagesPO) {
@@ -153,5 +159,20 @@ public class ConvertMapping {
         pptColor.setThumbnail(pptColorPO.getThumbnail());
 
         return pptColor;
+    }
+
+    public static PptPO buildPptPO(PptUploadRequestAO request, String pptUrl, String coverUrl) {
+        if (Objects.isNull(request)) {
+            return null;
+        }
+        PptPO pptPO = new PptPO();
+        pptPO.setFirstKind(request.getFirstKind());
+        pptPO.setSecondKind(request.getSecondKind());
+        pptPO.setTitle(request.getTitle());
+        pptPO.setPptUrl(pptUrl);
+        pptPO.setCoverUrl(coverUrl);
+        pptPO.setUserCode(request.getUserCode());
+
+        return pptPO;
     }
 }

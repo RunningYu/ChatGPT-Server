@@ -3,8 +3,10 @@ package chatgptserver.service.impl;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.MessagesAO;
+import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
 import chatgptserver.bean.ao.ppt.PptOutlineResponseAO;
+import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.CreateResponse;
@@ -14,12 +16,14 @@ import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptOutlineResponse;
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.dto.ppt.PptColorListResponse;
 import chatgptserver.bean.po.PptColorPO;
+import chatgptserver.bean.po.PptPO;
 import chatgptserver.dao.PptMapper;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.PptService;
 import chatgptserver.service.UserService;
 import chatgptserver.service.XunFeiService;
+import chatgptserver.utils.MinioUtil;
 import chatgptserver.utils.PptUtils;
 import chatgptserver.utils.StorageUtils;
 import com.alibaba.fastjson.JSON;
@@ -32,7 +36,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -41,6 +44,9 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class PptServiceImpl implements PptService {
+
+    @Autowired
+    private MinioUtil minioUtil;
 
     @Autowired
     private Cache<String, Object> caffeineCache;
@@ -309,5 +315,28 @@ public class PptServiceImpl implements PptService {
         log.info("PptServiceImpl pptCreateByOutline list:[{}]", list);
 
         return JsonResult.success(list);
+    }
+
+    @Override
+    public JsonResult pptUpload(PptUploadRequestAO request) {
+        log.info("PptServiceImpl pptUpload request:[{}]", request);
+        if (request.getUserCode() == null || "".equals(request.getUserCode())) {
+            log.info("PptServiceImpl pptUpload 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        PptPO pptPO = null;
+        try {
+            String pptUrl = minioUtil.upLoadFileToURL(request.getPptFile());
+            String coverUrl = minioUtil.upLoadFileToURL(request.getPptCoverFile());
+            pptPO = ConvertMapping.buildPptPO(request, pptUrl, coverUrl);
+            log.info("PptServiceImpl pptUpload pptPO:[{}]", pptPO);
+        } catch (Exception e) {
+            log.info("PptServiceImpl pptUpload 文件上传失败");
+            return JsonResult.error(500, "文件上传失败");
+        }
+        int id = pptMapper.pptUpload(pptPO);
+        String pptCode = "ppt_" + pptPO.getId();
+
+        return JsonResult.success("上传成功");
     }
 }
