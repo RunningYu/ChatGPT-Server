@@ -17,4 +17,6 @@ public interface PptService {
     JsonResult pptColorList();
 
     JsonResult pptUpload(PptUploadRequestAO request);
+
+    JsonResult pptKindList();
 }

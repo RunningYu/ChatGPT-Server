@@ -5,6 +5,7 @@ import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.UploadResponse;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
+import chatgptserver.bean.ao.ppt.PptKindResponseAO;
 import chatgptserver.bean.ao.ppt.PptOutlineResponseAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -336,7 +338,24 @@ public class PptServiceImpl implements PptService {
         }
         int id = pptMapper.pptUpload(pptPO);
         String pptCode = "ppt_" + pptPO.getId();
+        pptMapper.updatePptCodeById(pptCode, pptPO.getId());
 
         return JsonResult.success("上传成功");
+    }
+
+    @Override
+    public JsonResult pptKindList() {
+        log.info("PptServiceImpl pptKindList");
+        List<String> firstKindList = pptMapper.firstKindList();
+        List<PptKindResponseAO> response = new ArrayList<>();
+        for (String firstKind : firstKindList) {
+            PptKindResponseAO responseAO = new PptKindResponseAO(firstKind);
+            List<String> secondKindList = pptMapper.secondListByFirstKind(firstKind);
+            responseAO.setSecondKinds(secondKindList.stream().collect(Collectors.toList()));
+            response.add(responseAO);
+        }
+        log.info("PptServiceImpl pptKindList response:[{}]", response);
+
+        return JsonResult.success(response);
     }
 }

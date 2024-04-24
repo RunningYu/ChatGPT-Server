@@ -8,11 +8,23 @@
     </insert>
 
     <insert id="pptUpload" parameterType="chatgptserver.bean.po.PptPO" useGeneratedKeys="true" keyProperty="id">
-        insert into tb_ppt_info(first_kind, second_kind, color_theme, cover_url, ppt_url, create_time, update_time)
-        values (#{firstKind}, #{secondKind}, #{colorTheme}, #{coverUrl}, #{pptUrl}, now(), now())
+        insert into tb_ppt_info(first_kind, second_kind, title, cover_url, ppt_url, create_time, update_time)
+        values (#{firstKind}, #{secondKind}, #{title}, #{coverUrl}, #{pptUrl}, now(), now())
     </insert>
+
+    <update id="updatePptCodeById">
+        update tb_ppt_info set ppt_code = #{pptCode} where id = #{id}
+    </update>
 
     <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
         select * from tb_ppt_color
+    </select>
+
+    <select id="firstKindList" resultType="java.lang.String">
+        select DISTINCT(first_kind) from tb_ppt_kind
+    </select>
+
+    <select id="secondListByFirstKind" resultType="java.lang.String">
+        select DISTINCT(second_kind) from tb_ppt_kind where first_kind = #{firstKind}
     </select>
 </mapper>

@@ -32,14 +32,11 @@ public class PptPO {
     @ApiModelProperty("二级分类")
     private String secondKind;
 
-    @ApiModelProperty("颜色主题")
-    private String colorTheme;
+    @ApiModelProperty("PPT主题")
+    private String title;
 
     @ApiModelProperty("问题")
     private String content;
-
-    @ApiModelProperty("PPT主题")
-    private String title;
 
     @ApiModelProperty("PPT文件url")
     private String pptUrl;

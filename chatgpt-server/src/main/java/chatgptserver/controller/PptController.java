@@ -84,9 +84,20 @@ public class PptController {
         return null;
     }
 
+    @ApiOperation("获取分类数据")
+    @GetMapping("/ppt/kind/list")
+    public JsonResult pptKindList() {
+        log.info("PptController pptKindList");
+        JsonResult response = pptService.pptKindList();
+
+        return response;
+    }
+
+
     @ApiOperation("PPT分类查询")
     @GetMapping("/ppt/list")
     public JsonResult pptList() {
+
 
         return null;
     }
