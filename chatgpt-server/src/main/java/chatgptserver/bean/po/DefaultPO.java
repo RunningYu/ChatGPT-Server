@@ -29,6 +29,9 @@ public class DefaultPO {
     @ApiModelProperty("功能code")
     private String functionCode;
 
+    @ApiModelProperty("类型")
+    private String kind;
+
     @ApiModelProperty("预设问题")
     private String content;
 

@@ -141,6 +141,7 @@ public class ConvertMapping {
         }
         DefaultAO defaultAO = new DefaultAO();
         defaultAO.setName(defaultPO.getName());
+        defaultAO.setKind(defaultPO.getKind());
         defaultAO.setContent(defaultPO.getContent());
         defaultAO.setReplication(defaultPO.getReplication());
         defaultAO.setFunctionCode(defaultPO.getFunctionCode());
