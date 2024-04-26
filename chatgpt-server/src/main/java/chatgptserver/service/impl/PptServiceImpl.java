@@ -33,8 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
 
 /**
@@ -371,5 +369,21 @@ public class PptServiceImpl implements PptService {
         log.info("PptServiceImpl pptListByKind pptPOList:[{}]", pptPOList);
 
         return JsonResult.success(response);
+    }
+
+    @Override
+    public JsonResult pptCollect(String userCode, String pptCode) {
+        log.info("PptServiceImpl pptCollect userCode:[{}], pptCode:[{}]", userCode, pptCode);
+        Integer isCollected = null;
+        isCollected = pptMapper.pptIsCollected(userCode, pptCode);
+        if (isCollected == null || isCollected == 0) {
+            pptMapper.pptCollect(userCode, pptCode);
+
+            return JsonResult.success("收藏成功");
+        } else {
+            pptMapper.pptDisCollect(userCode, pptCode);
+
+            return JsonResult.success("取消收藏成功");
+        }
     }
 }

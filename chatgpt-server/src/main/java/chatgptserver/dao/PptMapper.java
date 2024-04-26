@@ -32,4 +32,10 @@ public interface PptMapper {
                               @Param("startIndex") int startIndex, @Param("size") int size);
 
     int totalOfpptListByKind(@Param("firstKind") String firstKind, @Param("secondKind") String secondKind);
+
+    Integer pptIsCollected(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+
+    void pptCollect(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+
+    void pptDisCollect(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
 }

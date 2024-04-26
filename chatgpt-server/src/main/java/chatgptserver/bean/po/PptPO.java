@@ -23,6 +23,9 @@ public class PptPO {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+    @ApiModelProperty("PPT的code")
+    private String pptCode;
+
     @ApiModelProperty("用户code")
     private String userCode;
 

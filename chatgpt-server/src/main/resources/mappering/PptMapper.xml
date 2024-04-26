@@ -12,9 +12,17 @@
         values (#{firstKind}, #{secondKind}, #{title}, #{coverUrl}, #{pptUrl}, now(), now())
     </insert>
 
+    <insert id="pptCollect">
+        insert into tb_ppt_collect(user_code, ppt_code) values (#{userCode}, #{pptCode})
+    </insert>
+
     <update id="updatePptCodeById">
         update tb_ppt_info set ppt_code = #{pptCode} where id = #{id}
     </update>
+
+    <delete id="pptDisCollect">
+        delete from tb_ppt_collect where user_code = #{userCode} and ppt_code = #{pptCode}
+    </delete>
 
     <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
         select * from tb_ppt_color
@@ -53,6 +61,10 @@
                 and second_kind = #{secondKind}
             </if>
         </where>
+    </select>
+
+    <select id="pptIsCollected" resultType="java.lang.Integer">
+        select count(*) from tb_ppt_collect where user_code = #{userCode} and ppt_code = #{pptCode}
     </select>
 
 </mapper>

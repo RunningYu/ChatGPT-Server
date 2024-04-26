@@ -109,9 +109,14 @@ public class PptController {
 
     @ApiOperation("PPT收藏")
     @GetMapping("/ppt/collect")
-    public JsonResult pptCollect() {
+    public JsonResult pptCollect(HttpServletRequest httpServletRequest,
+                                 @RequestParam("pptCode") String pptCode) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptCollect pptCode:[{}], token:[{}]", pptCode, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptCollect(userCode, pptCode);
 
-        return null;
+        return response;
     }
 
     @ApiOperation("PPT收藏列表")

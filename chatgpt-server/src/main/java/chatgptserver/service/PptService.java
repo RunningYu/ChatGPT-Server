@@ -22,4 +22,5 @@ public interface PptService {
 
     JsonResult pptListByKind(String firstKind, String secondKind, int page, int size, String userCode);
 
+    JsonResult pptCollect(String userCode, String pptCode);
 }
