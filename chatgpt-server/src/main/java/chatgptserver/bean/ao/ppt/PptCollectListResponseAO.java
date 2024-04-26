@@ -9,12 +9,12 @@ import java.util.List;
 
 /**
  * @author : 其然乐衣Letitbe
- * @date : 2024/4/24
+ * @date : 2024/4/26
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PptKindListResponseAO {
+public class PptCollectListResponseAO {
 
     private Integer total;
 

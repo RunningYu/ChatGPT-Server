@@ -1,6 +1,7 @@
 package chatgptserver.Mapping;
 
 import chatgptserver.bean.ao.*;
+import chatgptserver.bean.ao.ppt.PptAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.po.*;
@@ -175,5 +176,24 @@ public class ConvertMapping {
         pptPO.setUserCode(request.getUserCode());
 
         return pptPO;
+    }
+
+    public static PptAO pptPO2PptAO(PptPO pptPO) {
+        if (Objects.isNull(pptPO)) {
+            return null;
+        }
+        PptAO pptAO = new PptAO();
+        pptAO.setPptCode(pptPO.getPptCode());
+        pptAO.setPptUrl(pptPO.getPptUrl());
+        pptAO.setFirstKind(pptPO.getFirstKind());
+        pptAO.setSecondKind(pptPO.getSecondKind());
+        pptAO.setUserCode(pptPO.getUserCode());
+        pptAO.setTitle(pptPO.getTitle());
+        pptAO.setContent(pptPO.getContent());
+        pptAO.setCoverUrl(pptPO.getCoverUrl());
+        pptAO.setCreateTime(pptPO.getCreateTime());
+        pptAO.setUpdateTime(pptPO.getUpdateTime());
+
+        return pptAO;
     }
 }

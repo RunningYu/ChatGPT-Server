@@ -67,4 +67,14 @@
         select count(*) from tb_ppt_collect where user_code = #{userCode} and ppt_code = #{pptCode}
     </select>
 
+    <select id="pptCollectList" resultType="chatgptserver.bean.po.PptPO">
+        select * from tb_ppt_info where ppt_code
+        in (select ppt_code from tb_ppt_collect where user_code = #{userCode} order by create_time DESC)
+        limit #{startIndex}, #{size}
+    </select>
+
+    <select id="pptCollectListTotal" resultType="java.lang.Integer">
+        select count(*) from tb_ppt_collect where user_code = #{userCode}
+    </select>
+
 </mapper>

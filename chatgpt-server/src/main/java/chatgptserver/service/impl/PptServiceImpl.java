@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -364,8 +365,15 @@ public class PptServiceImpl implements PptService {
         }
         int startIndex = (page - 1) * size;
         List<PptPO> pptPOList = pptMapper.pptListByKind(firstKind, secondKind, startIndex, size);
+        List<PptAO> pptAOList = new ArrayList<>();
+        for (PptPO pptPO : pptPOList) {
+            PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);
+            Integer isCollected = pptMapper.pptIsCollected(userCode, pptPO.getPptCode());
+            pptAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
+            pptAOList.add(pptAO);
+        }
         int total = pptMapper.totalOfpptListByKind(firstKind, secondKind);
-        PptKindListResponseAO response = new PptKindListResponseAO(total, pptPOList);
+        PptKindListResponseAO response = new PptKindListResponseAO(total, pptAOList);
         log.info("PptServiceImpl pptListByKind pptPOList:[{}]", pptPOList);
 
         return JsonResult.success(response);
@@ -374,6 +382,10 @@ public class PptServiceImpl implements PptService {
     @Override
     public JsonResult pptCollect(String userCode, String pptCode) {
         log.info("PptServiceImpl pptCollect userCode:[{}], pptCode:[{}]", userCode, pptCode);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptCollect 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
         Integer isCollected = null;
         isCollected = pptMapper.pptIsCollected(userCode, pptCode);
         if (isCollected == null || isCollected == 0) {
@@ -385,5 +397,27 @@ public class PptServiceImpl implements PptService {
 
             return JsonResult.success("取消收藏成功");
         }
+    }
+
+    @Override
+    public JsonResult pptCollectList(int page, int size, String userCode) {
+        log.info("PptServiceImpl pptCollectList userCode:[{}]", userCode);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptCollectList 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        int startIndex = (page - 1) * size;
+        List<PptPO> list = pptMapper.pptCollectList(userCode, startIndex, size);
+        int total = pptMapper.pptCollectListTotal(userCode);
+        List<PptAO> pptAOList = new ArrayList<>();
+        for (PptPO pptPO : list) {
+            PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);
+            pptAO.setIsCollected(true);
+            pptAOList.add(pptAO);
+        }
+        PptCollectListResponseAO response = new PptCollectListResponseAO(total, pptAOList);
+        log.info("PptServiceImpl pptCollectList response:[{}]", response);
+
+        return JsonResult.success(response);
     }
 }

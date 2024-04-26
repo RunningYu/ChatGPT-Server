@@ -121,9 +121,14 @@ public class PptController {
 
     @ApiOperation("PPT收藏列表")
     @GetMapping("/ppt/collect/list")
-    public JsonResult pptCollectList() {
+    public JsonResult pptCollectList(HttpServletRequest httpServletRequest,
+                                     @RequestParam("page") int page, @RequestParam("size") int size) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptCollectList page:[{}], size:[{}], token:[{}]", page, size, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptCollectList(page, size, userCode);
 
-        return null;
+        return response;
     }
 
 }
