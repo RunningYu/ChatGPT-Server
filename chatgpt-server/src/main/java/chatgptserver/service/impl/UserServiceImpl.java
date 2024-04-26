@@ -409,6 +409,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public JsonResult gptChatFunctionList(String gptCode) {
+        log.info("UserServiceImpl gptChatFunctionList gptCode:[{}]", gptCode);
+        if (gptCode == null || "".equals(gptCode)) {
+            List<GptPO> gptPOList = gptMapper.gptList();
+            Map<String, List<ChatFunctionAO>> map = new HashMap<>();
+            for (GptPO gptPO : gptPOList) {
+                List<ChatFunctionAO> list = getChatFunctionListByGptCode(gptPO.getGptCode());
+                map.put(gptPO.getGptCode(), list);
+            }
+
+            return JsonResult.success(map);
+        } else {
+            List<ChatFunctionAO> list = getChatFunctionListByGptCode(gptCode);
+
+            return JsonResult.success(list);
+        }
+    }
+
+    public List<ChatFunctionAO> getChatFunctionListByGptCode(String gptCode) {
         List<ChatFunctionPO> list = userMapper.gptChatFunctionList(gptCode);
         List<ChatFunctionAO> response = new ArrayList<>();
         GptPO gptPO = gptMapper.getGptByCode(gptCode);
@@ -416,10 +434,9 @@ public class UserServiceImpl implements UserService {
             ChatFunctionAO chatFunctionAO = ConvertMapping.chatFunctionPO2ChatFunctionAO(chatFunctionPO);
             chatFunctionAO.setGptName(gptPO.getGptName());
             response.add(chatFunctionAO);
-
         }
 
-        return JsonResult.success(response);
+        return response;
     }
 
     @Override
