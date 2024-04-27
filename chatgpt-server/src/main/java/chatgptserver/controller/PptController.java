@@ -75,6 +75,9 @@ public class PptController {
         return response;
     }
 
+    /**
+     * todo：未完成
+     */
     @ApiOperation("PPT评分")
     @GetMapping("/ppt/scoring")
     public JsonResult pptScoring(HttpServletRequest httpServletRequest) {
