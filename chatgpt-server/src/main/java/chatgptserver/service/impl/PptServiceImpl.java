@@ -183,44 +183,8 @@ public class PptServiceImpl implements PptService {
         }
 
         try {
-            String sid = request.getSid();
             ProgressResponse progressResponse;
-            // 基于sid和大纲生成ppt
-            String sidResp = client.createPptBySid(appId, ts, signature, request.getSid());
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            log.info("PptServiceImpl pptCreateByOutline sidResp1:[{}]", sidResp);
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            CreateResponse sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
-            sidResp = client.createPptBySid(appId, ts, signature, request.getSid());
-            System.out.println(sidResp);
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            log.info("PptServiceImpl pptCreateByOutline sidResp2:[{}]", sidResp);
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-
-            sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
-            // 利用sid查询PPT生成进度
             int progress = 0;
-            while (progress < 100) {
-                // 再次检查是否要取消生成
-                if (StorageUtils.stopRequestMap.containsKey(request.getCid())) {
-                    StorageUtils.stopRequestMap.remove(request.getCid());
-
-                    return JsonResult.success();
-                }
-                String progressResult = client.checkProgress(appId, ts, signature, sidResponse.getData().getSid());
-                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
-                progress = progressResponse.getData().getProcess();
-                System.out.println("-->" + progressResult);
-                if (progress < 100) {
-                    Thread.sleep(5000);
-                }
-            }
-            // 再次检查是否要取消生成
-            if (StorageUtils.stopRequestMap.containsKey(request.getCid())) {
-                StorageUtils.stopRequestMap.remove(request.getCid());
-
-                return JsonResult.success();
-            }
             String outline = JSON.toJSONString(request.getOutline());
             // 基于大纲生成ppt
             String pptResp = client.createPptByOutline(appId, ts, signature, request.getContent(), outline, request.getColorTheme());

@@ -12,18 +12,18 @@ import java.util.List;
 @Data
 public class Chapters {
 
-    private Boolean chartFlag;
+    private Boolean chartFlag = false;
 
-    private Boolean searchFlag;
+    private Boolean searchFlag = false;
 
     private List<ChapterContents> chapterContents;
 
-    private String fileUrl;
+    private String fileUrl = "";
 
     private Integer id;
 
     private String chapterTitle;
 
-    private Integer fileType;
+    private Integer fileType = 0;
 
 }

@@ -9,16 +9,16 @@ import lombok.Data;
 @Data
 public class ChapterContents {
 
-    private String chartFlag;
+    private String chartFlag = "false";
 
-    private String searchFlag;
+    private String searchFlag = "false";
 
-    private String fileUrl;
+    private String fileUrl = "";
 
     private Integer id;
 
     private String chapterTitle;
 
-    private Integer fileType;
+    private Integer fileType = 0;
 
 }

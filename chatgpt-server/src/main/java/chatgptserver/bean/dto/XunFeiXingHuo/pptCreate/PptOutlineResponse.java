@@ -16,14 +16,14 @@ public class PptOutlineResponse {
 
     private List<Chapters> chapters;
 
-    private String fileUrl;
+    private String fileUrl = "";
 
-    private String end;
+    private String end = "";
 
     private Integer id;
 
     private String title;
 
-    private Integer fileType;
+    private Integer fileType = 0;
 
 }
