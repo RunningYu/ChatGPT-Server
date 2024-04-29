@@ -18,8 +18,8 @@ public class PptCreateRequestAO {
     @ApiModelProperty("大纲")
     private PptOutlineResponse outline;
 
-    @ApiModelProperty("颜色主题")
-    private String colorTheme;
+    @ApiModelProperty("颜色主题, 默认 auto：自动，随机主题")
+    private String colorTheme = "auto";
 
     @ApiModelProperty("问题")
     private String content;
