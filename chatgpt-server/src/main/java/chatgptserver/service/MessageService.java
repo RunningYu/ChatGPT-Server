@@ -3,6 +3,7 @@ package chatgptserver.service;
 import chatgptserver.bean.ao.ChatAO;
 import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.MessagesResponseAO;
+import chatgptserver.bean.ao.ppt.PptCreateResponseAO;
 
 import java.util.Date;
 import java.util.List;
@@ -28,4 +29,6 @@ public interface MessageService {
     void recordHistory(String userCode, String chatCode, String content, String response, Boolean isRebuild, Date questionTime);
 
     void recordDefaultHistory(String userCode, String chatCode, String content, String replication);
+
+    PptCreateResponseAO buildPptCreateResponseAO(String userCode, String coverUrl, String content, String replication, Date questionTime);
 }

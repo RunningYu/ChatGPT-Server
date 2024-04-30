@@ -2,6 +2,7 @@ package chatgptserver.service.impl;
 
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
+import chatgptserver.bean.ao.ppt.PptCreateResponseAO;
 import chatgptserver.bean.po.*;
 import chatgptserver.dao.GptMapper;
 import chatgptserver.dao.MessageMapper;
@@ -245,6 +246,18 @@ public class MessageServiceImpl implements MessageService {
         messagesPO.setIsDefault(1);
 
         messageMapper.insertDefaultMessage(messagesPO);
+    }
+
+    @Override
+    public PptCreateResponseAO buildPptCreateResponseAO(String userCode, String coverUrl, String content, String replication, Date questionTime) {
+        PptCreateResponseAO response = new PptCreateResponseAO();
+        response.setCoverUrl(coverUrl);
+        response.setUserCode(userCode);
+        response.setQuestion(content);
+        response.setReplication(replication);
+        response.setCreateTime(questionTime);
+
+        return response;
     }
 
     @Override

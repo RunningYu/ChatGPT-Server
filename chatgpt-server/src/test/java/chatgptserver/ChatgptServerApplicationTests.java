@@ -1,10 +1,12 @@
 package chatgptserver;
 
+import chatgptserver.bean.ao.ppt.PptCreateResponseAO;
 import chatgptserver.bean.dto.WenXin.ImageFlagDTO;
 import chatgptserver.bean.po.MessagesPO;
 import chatgptserver.dao.MessageMapper;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.MessageService;
+import com.alibaba.fastjson.JSON;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -32,6 +34,19 @@ class ChatgptServerApplicationTests {
 
     @Autowired
     private MessageMapper messageMapper;
+
+    @Test
+    public void test6 () {
+        PptCreateResponseAO responseAO = JSON.parseObject("{" +
+                "\"userCode\": \"123\",\n" +
+                "    \"username\": \"czyaaaa\",\n" +
+                "    \"question\": \"授课模板PPT\",\n" +
+                "    \"coverUrl\": \"https://bjcdn.openstorage.cn/xinghuo-privatedata/2x8wv4xs.jp\"\n" +
+                "    \"replication\": \"https://bjcdn.openstorage.cn/xinghuo-privatedata/%2Ftmp/apiTempFilec7fac625ccd943d9899c4f177cd4aedd1668730078262484467/%E6%8E%88%E8%AF%BE%E6%A8%A1%E6%9D%BF%E8%AE%BE%E8%AE%A1%E8%A6%81%E7%82%B9.pptx\",\n" +
+                "    \"createTime\": \"2024/04/23 12:17:41\",\n" +
+                "  }", PptCreateResponseAO.class);
+        System.out.println(responseAO);
+    }
 
     @Test
     public void test1() {

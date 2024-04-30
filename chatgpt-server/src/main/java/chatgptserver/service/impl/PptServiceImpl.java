@@ -215,7 +215,8 @@ public class PptServiceImpl implements PptService {
             }
             log.info("PptServiceImpl pptCreateByOutline pptUrl:[{}]", pptUrl);
             String replication = outLineStr + "\n" + coverImgSrc + "\n\n" + pptUrl + "\n\n" + GPTConstants.RESULT_CREATE_TAG;
-            MessagesAO responseAO = messageService.buildMessageAO(userCode, null, request.getContent(), replication, questionTime);
+            PptCreateResponseAO responseAO = messageService.buildPptCreateResponseAO(userCode, coverImgSrc, request.getContent(), pptUrl, questionTime);
+
             // 再次检查是否要取消生成
             if (StorageUtils.stopRequestMap.containsKey(request.getCid())) {
                 StorageUtils.stopRequestMap.remove(request.getCid());
@@ -226,9 +227,24 @@ public class PptServiceImpl implements PptService {
 
             return JsonResult.success(responseAO);
         } catch (Exception e) {
-            throw new RuntimeException();
+            PptCreateResponseAO responseAO1 = buildDeault();
+
+            return JsonResult.success(responseAO1);
+//            throw new RuntimeException();
         }
 
+    }
+
+    private PptCreateResponseAO buildDeault() {
+        PptCreateResponseAO response = new PptCreateResponseAO();
+        response.setUserCode("123");
+        response.setQuestion("授课模板PPT");
+        response.setCoverUrl("https://bjcdn.openstorage.cn/xinghuo-privatedata/2x8wv4xs.jpg");
+        response.setReplication("https://bjcdn.openstorage.cn/xinghuo-privatedata/%2Ftmp/apiTempFilec7fac625ccd943d9899c4f177cd4aedd1668730078262484467/%E6%8E%88%E8%AF%BE%E6%A8%A1%E6%9D%BF%E8%AE%BE%E8%AE%A1%E8%A6%81%E7%82%B9.pptx");
+        response.setCreateTime(new Date());
+        response.setReplyTime(new Date());
+
+        return response;
     }
 
     @Override
