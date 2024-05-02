@@ -339,14 +339,14 @@ public class PptServiceImpl implements PptService {
     }
 
     @Override
-    public JsonResult pptListByKind(String firstKind, String secondKind, int page, int size, String userCode) {
-        log.info("PptServiceImpl pptList firstKind:[{}], secondKind:[{}], page:[{}], size:[{}], userCode:[{}]", firstKind, secondKind, page, size, userCode);
+    public JsonResult pptListByKind(String keyword, String firstKind, String secondKind, int page, int size, String userCode) {
+        log.info("PptServiceImpl pptList keyword:[{}], firstKind:[{}], secondKind:[{}], page:[{}], size:[{}], userCode:[{}]", keyword, firstKind, secondKind, page, size, userCode);
         if (userCode == null || "".equals(userCode)) {
             log.info("PptServiceImpl pptList 请先登录");
             return JsonResult.error(500, "请先登录");
         }
         int startIndex = (page - 1) * size;
-        List<PptPO> pptPOList = pptMapper.pptListByKind(firstKind, secondKind, startIndex, size);
+        List<PptPO> pptPOList = pptMapper.pptListByKind(keyword, firstKind, secondKind, startIndex, size);
         List<PptAO> pptAOList = new ArrayList<>();
         for (PptPO pptPO : pptPOList) {
             PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);

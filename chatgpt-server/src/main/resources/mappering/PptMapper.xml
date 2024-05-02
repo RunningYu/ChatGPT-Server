@@ -48,6 +48,9 @@
         select *
         from tb_ppt_info
         <where>
+            <if test="keyword != null and keyword != ''">
+                and title like CONCAT('%', #{keyword}, '%')
+            </if>
             <if test="firstKind != null and firstKind != ''">
                 and first_kind = #{firstKind}
             </if>
@@ -55,7 +58,7 @@
                 and second_kind = #{secondKind}
             </if>
         </where>
-        order by create_time DESC limit #{startIndex}, #{size}
+        order by score DESC, create_time DESC limit #{startIndex}, #{size}
     </select>
 
     <select id="totalOfpptListByKind" resultType="java.lang.Integer">

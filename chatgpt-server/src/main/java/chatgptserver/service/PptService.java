@@ -20,7 +20,7 @@ public interface PptService {
 
     JsonResult pptKindList();
 
-    JsonResult pptListByKind(String firstKind, String secondKind, int page, int size, String userCode);
+    JsonResult pptListByKind(String keyword, String firstKind, String secondKind, int page, int size, String userCode);
 
     JsonResult pptCollect(String folderCode, String userCode, String pptCode);
 

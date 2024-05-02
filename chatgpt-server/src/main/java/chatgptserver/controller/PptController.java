@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -97,15 +96,16 @@ public class PptController {
     }
 
 
-    @ApiOperation("PPT分类查询")
+    @ApiOperation("PPT分类查询、搜索")
     @GetMapping("/ppt/list/by/kind")
     public JsonResult pptListByKind(HttpServletRequest httpServletRequest,
+                                    @RequestParam(value = "keyword", required = false) String keyword,
                                     @RequestParam(value = "firstKind", required = false) String firstKind, @RequestParam(value = "secondKind", required = false) String secondKind,
                                     @RequestParam("page") int page, @RequestParam("size") int size) {
         String token = httpServletRequest.getHeader("token");
-        log.info("PptController pptList firstKind:[{}], secondKind:[{}], page:[{}], size:[{}], token:[{}]", firstKind, secondKind, page, size, token);
+        log.info("PptController pptList keyword:[{}], firstKind:[{}], secondKind:[{}], page:[{}], size:[{}], token:[{}]", keyword, firstKind, secondKind, page, size, token);
         String userCode = userService.getUserCodeByToken(token);
-        JsonResult response = pptService.pptListByKind(firstKind, secondKind, page, size, userCode);
+        JsonResult response = pptService.pptListByKind(keyword, firstKind, secondKind, page, size, userCode);
 
         return response;
     }
