@@ -376,10 +376,12 @@ public class PptServiceImpl implements PptService {
         isCollected = pptMapper.pptIsCollected(folderCode, userCode, pptCode);
         if (isCollected == null || isCollected == 0) {
             pptMapper.pptCollect(folderCode, userCode, pptCode);
+            pptMapper.updateCollectAmount(pptCode, 1);
 
             return JsonResult.success("收藏成功");
         } else {
             pptMapper.pptDisCollect(folderCode, userCode, pptCode);
+            pptMapper.updateCollectAmount(pptCode, -1);
 
             return JsonResult.success("取消收藏成功");
         }

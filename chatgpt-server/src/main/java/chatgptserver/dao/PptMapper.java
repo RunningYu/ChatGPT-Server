@@ -52,4 +52,5 @@ public interface PptMapper {
 
     List<FolderPO> folderList(@Param("userCode") String userCode);
 
+    void updateCollectAmount(@Param("pptCode") String pptCode, @Param("score") int score);
 }
