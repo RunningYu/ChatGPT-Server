@@ -195,4 +195,16 @@ public class PptController {
         return response;
     }
 
+    @ApiOperation("PPT删除")
+    @GetMapping("/ppt/delete")
+    public JsonResult pptDelete(HttpServletRequest httpServletRequest,
+                                @RequestParam("pptCode") String pptCode) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptDelete pptCode:[{}] token:[{}]", pptCode, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptDelete(userCode, pptCode);
+
+        return response;
+    }
+
 }

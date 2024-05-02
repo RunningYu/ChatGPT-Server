@@ -70,4 +70,8 @@ public interface PptMapper {
     List<PptPO> pptMeList(@Param("userCode") String userCode, @Param("startIndex") int startIndex, @Param("size") int size);
 
     int totalOfPptMeList(String userCode);
+
+    void pptDelete(String pptCode);
+
+    void collectRecordDeleteByPptCode(String pptCode);
 }

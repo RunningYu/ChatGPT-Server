@@ -507,4 +507,14 @@ public class PptServiceImpl implements PptService {
 
         return JsonResult.success(response);
     }
+
+    @Override
+    public JsonResult pptDelete(String userCode, String pptCode) {
+        log.info("PptServiceImpl pptDelete userCode:[{}], pptCode:[{}]", userCode, pptCode);
+        pptMapper.pptDelete(pptCode);
+        // 删除收藏过这份PPT的记录
+        pptMapper.collectRecordDeleteByPptCode(pptCode);
+
+        return JsonResult.success("删除成功");
+    }
 }

@@ -55,6 +55,14 @@
         delete from tb_ppt_collect where folder_code = #{folderCode}
     </delete>
 
+    <delete id="pptDelete">
+        delete from tb_ppt_info where ppt_code = #{pptCode}
+    </delete>
+
+    <delete id="collectRecordDeleteByPptCode">
+        delete from tb_ppt_collect where ppt_code = #{pptCode}
+    </delete>
+
     <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
         select * from tb_ppt_color
     </select>
