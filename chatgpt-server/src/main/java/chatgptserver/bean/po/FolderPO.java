@@ -32,6 +32,9 @@ public class FolderPO {
     @ApiModelProperty("文件夹")
     private String folder;
 
+    @ApiModelProperty("0：不是，1：是默认收藏夹")
+    private Integer isDefault;
+
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

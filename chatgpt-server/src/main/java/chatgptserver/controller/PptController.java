@@ -159,4 +159,28 @@ public class PptController {
         return response;
     }
 
+    @ApiOperation("文件夹名字修改")
+    @GetMapping("/ppt/folder/update")
+    public JsonResult pptFolderUpdate(HttpServletRequest httpServletRequest,
+                                      @RequestParam("folderCode") String folderCode, @RequestParam("folder") String folder) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptFolderUpdate folderCode:[{}], folder:[{}], token:[{}]", folderCode, folder, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptFolderUpdate(userCode, folderCode, folder);
+
+        return response;
+    }
+
+    @ApiOperation("文件夹删除")
+    @GetMapping("/ppt/folder/delete")
+    public JsonResult pptFolderDelete(HttpServletRequest httpServletRequest,
+                                      @RequestParam("folderCode") String folderCode) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptFolderDelete folderCode:[{}], token:[{}]", folderCode, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptFolderDelete(userCode, folderCode);
+
+        return response;
+    }
+
 }

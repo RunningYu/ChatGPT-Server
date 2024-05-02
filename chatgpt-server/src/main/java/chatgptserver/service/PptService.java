@@ -29,4 +29,10 @@ public interface PptService {
     JsonResult pptFolderCreate(String folder, String userCode);
 
     JsonResult pptCollectFolderList(String pptCode, String userCode);
+
+    JsonResult pptFolderUpdate(String userCode, String folderCode, String folder);
+
+    JsonResult pptFolderDelete(String userCode, String folderCode);
+
+    void createDefaultFolder(String userCode);
 }

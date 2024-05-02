@@ -17,7 +17,7 @@
     </insert>
 
      <insert id="folderCreate" parameterType="chatgptserver.bean.po.FolderPO" useGeneratedKeys="true" keyProperty="id">
-        insert into tb_ppt_folder(user_code, folder) values (#{userCode}, #{folder})
+        insert into tb_ppt_folder(user_code, folder, is_default) values (#{userCode}, #{folder}, #{isDefault})
     </insert>
 
     <update id="updatePptCodeById">
@@ -32,8 +32,17 @@
         update tb_ppt_info set collect_amount = collect_amount + #{score} where ppt_code = #{pptCode}
     </update>
 
+    <update id="folderUpdate">
+        update tb_ppt_folder set folder = #{folder} where folder_code = #{folderCode}
+    </update>
+
+
     <delete id="pptDisCollect">
         delete from tb_ppt_collect where folder_code = #{folderCode} and user_code = #{userCode} and ppt_code = #{pptCode}
+    </delete>
+
+    <delete id="folderDelete">
+        delete from tb_ppt_folder where folder_code = #{folderCode} and is_default = 0
     </delete>
 
     <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
@@ -96,11 +105,15 @@
     </select>
 
     <select id="folderList" resultType="chatgptserver.bean.po.FolderPO">
-        select * from tb_ppt_folder where user_code = #{userCode}
+        select * from tb_ppt_folder where user_code = #{userCode} order by create_time ASC
     </select>
 
     <select id="isCollected" resultType="java.lang.Integer">
         select count(*) from tb_ppt_collect where user_code = #{userCode} and ppt_code = #{pptCode}
+    </select>
+
+    <select id="countAmount" resultType="java.lang.Integer">
+        select count(*) from tb_ppt_collect where folder_code = #{folderCode}
     </select>
 
 </mapper>

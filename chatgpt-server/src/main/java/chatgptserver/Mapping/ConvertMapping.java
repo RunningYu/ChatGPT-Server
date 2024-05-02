@@ -216,6 +216,7 @@ public class ConvertMapping {
         folderAO.setUserCode(folderPO.getUserCode());
         folderAO.setCreateTime(folderPO.getCreateTime());
         folderAO.setUpdateTime(folderPO.getUpdateTime());
+        folderAO.setIsDefault(folderPO.getIsDefault());
 
         return folderAO;
     }

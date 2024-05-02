@@ -53,4 +53,10 @@ public interface PptMapper {
     List<FolderPO> folderList(@Param("userCode") String userCode);
 
     void updateCollectAmount(@Param("pptCode") String pptCode, @Param("score") int score);
+
+    void folderUpdate(@Param("folderCode") String folderCode, @Param("folder") String folder);
+
+    int folderDelete(@Param("folderCode") String folderCode);
+
+    int countAmount(String folderCode);
 }

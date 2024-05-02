@@ -31,6 +31,12 @@ public class FolderAO {
     @ApiModelProperty("true：收藏，false：没收藏")
     private Boolean isCollected;
 
+    @ApiModelProperty("0：不是，1：是默认收藏夹")
+    private Integer isDefault;
+
+    @ApiModelProperty("文件夹内的ppt数目")
+    private Integer amount;
+
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

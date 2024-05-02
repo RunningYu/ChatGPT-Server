@@ -5,8 +5,10 @@ import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.*;
 import chatgptserver.dao.GptMapper;
+import chatgptserver.dao.PptMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.service.MessageService;
+import chatgptserver.service.PptService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MD5Util;
@@ -28,6 +30,10 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Lazy
+    @Autowired
+    private PptService pptService;
 
     private Object lock = new Object();
 
@@ -154,6 +160,8 @@ public class UserServiceImpl implements UserService {
                     userPO = user;
                     log.info("UserServiceImpl login user:[{}]", user);
                     userMapper.updateUserCode(userCode, user.getId());
+                    // 创建默认收藏夹
+                    pptService.createDefaultFolder(userCode);
                 } else {
                     log.info("UserServiceImpl login 请输入验证码");
                     return JsonResult.error("请输入验证码");
@@ -243,6 +251,8 @@ public class UserServiceImpl implements UserService {
             userPO = user;
             log.info("UserServiceImpl loginByVerifyCode user:[{}]", user);
             userMapper.updateUserCode(userCode, user.getId());
+            // 创建默认收藏夹
+            pptService.createDefaultFolder(userCode);
         }
         // 生成token，存token进redis
         String token = jwtUtils.createToken(userPO);

@@ -441,9 +441,42 @@ public class PptServiceImpl implements PptService {
                 isCollected = pptMapper.pptIsCollected(folderPO.getFolderCode(), userCode, pptCode);
                 folderAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
             }
+            int amount = pptMapper.countAmount(folderPO.getFolderCode());
+            folderAO.setAmount(amount);
             response.add(folderAO);
         }
 
         return JsonResult.success(response);
+    }
+
+    @Override
+    public JsonResult pptFolderUpdate(String userCode, String folderCode, String folder) {
+        log.info("PptServiceImpl pptFolderUpdate folderCode:[{}], folder:[{}], userCode:[{}]", folderCode, folder, userCode);
+        pptMapper.folderUpdate(folderCode, folder);
+
+        return JsonResult.success("修改成功");
+    }
+
+    @Override
+    public JsonResult pptFolderDelete(String userCode, String folderCode) {
+        log.info("PptServiceImpl pptFolderDelete folderCode:[{}], userCode:[{}]", folderCode, userCode);
+        int isDelete = pptMapper.folderDelete(folderCode);
+        if (isDelete == 0) {
+            log.info("PptServiceImpl pptFolderDelete isDelete:[{}] 默认收藏夹不可删除", isDelete);
+            return JsonResult.error(500, "默认收藏夹不可删除");
+        }
+        log.info("PptServiceImpl pptFolderDelete isDelete:[{}] 删除成功", isDelete);
+
+        return JsonResult.success("删除成功");
+    }
+
+    @Override
+    public void createDefaultFolder(String userCode) {
+        log.info("PptServiceImpl createDefaultFolder userCode:[{}]", userCode);
+        FolderPO folderPO = new FolderPO(userCode, "默认收藏夹");
+        folderPO.setIsDefault(1);
+        pptMapper.folderCreate(folderPO);
+        String folderCode = "folder_" + folderPO.getId();
+        pptMapper.updateFolderCode(folderCode, folderPO.getId());
     }
 }
