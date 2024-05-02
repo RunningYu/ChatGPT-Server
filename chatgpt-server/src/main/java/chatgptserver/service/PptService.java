@@ -22,7 +22,11 @@ public interface PptService {
 
     JsonResult pptListByKind(String firstKind, String secondKind, int page, int size, String userCode);
 
-    JsonResult pptCollect(String userCode, String pptCode);
+    JsonResult pptCollect(String folderCode, String userCode, String pptCode);
 
     JsonResult pptCollectList(int page, int size, String userCode);
+
+    JsonResult pptFolderCreate(String folder, String userCode);
+
+    JsonResult pptCollectFolderList(String pptCode, String userCode);
 }

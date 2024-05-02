@@ -2,7 +2,6 @@ package chatgptserver.service.impl;
 
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.JsonResult;
-import chatgptserver.bean.ao.MessagesAO;
 import chatgptserver.bean.ao.ppt.*;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiAuthAlgorithm;
 import chatgptserver.bean.dto.XunFeiXingHuo.XunFeiPptCreate.ApiClient;
@@ -12,6 +11,7 @@ import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptCoverResponseDTO;
 import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptOutlineResponse;
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.dto.ppt.PptColorListResponse;
+import chatgptserver.bean.po.FolderPO;
 import chatgptserver.bean.po.PptColorPO;
 import chatgptserver.bean.po.PptPO;
 import chatgptserver.bean.po.UserPO;
@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -355,7 +354,7 @@ public class PptServiceImpl implements PptService {
             if (userPO != null) {
                 pptAO.setUsername(userPO.getUsername());
             }
-            Integer isCollected = pptMapper.pptIsCollected(userCode, pptPO.getPptCode());
+            Integer isCollected = pptMapper.isCollected(userCode, pptPO.getPptCode());
             pptAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
             pptAOList.add(pptAO);
         }
@@ -367,16 +366,16 @@ public class PptServiceImpl implements PptService {
     }
 
     @Override
-    public JsonResult pptCollect(String userCode, String pptCode) {
-        log.info("PptServiceImpl pptCollect userCode:[{}], pptCode:[{}]", userCode, pptCode);
+    public JsonResult pptCollect(String folderCode, String userCode, String pptCode) {
+        log.info("PptServiceImpl pptCollect folderCode:[{}], userCode:[{}], pptCode:[{}]", folderCode, userCode, pptCode);
         if (userCode == null || "".equals(userCode)) {
             log.info("PptServiceImpl pptCollect 请先登录");
             return JsonResult.error(500, "请先登录");
         }
         Integer isCollected = null;
-        isCollected = pptMapper.pptIsCollected(userCode, pptCode);
+        isCollected = pptMapper.pptIsCollected(folderCode, userCode, pptCode);
         if (isCollected == null || isCollected == 0) {
-            pptMapper.pptCollect(userCode, pptCode);
+            pptMapper.pptCollect(folderCode, userCode, pptCode);
 
             return JsonResult.success("收藏成功");
         } else {
@@ -404,6 +403,44 @@ public class PptServiceImpl implements PptService {
         }
         PptCollectListResponseAO response = new PptCollectListResponseAO(total, pptAOList);
         log.info("PptServiceImpl pptCollectList response:[{}]", response);
+
+        return JsonResult.success(response);
+    }
+
+    @Override
+    public JsonResult pptFolderCreate(String folder, String userCode) {
+        log.info("PptServiceImpl pptFolderCreate folder:[{}], userCode:[{}]", folder, userCode);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptFolderCreate 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        FolderPO folderPO = new FolderPO(userCode, folder);
+        pptMapper.folderCreate(folderPO);
+        String folderCode = "folder_" + folderPO.getId();
+        pptMapper.updateFolderCode(folderCode, folderPO.getId());
+        folderPO.setFolderCode(folderCode);
+
+        return JsonResult.success(folderPO);
+    }
+
+    @Override
+    public JsonResult pptCollectFolderList(String pptCode, String userCode) {
+        log.info("PptServiceImpl pptCollectFolderList pptCode:[{}], userCode:[{}]", pptCode, userCode);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptCollectFolderList 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        List<FolderPO> list = pptMapper.folderList(userCode);
+        List<FolderAO> response = new ArrayList<>();
+        for (FolderPO folderPO : list) {
+            FolderAO folderAO = ConvertMapping.folderPO2FolderAO(folderPO);
+            if (pptCode != null && !"".equals(pptCode)) {
+                Integer isCollected = null;
+                isCollected = pptMapper.pptIsCollected(folderPO.getFolderCode(), userCode, pptCode);
+                folderAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
+            }
+            response.add(folderAO);
+        }
 
         return JsonResult.success(response);
     }

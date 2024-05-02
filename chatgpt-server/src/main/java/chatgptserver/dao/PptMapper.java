@@ -1,6 +1,7 @@
 package chatgptserver.dao;
 
 import chatgptserver.bean.dto.ppt.PptColor;
+import chatgptserver.bean.po.FolderPO;
 import chatgptserver.bean.po.PptColorPO;
 import chatgptserver.bean.po.PptPO;
 import org.apache.ibatis.annotations.Mapper;
@@ -33,13 +34,22 @@ public interface PptMapper {
 
     int totalOfpptListByKind(@Param("firstKind") String firstKind, @Param("secondKind") String secondKind);
 
-    Integer pptIsCollected(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+    Integer pptIsCollected(@Param("folderCode") String folderCode, @Param("userCode") String userCode, @Param("pptCode") String pptCode);
 
-    void pptCollect(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+    Integer isCollected(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+
+    void pptCollect(@Param("folderCode") String folderCode, @Param("userCode") String userCode, @Param("pptCode") String pptCode);
 
     void pptDisCollect(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
 
     List<PptPO> pptCollectList(@Param("userCode") String userCode, @Param("startIndex") int startIndex, @Param("size") int size);
 
     int pptCollectListTotal(String userCode);
+
+    void folderCreate(FolderPO folderPO);
+
+    void updateFolderCode(@Param("folderCode") String folderCode, @Param("id") Integer id);
+
+    List<FolderPO> folderList(@Param("userCode") String userCode);
+
 }

@@ -113,11 +113,11 @@ public class PptController {
     @ApiOperation("PPT收藏")
     @GetMapping("/ppt/collect")
     public JsonResult pptCollect(HttpServletRequest httpServletRequest,
-                                 @RequestParam("pptCode") String pptCode) {
+                                 @RequestParam("folderCode") String folderCode, @RequestParam("pptCode") String pptCode) {
         String token = httpServletRequest.getHeader("token");
-        log.info("PptController pptCollect pptCode:[{}], token:[{}]", pptCode, token);
+        log.info("PptController pptCollect folderCode:[{}], pptCode:[{}], token:[{}]", folderCode, pptCode, token);
         String userCode = userService.getUserCodeByToken(token);
-        JsonResult response = pptService.pptCollect(userCode, pptCode);
+        JsonResult response = pptService.pptCollect(folderCode, userCode, pptCode);
 
         return response;
     }
@@ -130,6 +130,30 @@ public class PptController {
         log.info("PptController pptCollectList page:[{}], size:[{}], token:[{}]", page, size, token);
         String userCode = userService.getUserCodeByToken(token);
         JsonResult response = pptService.pptCollectList(page, size, userCode);
+
+        return response;
+    }
+
+    @ApiOperation("文件夹列表")
+    @GetMapping("/ppt/collect/folder/list")
+    public JsonResult pptCollectFolderList(HttpServletRequest httpServletRequest,
+                                     @RequestParam(value = "pptCode", required = false) String pptCode) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptCollectFolderList pptCode:[{}], token:[{}]", pptCode, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptCollectFolderList(pptCode, userCode);
+
+        return response;
+    }
+
+    @ApiOperation("新建收藏文件夹")
+    @GetMapping("/ppt/folder/create")
+    public JsonResult pptFolderCreate(HttpServletRequest httpServletRequest,
+                                     @RequestParam("folder") String folder) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptFolderCreate folder:[{}], token:[{}]", folder, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptFolderCreate(folder, userCode);
 
         return response;
     }

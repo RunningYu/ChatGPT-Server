@@ -1,6 +1,7 @@
 package chatgptserver.Mapping;
 
 import chatgptserver.bean.ao.*;
+import chatgptserver.bean.ao.ppt.FolderAO;
 import chatgptserver.bean.ao.ppt.PptAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.bean.dto.ppt.PptColor;
@@ -203,5 +204,19 @@ public class ConvertMapping {
         pptAO.setCollectAmount(pptPO.getCollectAmount());
 
         return pptAO;
+    }
+
+    public static FolderAO folderPO2FolderAO(FolderPO folderPO) {
+        if (Objects.isNull(folderPO)) {
+            return null;
+        }
+        FolderAO folderAO = new FolderAO();
+        folderAO.setFolder(folderPO.getFolder());
+        folderAO.setFolderCode(folderPO.getFolderCode());
+        folderAO.setUserCode(folderPO.getUserCode());
+        folderAO.setCreateTime(folderPO.getCreateTime());
+        folderAO.setUpdateTime(folderPO.getUpdateTime());
+
+        return folderAO;
     }
 }
