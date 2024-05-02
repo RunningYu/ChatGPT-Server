@@ -20,7 +20,7 @@ public class QQEmailTest {
 
 
     //接收人
-    private static final String recipient = "3385369312@qq.com";
+    private static final String recipient = "";
 
     /**
      * 发送文本邮件

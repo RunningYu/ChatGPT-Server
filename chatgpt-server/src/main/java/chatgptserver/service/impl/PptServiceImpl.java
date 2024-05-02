@@ -394,7 +394,7 @@ public class PptServiceImpl implements PptService {
         }
         int startIndex = (page - 1) * size;
         List<PptPO> list = pptMapper.pptCollectList(folderCode, userCode, startIndex, size);
-        int total = pptMapper.pptCollectListTotal(userCode);
+        int total = pptMapper.pptCollectListTotal(folderCode, userCode);
         List<PptAO> pptAOList = new ArrayList<>();
         for (PptPO pptPO : list) {
             PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);

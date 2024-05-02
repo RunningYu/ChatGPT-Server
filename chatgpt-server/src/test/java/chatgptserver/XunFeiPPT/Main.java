@@ -15,8 +15,8 @@ import java.util.concurrent.CompletionException;
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         // 输入个人appId
-        String appId = "f6b93318";
-        String secret = "NjU2ZTc5ZmNkZWI5NmQwYWI1MDJiMzg4";
+        String appId = "";
+        String secret = "";
         long timestamp = System.currentTimeMillis()/1000;
         String ts = String.valueOf(timestamp);
         // 获得鉴权信息

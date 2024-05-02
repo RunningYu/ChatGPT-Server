@@ -77,8 +77,8 @@ class ChatTests {
      */
     private String wenXinGetAccess_tokenUrl = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=%s&client_secret=%s";
 
-    private String apiKey = "ESGeNmQ8sjAbV7NSUhIbC3eo";
-    private String secretKey = "Hl5wLy3Tjk5BPNwIcTG154E3B2grsVSa";
+    private String apiKey = "";
+    private String secretKey = "";
 
     private String wenXinUrl = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_bot_8k?access_token=%s";
 //    private String wenXinUrl = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token=%s";

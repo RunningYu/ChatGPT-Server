@@ -82,7 +82,7 @@
     </select>
 
     <select id="pptCollectListTotal" resultType="java.lang.Integer">
-        select count(*) from tb_ppt_collect where user_code = #{userCode}
+        select count(*) from tb_ppt_collect where folder_code = #{folderCode} and  user_code = #{userCode}
     </select>
 
     <select id="folderList" resultType="chatgptserver.bean.po.FolderPO">

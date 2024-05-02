@@ -44,7 +44,7 @@ public interface PptMapper {
 
     List<PptPO> pptCollectList(@Param("folderCode") String folderCode, @Param("userCode") String userCode, @Param("startIndex") int startIndex, @Param("size") int size);
 
-    int pptCollectListTotal(String userCode);
+    int pptCollectListTotal(@Param("folderCode") String folderCode, String userCode);
 
     void folderCreate(FolderPO folderPO);
 

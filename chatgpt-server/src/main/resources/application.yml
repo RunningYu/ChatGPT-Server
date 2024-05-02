@@ -1,8 +1,8 @@
 spring:
   datasource:
-    username: slx
-    password: slx_9920
-    url: jdbc:mysql://rm-j6c2k7uyo6n6o2870no.mysql.rds.aliyuncs.com/chatgpt?useSSL=false
+    username:
+    password:
+    url:
     driver-class-name: com.mysql.cj.jdbc.Driver
   servlet:
     multipart:
@@ -10,10 +10,10 @@ spring:
       max-request-size: 150MB  # 设置单次请求文件的总大小
 
   rabbitmq:
-    host: 124.71.110.30
-    username: admin
-    password: admin
-    virtual-host: /chatgpt
+    host:
+    username:
+    password:
+    virtual-host:
     listener:
       simple:
         prefetch: 1    #（设置preFetch这个值，可以控制预取消息的上限）每次只能获取一条消息，处理完成才能获取下一个消息
@@ -22,7 +22,7 @@ mybatis-plus:
   mapper-locations: classpath:mappering/*.xml
 
 minio:
-  endpoint: http://124.71.110.30:9000
-  accessKey: minio
-  secretKey: minio123
-  bucket: file
+  endpoint:
+  accessKey:
+  secretKey:
+  bucket:

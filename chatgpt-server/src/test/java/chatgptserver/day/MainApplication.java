@@ -25,9 +25,9 @@ public class MainApplication {
     private OkHttpService okHttpService;
 
     public static final String hostUrl = "https://spark-api.cn-huabei-1.xf-yun.com/v2.1/tti";
-    public static final String appid = "f6b93318";
-    public static final String apiSecret = "NjU2ZTc5ZmNkZWI5NmQwYWI1MDJiMzg4";
-    public static final String apiKey = "df704f2ff951c364c9bac34536811256";
+    public static final String appid = "";
+    public static final String apiSecret = "";
+    public static final String apiKey = "";
 
     @Test
     public void test() throws Exception {
