@@ -35,4 +35,6 @@ public interface PptService {
     JsonResult pptFolderDelete(String userCode, String folderCode);
 
     void createDefaultFolder(String userCode);
+
+    JsonResult pptMeList(String userCode, int page, int size);
 }

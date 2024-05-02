@@ -59,4 +59,15 @@ public interface PptMapper {
     int folderDelete(@Param("folderCode") String folderCode);
 
     int countAmount(String folderCode);
+
+    /**
+     * collectAmount -1
+     */
+    void updateCollectAmountAfterFolderDelete(@Param("folderCode") String folderCode);
+
+    void collectRecordDelete(String folderCode);
+
+    List<PptPO> pptMeList(@Param("userCode") String userCode, @Param("startIndex") int startIndex, @Param("size") int size);
+
+    int totalOfPptMeList(String userCode);
 }

@@ -36,6 +36,12 @@
         update tb_ppt_folder set folder = #{folder} where folder_code = #{folderCode}
     </update>
 
+    <update id="updateCollectAmountAfterFolderDelete">
+        update tb_ppt_info set collect_amount = collect_amount - 1
+        where ppt_code
+        in (select ppt_code from tb_ppt_collect where folder_code = #{folderCode})
+    </update>
+
 
     <delete id="pptDisCollect">
         delete from tb_ppt_collect where folder_code = #{folderCode} and user_code = #{userCode} and ppt_code = #{pptCode}
@@ -43,6 +49,10 @@
 
     <delete id="folderDelete">
         delete from tb_ppt_folder where folder_code = #{folderCode} and is_default = 0
+    </delete>
+
+    <delete id="collectRecordDelete">
+        delete from tb_ppt_collect where folder_code = #{folderCode}
     </delete>
 
     <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
@@ -114,6 +124,14 @@
 
     <select id="countAmount" resultType="java.lang.Integer">
         select count(*) from tb_ppt_collect where folder_code = #{folderCode}
+    </select>
+
+    <select id="pptMeList" resultType="chatgptserver.bean.po.PptPO">
+        select * from tb_ppt_info where user_code = #{userCode} order by create_time DESC limit #{startIndex}, #{size}
+    </select>
+
+    <select id="totalOfPptMeList" resultType="java.lang.Integer">
+        select count(*) from tb_ppt_info where user_code = #{userCode}
     </select>
 
 </mapper>

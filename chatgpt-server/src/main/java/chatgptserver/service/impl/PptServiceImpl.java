@@ -417,6 +417,7 @@ public class PptServiceImpl implements PptService {
             return JsonResult.error(500, "请先登录");
         }
         FolderPO folderPO = new FolderPO(userCode, folder);
+        folderPO.setIsDefault(0);
         pptMapper.folderCreate(folderPO);
         String folderCode = "folder_" + folderPO.getId();
         pptMapper.updateFolderCode(folderCode, folderPO.getId());
@@ -466,6 +467,10 @@ public class PptServiceImpl implements PptService {
             return JsonResult.error(500, "默认收藏夹不可删除");
         }
         log.info("PptServiceImpl pptFolderDelete isDelete:[{}] 删除成功", isDelete);
+        // collectAmount -1
+        pptMapper.updateCollectAmountAfterFolderDelete(folderCode);
+        // 删除文件夹下收藏的记录
+        pptMapper.collectRecordDelete(folderCode);
 
         return JsonResult.success("删除成功");
     }
@@ -478,5 +483,28 @@ public class PptServiceImpl implements PptService {
         pptMapper.folderCreate(folderPO);
         String folderCode = "folder_" + folderPO.getId();
         pptMapper.updateFolderCode(folderCode, folderPO.getId());
+    }
+
+    @Override
+    public JsonResult pptMeList(String userCode, int page, int size) {
+        log.info("PptServiceImpl pptMeList userCode:[{}]", userCode);
+        int startIndex = (page - 1) * size;
+        List<PptPO> list = pptMapper.pptMeList(userCode, startIndex, size);
+        List<PptAO> pptAOList = new ArrayList<>();
+        for (PptPO pptPO : list) {
+            PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);
+            UserPO userPO = userService.getUserByCode(userCode);
+            if (userPO != null) {
+                pptAO.setUsername(userPO.getUsername());
+            }
+            Integer isCollected = pptMapper.isCollected(userCode, pptPO.getPptCode());
+            pptAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
+            pptAOList.add(pptAO);
+        }
+        log.info("PptServiceImpl pptMeList pptAOList:[{}]", pptAOList);
+        int total = pptMapper.totalOfPptMeList(userCode);
+        PptKindListResponseAO response = new PptKindListResponseAO(total, pptAOList);
+
+        return JsonResult.success(response);
     }
 }

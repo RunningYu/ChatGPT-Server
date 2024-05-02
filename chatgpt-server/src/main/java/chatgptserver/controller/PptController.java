@@ -183,4 +183,16 @@ public class PptController {
         return response;
     }
 
+    @ApiOperation("我的上传列表")
+    @GetMapping("/ppt/me/list")
+    public JsonResult pptMeList(HttpServletRequest httpServletRequest,
+                                @RequestParam("page") int page, @RequestParam("size") int size) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptMeList page:[{}], size:[{}], token:[{}]", page, size, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptMeList(userCode, page, size);
+
+        return response;
+    }
+
 }
