@@ -10,9 +10,9 @@ spring:
       max-request-size: 150MB  # 设置单次请求文件的总大小
 
   rabbitmq:
-    host: 124.71.110.30
-    username: admin
-    password: admin
+    host: 
+    username: 
+    password: 
     virtual-host: /chatgpt
     listener:
       simple:
