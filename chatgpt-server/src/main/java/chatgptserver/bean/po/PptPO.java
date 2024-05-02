@@ -29,6 +29,9 @@ public class PptPO {
     @ApiModelProperty("用户code")
     private String userCode;
 
+    @ApiModelProperty("用户c用户名称ode")
+    private String username;
+
     @ApiModelProperty("一级分类")
     private String firstKind;
 
@@ -41,11 +44,20 @@ public class PptPO {
     @ApiModelProperty("问题")
     private String content;
 
-    @ApiModelProperty("PPT文件url")
-    private String pptUrl;
+    @ApiModelProperty("描述")
+    private String description;
 
     @ApiModelProperty("PPT封面url")
     private String coverUrl;
+
+    @ApiModelProperty("PPT文件url")
+    private String pptUrl;
+
+    @ApiModelProperty("评分")
+    private Double score;
+
+    @ApiModelProperty("收藏量")
+    private Integer collectAmount;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

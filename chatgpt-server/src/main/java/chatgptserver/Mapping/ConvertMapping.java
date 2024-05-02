@@ -5,6 +5,8 @@ import chatgptserver.bean.ao.ppt.PptAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.po.*;
+import chatgptserver.dao.UserMapper;
+import chatgptserver.service.UserService;
 import chatgptserver.utils.MinioUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ import java.util.Objects;
  */
 @Slf4j
 public class ConvertMapping {
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private MinioUtil minioUtil;
@@ -171,6 +176,7 @@ public class ConvertMapping {
         pptPO.setFirstKind(request.getFirstKind());
         pptPO.setSecondKind(request.getSecondKind());
         pptPO.setTitle(request.getTitle());
+        pptPO.setDescription(request.getDescription());
         pptPO.setPptUrl(pptUrl);
         pptPO.setCoverUrl(coverUrl);
         pptPO.setUserCode(request.getUserCode());
@@ -189,10 +195,12 @@ public class ConvertMapping {
         pptAO.setSecondKind(pptPO.getSecondKind());
         pptAO.setUserCode(pptPO.getUserCode());
         pptAO.setTitle(pptPO.getTitle());
-        pptAO.setContent(pptPO.getContent());
         pptAO.setCoverUrl(pptPO.getCoverUrl());
         pptAO.setCreateTime(pptPO.getCreateTime());
         pptAO.setUpdateTime(pptPO.getUpdateTime());
+        pptAO.setDescription(pptPO.getDescription());
+        pptAO.setScore(pptPO.getScore());
+        pptAO.setCollectAmount(pptPO.getCollectAmount());
 
         return pptAO;
     }

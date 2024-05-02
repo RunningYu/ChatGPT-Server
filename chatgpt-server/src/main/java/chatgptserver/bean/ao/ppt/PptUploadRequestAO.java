@@ -35,6 +35,9 @@ public class PptUploadRequestAO {
     @NotBlank(message = "PPT主题title不能为空")
     private String title;
 
+    @ApiModelProperty("描述")
+    private String description;
+
     @ApiModelProperty("用户code")
     private String userCode;
 

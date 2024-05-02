@@ -14,6 +14,7 @@ import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.dto.ppt.PptColorListResponse;
 import chatgptserver.bean.po.PptColorPO;
 import chatgptserver.bean.po.PptPO;
+import chatgptserver.bean.po.UserPO;
 import chatgptserver.dao.PptMapper;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.MessageService;
@@ -308,6 +309,8 @@ public class PptServiceImpl implements PptService {
             String pptUrl = minioUtil.upLoadFileToURL(request.getPptFile());
             String coverUrl = minioUtil.upLoadFileToURL(request.getPptCoverFile());
             pptPO = ConvertMapping.buildPptPO(request, pptUrl, coverUrl);
+//            UserPO userPO = userService.getUserByCode(request.getUserCode());
+//            pptPO.setUsername(userPO.getUsername());
             log.info("PptServiceImpl pptUpload pptPO:[{}]", pptPO);
         } catch (Exception e) {
             log.info("PptServiceImpl pptUpload 文件上传失败");
@@ -348,6 +351,10 @@ public class PptServiceImpl implements PptService {
         List<PptAO> pptAOList = new ArrayList<>();
         for (PptPO pptPO : pptPOList) {
             PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);
+            UserPO userPO = userService.getUserByCode(userCode);
+            if (userPO != null) {
+                pptAO.setUsername(userPO.getUsername());
+            }
             Integer isCollected = pptMapper.pptIsCollected(userCode, pptPO.getPptCode());
             pptAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
             pptAOList.add(pptAO);

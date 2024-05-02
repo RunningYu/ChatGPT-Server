@@ -8,8 +8,8 @@
     </insert>
 
     <insert id="pptUpload" parameterType="chatgptserver.bean.po.PptPO" useGeneratedKeys="true" keyProperty="id">
-        insert into tb_ppt_info(first_kind, second_kind, title, cover_url, ppt_url, create_time, update_time)
-        values (#{firstKind}, #{secondKind}, #{title}, #{coverUrl}, #{pptUrl}, now(), now())
+        insert into tb_ppt_info(user_code, first_kind, second_kind, title, description, cover_url, ppt_url, create_time, update_time)
+        values (#{userCode}, #{firstKind}, #{secondKind}, #{title}, #{description}, #{coverUrl}, #{pptUrl}, now(), now())
     </insert>
 
     <insert id="pptCollect">
