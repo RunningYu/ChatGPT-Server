@@ -22,7 +22,7 @@ mybatis-plus:
   mapper-locations: classpath:mappering/*.xml
 
 minio:
-  endpoint: http://124.71.110.30:9000
-  accessKey: minio
-  secretKey: minio123
+  endpoint: 
+  accessKey: 
+  secretKey: 
   bucket: file
