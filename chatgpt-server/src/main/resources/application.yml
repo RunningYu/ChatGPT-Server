@@ -1,8 +1,8 @@
 spring:
   datasource:
-    username: slx
-    password: slx_9920
-    url: jdbc:mysql://rm-j6c2k7uyo6n6o2870no.mysql.rds.aliyuncs.com/chatgpt?useSSL=false
+    username: 
+    password: 
+    url: 
     driver-class-name: com.mysql.cj.jdbc.Driver
   servlet:
     multipart:
