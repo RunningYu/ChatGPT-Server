@@ -40,9 +40,9 @@ public interface PptMapper {
 
     void pptCollect(@Param("folderCode") String folderCode, @Param("userCode") String userCode, @Param("pptCode") String pptCode);
 
-    void pptDisCollect(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+    void pptDisCollect(@Param("folderCode") String folderCode, @Param("userCode") String userCode, @Param("pptCode") String pptCode);
 
-    List<PptPO> pptCollectList(@Param("userCode") String userCode, @Param("startIndex") int startIndex, @Param("size") int size);
+    List<PptPO> pptCollectList(@Param("folderCode") String folderCode, @Param("userCode") String userCode, @Param("startIndex") int startIndex, @Param("size") int size);
 
     int pptCollectListTotal(String userCode);
 

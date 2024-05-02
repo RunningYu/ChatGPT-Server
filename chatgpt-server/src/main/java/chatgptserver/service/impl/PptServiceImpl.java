@@ -379,21 +379,21 @@ public class PptServiceImpl implements PptService {
 
             return JsonResult.success("收藏成功");
         } else {
-            pptMapper.pptDisCollect(userCode, pptCode);
+            pptMapper.pptDisCollect(folderCode, userCode, pptCode);
 
             return JsonResult.success("取消收藏成功");
         }
     }
 
     @Override
-    public JsonResult pptCollectList(int page, int size, String userCode) {
-        log.info("PptServiceImpl pptCollectList userCode:[{}]", userCode);
+    public JsonResult pptCollectList(String folderCode, int page, int size, String userCode) {
+        log.info("PptServiceImpl pptCollectList folderCode:[{}], userCode:[{}]", folderCode, userCode);
         if (userCode == null || "".equals(userCode)) {
             log.info("PptServiceImpl pptCollectList 请先登录");
             return JsonResult.error(500, "请先登录");
         }
         int startIndex = (page - 1) * size;
-        List<PptPO> list = pptMapper.pptCollectList(userCode, startIndex, size);
+        List<PptPO> list = pptMapper.pptCollectList(folderCode, userCode, startIndex, size);
         int total = pptMapper.pptCollectListTotal(userCode);
         List<PptAO> pptAOList = new ArrayList<>();
         for (PptPO pptPO : list) {

@@ -29,7 +29,7 @@
     </update>
 
     <delete id="pptDisCollect">
-        delete from tb_ppt_collect where user_code = #{userCode} and ppt_code = #{pptCode}
+        delete from tb_ppt_collect where folder_code = #{folderCode} and user_code = #{userCode} and ppt_code = #{pptCode}
     </delete>
 
     <select id="pptColorList" resultType="chatgptserver.bean.po.PptColorPO">
@@ -77,7 +77,7 @@
 
     <select id="pptCollectList" resultType="chatgptserver.bean.po.PptPO">
         select * from tb_ppt_info where ppt_code
-        in (select ppt_code from tb_ppt_collect where user_code = #{userCode} order by create_time DESC)
+        in (select ppt_code from tb_ppt_collect where folder_code = #{folderCode} and user_code = #{userCode} order by create_time DESC)
         limit #{startIndex}, #{size}
     </select>
 

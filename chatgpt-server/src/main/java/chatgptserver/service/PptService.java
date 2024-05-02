@@ -24,7 +24,7 @@ public interface PptService {
 
     JsonResult pptCollect(String folderCode, String userCode, String pptCode);
 
-    JsonResult pptCollectList(int page, int size, String userCode);
+    JsonResult pptCollectList(String folderCode, int page, int size, String userCode);
 
     JsonResult pptFolderCreate(String folder, String userCode);
 
