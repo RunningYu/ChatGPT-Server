@@ -358,7 +358,7 @@ public class PptServiceImpl implements PptService {
             pptAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
             pptAOList.add(pptAO);
         }
-        int total = pptMapper.totalOfpptListByKind(firstKind, secondKind);
+        int total = pptMapper.totalOfpptListByKind(keyword, firstKind, secondKind);
         PptKindListResponseAO response = new PptKindListResponseAO(total, pptAOList);
         log.info("PptServiceImpl pptListByKind pptPOList:[{}]", pptPOList);
 

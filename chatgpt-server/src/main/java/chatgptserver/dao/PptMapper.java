@@ -32,7 +32,7 @@ public interface PptMapper {
     List<PptPO> pptListByKind(@Param("keyword") String keyword, @Param("firstKind") String firstKind, @Param("secondKind") String secondKind,
                               @Param("startIndex") int startIndex, @Param("size") int size);
 
-    int totalOfpptListByKind(@Param("firstKind") String firstKind, @Param("secondKind") String secondKind);
+    int totalOfpptListByKind(@Param("keyword") String keyword, @Param("firstKind") String firstKind, @Param("secondKind") String secondKind);
 
     Integer pptIsCollected(@Param("folderCode") String folderCode, @Param("userCode") String userCode, @Param("pptCode") String pptCode);
 
