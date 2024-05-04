@@ -1,4 +1,4 @@
-# Gpt-Server
+# ChatGPT-Server
 
 **集成市面上常用的chatgpt.包括但不限于，文心一言、通义千问、讯飞星火**
 

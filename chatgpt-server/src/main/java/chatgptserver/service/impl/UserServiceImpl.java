@@ -489,7 +489,7 @@ public class UserServiceImpl implements UserService {
         request.setPassword(MD5Util.encrypt(request.getPassword()));
         userMapper.userInfoUpdate(request);
 
-        return JsonResult.success("update successfully");
+        return JsonResult.success("修改成功");
     }
 
 }
