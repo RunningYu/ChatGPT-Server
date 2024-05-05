@@ -504,16 +504,20 @@ public class UserServiceImpl implements UserService {
             log.info("UserServiceImpl userInfoUpdate 邮箱格式不正确！");
             return JsonResult.error("邮箱格式不正确");
         }
+        // 发邮件
+        UserPO userPO = userMapper.getUserByCode(userCode);
+        if (!userPO.getEmail().equals(request.getEmail())) {
+            try {
+                MailUtil.emailConfirm("邮箱绑定修改", request.getEmail(), "邮箱绑定修改成功");
+            } catch (Exception e) {
+                log.info("UserServiceImpl userInfoUpdate verifyCode:[{}] 该邮箱不可用或不存在，请更换有效的邮箱");
+                return JsonResult.error(500, "该邮箱不可用或不存在，请更换有效的邮箱");
+            }
+        }
         if (!(request.getUsername() != null && request.getUsername().length() <= 50)) {
             log.info("UserServiceImpl userInfoUpdate 用户名不能为空，长度最大为50");
             return JsonResult.error("用户名不能为空，长度最大为50");
         }
-//        // 数字+字母，6-20位. 返回true 否则false
-//        boolean isLegal = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,20}$");
-//        if (isLegal == false) {
-//            log.info("UserServiceImpl userInfoUpdate 密码请输入数字+字母，6-20位");
-//            return JsonResult.error("密码请输入数字+字母，6-20位");
-//        }
         request.setUserCode(userCode);
 //        request.setPassword(MD5Util.encrypt(request.getPassword()));
         userMapper.userInfoUpdate(request);

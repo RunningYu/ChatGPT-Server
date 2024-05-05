@@ -166,4 +166,62 @@ public class MailUtil {
         ts.close();
     }
 
+    /**
+     * 验证邮箱是否有效
+     */
+    public static void emailConfirm(String subject, String email, String content) throws GeneralSecurityException, MessagingException {
+        Properties prop=new Properties();
+        //设置QQ邮件服务器
+        prop.setProperty("mail.host","smtp.qq.com");
+        //邮件发送协议
+        prop.setProperty("mail.transport.protocol","smtp");
+        //需要验证用户密码
+        prop.setProperty("mail.smtp.auth","true");
+
+        //设置SSL加密，QQ邮箱才有
+        MailSSLSocketFactory sf=new MailSSLSocketFactory();
+        sf.setTrustAllHosts(true);
+        prop.put("mail.smtp.ssl.enable","true");
+        prop.put("mail.smtp.ssl.socketFactory",sf);
+
+        //使用javaMail发送邮件的6个步骤
+        //1.创建定义整个应用程序所需要的环境信息的session对象
+
+        //QQ邮箱才有，其他邮箱就不用
+        Session session=Session.getDefaultInstance(prop, new Authenticator() {
+            @Override
+            public PasswordAuthentication getPasswordAuthentication() {
+                //发件人邮件用户名、授权码
+                return new PasswordAuthentication(QQEmailConstants.QQ_EMAIL_SENDER_EMAIL,QQEmailConstants.QQ_EMAIL_AUTHORIZATION_CODE);
+            }
+        });
+
+        //开启session的debug模式，这样可以查看到程序发送Email的运行状态
+        session.setDebug(true);
+
+        //2.通过session得到transport对象
+        Transport ts=session.getTransport();
+
+        //3.使用邮箱的用户名和授权码连上邮件服务器
+        ts.connect("smtp.qq.com", QQEmailConstants.QQ_EMAIL_SENDER_EMAIL, QQEmailConstants.QQ_EMAIL_AUTHORIZATION_CODE);
+
+        //4.创建邮件：写文件
+        //注意需要传递session
+        MimeMessage message=new MimeMessage(session);
+        //指明邮件的发件人
+        message.setFrom(new InternetAddress(QQEmailConstants.QQ_EMAIL_SENDER_EMAIL));
+        //指明邮件的收件人
+        message.setRecipient(Message.RecipientType.TO,new InternetAddress(email));
+        //邮件标题
+        message.setSubject(subject);
+        //邮件的文本内容
+        message.setContent(content,"text/html;charset=UTF-8");
+
+        //5.发送邮件
+        ts.sendMessage(message,message.getAllRecipients());
+
+        //6.关闭连接
+        ts.close();
+    }
+
 }
