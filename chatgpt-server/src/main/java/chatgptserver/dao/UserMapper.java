@@ -45,4 +45,6 @@ public interface UserMapper {
     void userInfoUpdate(UserAO request);
 
     void updatePassword(String password, String email);
+
+    void userPasswordUpdate(@Param("userCode") String userCode, @Param("newPassword") String newPassword);
 }

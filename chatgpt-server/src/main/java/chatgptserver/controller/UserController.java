@@ -149,6 +149,23 @@ public class UserController {
         return response;
     }
 
+    @ApiOperation("用户密码修改")
+    @GetMapping("/user/password/update")
+    public JsonResult userPasswordUpdate(HttpServletRequest httpServletRequest,
+                                     @RequestParam(value = "oldPassword", required = true) String oldPassword,
+                                     @RequestParam(value = "newPassword", required = true) String newPassword,
+                                     @RequestParam(value = "confirmPassword", required = true) String confirmPassword) {
+
+
+        log.info("userController userPasswordUpdate oldPassword:[{}], newPassword:[{}], confirmPassword:[{}]", oldPassword, newPassword, confirmPassword);
+        String token = httpServletRequest.getHeader("token");
+        log.info("userController userPasswordUpdate token:[{}]", token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = userService.userPasswordUpdate(userCode, oldPassword, newPassword, confirmPassword);
+
+        return response;
+    }
+
     @ApiOperation("新建聊天")
     @PostMapping("/chat/add")
     public JsonResult chatAdd(@RequestBody ChatAddRequestAO request,

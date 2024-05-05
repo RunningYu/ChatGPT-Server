@@ -43,4 +43,6 @@ public interface UserService {
     JsonResult loginByScan(String pid, String did, String createTime);
 
     JsonResult loginByScanListen(String pid, String createTime);
+
+    JsonResult userPasswordUpdate(String userCode, String oldPassword, String newPassword, String confirmPassword);
 }

@@ -24,12 +24,17 @@
     </update>
 
     <update id="userInfoUpdate">
-        update tb_chatgpt_user set email = #{email}, phone = #{phone}, username = #{username}, headshot = #{headShot},
-                                   password = #{password} where user_code = #{userCode}
+        update tb_chatgpt_user
+        set email = #{email}, username = #{username}, headshot = #{headShot}
+        where user_code = #{userCode}
     </update>
 
     <update id="updatePassword">
         update tb_chatgpt_user set password = #{password} where email = #{email}
+    </update>
+
+    <update id="userPasswordUpdate">
+        update tb_chatgpt_user set password = #{newPassword} where user_code = #{userCode}
     </update>
 
     <delete id="chatDelete">

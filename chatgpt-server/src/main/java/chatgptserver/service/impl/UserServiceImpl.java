@@ -5,7 +5,6 @@ import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.*;
 import chatgptserver.bean.po.*;
 import chatgptserver.dao.GptMapper;
-import chatgptserver.dao.PptMapper;
 import chatgptserver.dao.UserMapper;
 import chatgptserver.service.MessageService;
 import chatgptserver.service.PptService;
@@ -378,6 +377,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public JsonResult userPasswordUpdate(String userCode, String oldPassword, String newPassword, String confirmPassword) {
+        log.info("UserServiceImpl userPasswordUpdate userCode:[{}], oldPassword:[{}], newPassword:[{}], confirmPassword:[{}]", userCode, oldPassword, newPassword, confirmPassword);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("UserServiceImpl userPasswordUpdate 请先登录");
+            return JsonResult.error(401, "请先登录");
+        }
+        // 判断输入的原密码是否正确
+        UserPO userPO = userMapper.getUserByCode(userCode);
+        if (!MD5Util.encrypt(oldPassword).equals(userPO.getPassword())) {
+            log.info("UserServiceImpl userPasswordUpdate 原密码输入错误");
+            return JsonResult.error(500, "原密码输入错误");
+        }
+        // 数字+字母，6-20位. 返回true 否则false
+        boolean isLegal = newPassword.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,20}$");
+        if (isLegal == false) {
+            log.info("UserServiceImpl userPasswordUpdate 密码请输入数字+字母，6-20位");
+            return JsonResult.error("密码请输入数字+字母，6-20位");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            log.info("UserServiceImpl userPasswordUpdate 两次密码不一致");
+            return JsonResult.error(500, "两次密码不一致");
+        }
+        String password = MD5Util.encrypt(newPassword);
+        log.info("UserServiceImpl userPasswordUpdate md5Password:[{}]", password);
+        userMapper.userPasswordUpdate(userCode, password);
+
+        return JsonResult.success("修改成功");
+    }
+
+    @Override
     public JsonResult sendEmailVerifyCode(String email) {
         log.info("UserServiceImpl sendEmailVerifyCode email:[{}]", email);
         Boolean emailIsLegal = (email != null && email.matches("^[1-9][0-9]{4,10}@qq\\.com$"));
@@ -479,14 +508,14 @@ public class UserServiceImpl implements UserService {
             log.info("UserServiceImpl userInfoUpdate 用户名不能为空，长度最大为50");
             return JsonResult.error("用户名不能为空，长度最大为50");
         }
-        // 数字+字母，6-20位. 返回true 否则false
-        boolean isLegal = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,20}$");
-        if (isLegal == false) {
-            log.info("UserServiceImpl userInfoUpdate 密码请输入数字+字母，6-20位");
-            return JsonResult.error("密码请输入数字+字母，6-20位");
-        }
+//        // 数字+字母，6-20位. 返回true 否则false
+//        boolean isLegal = request.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,20}$");
+//        if (isLegal == false) {
+//            log.info("UserServiceImpl userInfoUpdate 密码请输入数字+字母，6-20位");
+//            return JsonResult.error("密码请输入数字+字母，6-20位");
+//        }
         request.setUserCode(userCode);
-        request.setPassword(MD5Util.encrypt(request.getPassword()));
+//        request.setPassword(MD5Util.encrypt(request.getPassword()));
         userMapper.userInfoUpdate(request);
 
         return JsonResult.success("修改成功");
