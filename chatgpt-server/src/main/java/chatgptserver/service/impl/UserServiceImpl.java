@@ -506,6 +506,7 @@ public class UserServiceImpl implements UserService {
         }
         // 发邮件
         UserPO userPO = userMapper.getUserByCode(userCode);
+        // todo: 判断是否存在该邮箱绑定了
         if (!userPO.getEmail().equals(request.getEmail())) {
             try {
                 MailUtil.emailConfirm("邮箱绑定修改", request.getEmail(), "邮箱绑定修改成功");
