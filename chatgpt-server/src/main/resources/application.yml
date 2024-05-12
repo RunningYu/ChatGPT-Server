@@ -18,6 +18,11 @@ spring:
       simple:
         prefetch: 1    #（设置preFetch这个值，可以控制预取消息的上限）每次只能获取一条消息，处理完成才能获取下一个消息
 
+  redis:
+    host: 8.137.71.187
+    port: 6379                # Redis的端口
+    password: redis         # Redis服务器连接密码
+
 mybatis-plus:
   mapper-locations: classpath:mappering/*.xml
 

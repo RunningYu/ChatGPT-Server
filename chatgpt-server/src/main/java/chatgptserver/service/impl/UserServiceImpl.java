@@ -11,6 +11,7 @@ import chatgptserver.service.PptService;
 import chatgptserver.service.UserService;
 import chatgptserver.utils.JwtUtils;
 import chatgptserver.utils.MD5Util;
+import chatgptserver.utils.MinioUtil;
 import chatgptserver.utils.StorageUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +55,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private MinioUtil minioUtil;
 
 
     @Override
@@ -490,7 +494,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public JsonResult userInfoUpdate(String token, UserAO request) {
+    public JsonResult userInfoUpdate(String token, UserUpdateRequestAO request) {
         log.info("UserServiceImpl userInfoUpdate token:[{}], request:[{}]", token, request);
         if (token == null || "".equals(token)) {
             return JsonResult.error(401, "请先登录");
@@ -504,10 +508,21 @@ public class UserServiceImpl implements UserService {
             log.info("UserServiceImpl userInfoUpdate 邮箱格式不正确！");
             return JsonResult.error("邮箱格式不正确");
         }
-        // 发邮件
+        UserAO userAO = new UserAO();
         UserPO userPO = userMapper.getUserByCode(userCode);
-        // todo: 判断是否存在该邮箱绑定了
+        if (Objects.isNull(request.getHeadShot())) {
+            userAO.setHeadShot(userPO.getHeadshot());
+        } else {
+            UploadResponse uploadResponse = minioUtil.uploadFile(request.getHeadShot(), "file");
+            userAO.setHeadShot(uploadResponse.getMinIoUrl());
+        }
+        // 发邮件
         if (!userPO.getEmail().equals(request.getEmail())) {
+            // 判断是否存在该邮箱绑定了
+            int isOtherHave = userMapper.isOtherHaveEamil(userCode, request.getEmail());
+            if (isOtherHave != 0) {
+                return JsonResult.error(500, "已经有其它用户绑定了改邮箱！");
+            }
             try {
                 MailUtil.emailConfirm("邮箱绑定修改", request.getEmail(), "邮箱绑定修改成功");
             } catch (Exception e) {
@@ -519,11 +534,13 @@ public class UserServiceImpl implements UserService {
             log.info("UserServiceImpl userInfoUpdate 用户名不能为空，长度最大为50");
             return JsonResult.error("用户名不能为空，长度最大为50");
         }
-        request.setUserCode(userCode);
-//        request.setPassword(MD5Util.encrypt(request.getPassword()));
-        userMapper.userInfoUpdate(request);
+        userAO.setUserCode(userCode);
+        userAO.setUsername(request.getUsername());
+        userAO.setEmail(request.getEmail());
+        userMapper.userInfoUpdate(userAO);
+        userPO = userMapper.getUserByCode(userCode);
 
-        return JsonResult.success("修改成功");
+        return JsonResult.success(userPO);
     }
 
 }

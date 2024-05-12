@@ -11,10 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @ApiModel("用户")
 @Data
-public class UserAO {
-
-    @ApiModelProperty("type, 0-注册 1-登录")
-    private Integer type;
+public class UserUpdateRequestAO {
 
     @ApiModelProperty("唯一code")
     private String userCode;
@@ -22,28 +19,18 @@ public class UserAO {
     @ApiModelProperty("邮箱")
     private String email;
 
-    @ApiModelProperty("发送验证码时的邮箱")
-    private String preEmail;
-
-    @ApiModelProperty("电话号码")
-    private String phone;
-
-    @ApiModelProperty("用户输入的验证码")
-    private String userVerifyCode;
-
-    @ApiModelProperty("验证码")
-    private String verifyCode;
-
     @ApiModelProperty("用户名")
     private String username;
 
     @ApiModelProperty("头像")
-    private String headShot;
+    private MultipartFile headShot;
 
     @ApiModelProperty("密码")
     private String password;
 
-    @ApiModelProperty("再次确认的密码")
-    private String againPassword;
-
+    public UserUpdateRequestAO(MultipartFile headShot, String email, String username) {
+        this.headShot = headShot;
+        this.email = email;
+        this.username = username;
+    }
 }

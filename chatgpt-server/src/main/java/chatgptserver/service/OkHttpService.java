@@ -1,6 +1,5 @@
 package chatgptserver.service;
 
-import com.alibaba.fastjson.JSON;
 import okhttp3.*;
 import org.springframework.stereotype.Component;
 

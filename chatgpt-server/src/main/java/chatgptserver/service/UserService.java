@@ -30,7 +30,7 @@ public interface UserService {
 
     JsonResult userInfo(String userCode);
 
-    JsonResult userInfoUpdate(String token, UserAO request);
+    JsonResult userInfoUpdate(String token, UserUpdateRequestAO request);
 
     JsonResult register(UserAO request);
 

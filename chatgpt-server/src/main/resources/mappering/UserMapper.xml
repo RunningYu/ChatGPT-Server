@@ -65,4 +65,8 @@
         select * from tb_chatgpt_chat_functions where gpt_code = #{gptCode}
     </select>
 
+    <select id="isOtherHaveEamil" resultType="java.lang.Integer">
+        select count(*) from tb_chatgpt_user where email = #{email} and user_code != #{userCode}
+    </select>
+
 </mapper>

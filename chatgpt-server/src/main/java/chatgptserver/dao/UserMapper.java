@@ -47,4 +47,6 @@ public interface UserMapper {
     void updatePassword(String password, String email);
 
     void userPasswordUpdate(@Param("userCode") String userCode, @Param("newPassword") String newPassword);
+
+    int isOtherHaveEamil(@Param("userCode") String userCode, @Param("email") String email);
 }

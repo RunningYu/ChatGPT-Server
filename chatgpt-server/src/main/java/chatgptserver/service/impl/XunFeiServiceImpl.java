@@ -149,7 +149,6 @@ public class XunFeiServiceImpl implements XunFeiService {
                         } else {
                             question = imageUrl + "\n\n" + realContent;
                         }
-
                         if (isRebuild) {
                             messageService.recordHistory("", chatCode, "", totalResponse, isRebuild, questionTime);
                         } else {

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -140,7 +141,10 @@ public class UserController {
     @ApiOperation("用户信息修改")
     @PostMapping("/user/info/update")
     public JsonResult userInfoUpdate(HttpServletRequest httpServletRequest,
-                                     @RequestBody UserAO request) {
+                                     @RequestParam(value = "headShot", required = false) MultipartFile headShot,
+                                     @RequestParam(value = "email", required = true) String email,
+                                     @RequestParam(value = "username", required = true) String username) {
+        UserUpdateRequestAO request = new UserUpdateRequestAO(headShot, email, username);
         log.info("userController userInfoUpdate request:[{}]", request);
         String token = httpServletRequest.getHeader("token");
         log.info("userController userInfoUpdate token:[{}]", token);
