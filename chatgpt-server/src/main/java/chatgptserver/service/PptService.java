@@ -2,6 +2,7 @@ package chatgptserver.service;
 
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
+import chatgptserver.bean.ao.ppt.PptScoreRequestAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 
 /**
@@ -39,4 +40,8 @@ public interface PptService {
     JsonResult pptMeList(String userCode, int page, int size);
 
     JsonResult pptDelete(String userCode, String pptCode);
+
+    JsonResult pptSocring(String userCode, PptScoreRequestAO request);
+
+    JsonResult pptSee(String pptCode);
 }

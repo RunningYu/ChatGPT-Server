@@ -54,6 +54,9 @@ public class PptAO {
     @ApiModelProperty("收藏量")
     private Integer collectAmount;
 
+    @ApiModelProperty("浏览量")
+    private Integer seeAmount;
+
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

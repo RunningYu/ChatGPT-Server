@@ -3,6 +3,7 @@ package chatgptserver.controller;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
+import chatgptserver.bean.ao.ppt.PptScoreRequestAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
 import chatgptserver.service.PptService;
 import chatgptserver.service.UserService;
@@ -74,16 +75,16 @@ public class PptController {
         return response;
     }
 
-    /**
-     * todo：未完成
-     */
     @ApiOperation("PPT评分")
-    @GetMapping("/ppt/scoring")
-    public JsonResult pptScoring(HttpServletRequest httpServletRequest) {
+    @PostMapping("/ppt/scoring")
+    public JsonResult pptScoring(HttpServletRequest httpServletRequest,
+                                 @RequestBody PptScoreRequestAO request) {
         String token = httpServletRequest.getHeader("token");
-        log.info("PptController pptScoring token:[{}]", token);
+        log.info("PptController pptScoring request:[{}], token:[{}]", request, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptSocring(userCode, request);
 
-        return null;
+        return response;
     }
 
     @ApiOperation("获取分类数据")
@@ -203,6 +204,15 @@ public class PptController {
         log.info("PptController pptDelete pptCode:[{}] token:[{}]", pptCode, token);
         String userCode = userService.getUserCodeByToken(token);
         JsonResult response = pptService.pptDelete(userCode, pptCode);
+
+        return response;
+    }
+
+    @ApiOperation("PPT 浏览量+1")
+    @GetMapping("/ppt/see")
+    public JsonResult pptSee(@RequestParam("pptCode") String pptCode) {
+        log.info("PptController pptSee pptCode:[{}]", pptCode);
+        JsonResult response = pptService.pptSee(pptCode);
 
         return response;
     }

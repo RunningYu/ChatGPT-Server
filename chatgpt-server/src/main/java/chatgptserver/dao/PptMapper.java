@@ -74,4 +74,10 @@ public interface PptMapper {
     void pptDelete(String pptCode);
 
     void collectRecordDeleteByPptCode(String pptCode);
+
+    double getTotalScore(String pptCode);
+
+    void updateScore(@Param("pptCode") String pptCode, @Param("score") double score, @Param("totalScore") double totalScore);
+
+    void pptSeeAmountAdd(@Param("pptCode") String pptCode);
 }

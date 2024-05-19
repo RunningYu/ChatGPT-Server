@@ -36,6 +36,16 @@ class ChatgptServerApplicationTests {
     private MessageMapper messageMapper;
 
     @Test
+    public void testScore() {
+        double score = 3.7;
+        score = (score % (int)score < 0.5) ? (int)score : ((int)score + 0.5);
+        System.out.println(score);
+        score = 2.4;
+        score = (score % (int)score < 0.5) ? (int)score : ((int)score + 0.5);
+        System.out.println(score);
+    }
+
+    @Test
     public void test6 () {
         PptCreateResponseAO responseAO = JSON.parseObject("{" +
                 "\"userCode\": \"123\",\n" +

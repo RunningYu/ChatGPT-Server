@@ -202,6 +202,7 @@ public class ConvertMapping {
         pptAO.setDescription(pptPO.getDescription());
         pptAO.setScore(pptPO.getScore());
         pptAO.setCollectAmount(pptPO.getCollectAmount());
+        pptAO.setSeeAmount(pptPO.getSeeAmount());
 
         return pptAO;
     }

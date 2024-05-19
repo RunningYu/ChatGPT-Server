@@ -176,7 +176,7 @@ public class XunFeiServiceImpl implements XunFeiService {
         List<Text> requestList = new ArrayList<>();
         String base64Image = "";
         content = MessageUtils.buildContent(content);
-        content = ("".equals(content) ? CharacterConstants.DEFAULT_CONTENT : content);
+        content = (content == null || "".equals(content) ? CharacterConstants.DEFAULT_CONTENT : content);
         String iUrl = null;
         if (isRebuild) {
             MessagesPO messagesPO = messageMapper.getUpdateMessagePO(chatCode);

@@ -1,5 +1,6 @@
 package chatgptserver.service.impl;
 
+import chatgptserver.Common.FileUtil;
 import chatgptserver.Mapping.ConvertMapping;
 import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.ppt.*;
@@ -29,6 +30,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -306,7 +308,9 @@ public class PptServiceImpl implements PptService {
         PptPO pptPO = null;
         try {
             String pptUrl = minioUtil.upLoadFileToURL(request.getPptFile());
+            // 截取PPT第一页作为封面
             String coverUrl = minioUtil.upLoadFileToURL(request.getPptCoverFile());
+//            coverUrl = cutPptCover(request.getPptFile());
             pptPO = ConvertMapping.buildPptPO(request, pptUrl, coverUrl);
 //            UserPO userPO = userService.getUserByCode(request.getUserCode());
 //            pptPO.setUsername(userPO.getUsername());
@@ -321,6 +325,12 @@ public class PptServiceImpl implements PptService {
 
         return JsonResult.success("上传成功");
     }
+
+//    private String cutPptCover(MultipartFile pptFile) {
+//
+////        MultipartFile multipartFile = FileUtil.cutPptConver(pptFile);
+//
+//    }
 
     @Override
     public JsonResult pptKindList() {
@@ -341,10 +351,6 @@ public class PptServiceImpl implements PptService {
     @Override
     public JsonResult pptListByKind(String keyword, String firstKind, String secondKind, int page, int size, String userCode) {
         log.info("PptServiceImpl pptList keyword:[{}], firstKind:[{}], secondKind:[{}], page:[{}], size:[{}], userCode:[{}]", keyword, firstKind, secondKind, page, size, userCode);
-//        if (userCode == null || "".equals(userCode)) {
-//            log.info("PptServiceImpl pptList 请先登录");
-//            return JsonResult.error(500, "请先登录");
-//        }
         int startIndex = (page - 1) * size;
         List<PptPO> pptPOList = pptMapper.pptListByKind(keyword, firstKind, secondKind, startIndex, size);
         List<PptAO> pptAOList = new ArrayList<>();
@@ -516,5 +522,32 @@ public class PptServiceImpl implements PptService {
         pptMapper.collectRecordDeleteByPptCode(pptCode);
 
         return JsonResult.success("删除成功");
+    }
+
+    @Override
+    public JsonResult pptSocring(String userCode, PptScoreRequestAO request) {
+        log.info("PptServiceImpl pptSocring userCode:[{}], request:[{}]", userCode, request);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptCollectFolderList 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        double totalScore = pptMapper.getTotalScore(request.getPptCode());
+        log.info("PptServiceImpl pptSocring before totalScore:[{}]", totalScore);
+        totalScore += request.getScore1() + request.getScore2() + request.getScore3();
+        log.info("PptServiceImpl pptSocring after totalScore:[{}]", totalScore);
+        double score = totalScore / 5;
+        score = (score % (int)score < 0.5) ? (int)score : ((int)score + 0.5);
+        log.info("PptServiceImpl pptSocring score:[{}]", score);
+        pptMapper.updateScore(request.getPptCode(), score, totalScore);
+
+        return JsonResult.success("评分成功");
+    }
+
+    @Override
+    public JsonResult pptSee(String pptCode) {
+        log.info("PptServiceImpl pptSee pptCode:[{}]", pptCode);
+        pptMapper.pptSeeAmountAdd(pptCode);
+
+        return JsonResult.success();
     }
 }

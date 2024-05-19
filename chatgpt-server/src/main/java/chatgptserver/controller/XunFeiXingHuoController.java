@@ -97,7 +97,7 @@ public class XunFeiXingHuoController {
     @PostMapping("/chat/xf/image/understander")
     public JsonResult xfImageUnderstand(HttpServletRequest httpServletRequest,
                                         @RequestParam(value = "image", required = false) MultipartFile image,
-                                        @RequestParam("content") String content,
+                                        @RequestParam(value = "content", required = false) String content,
                                         @RequestParam("chatCode") String chatCode,
                                         @RequestParam("isRebuild") Boolean isRebuild,
                                         @RequestParam("cid") String cid) {

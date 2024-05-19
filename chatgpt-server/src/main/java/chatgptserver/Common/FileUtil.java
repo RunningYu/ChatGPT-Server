@@ -11,6 +11,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Objects;
 
@@ -57,5 +59,24 @@ public class FileUtil {
     }
 
 
-
+//    public static MultipartFile cutPptConver(MultipartFile pptFile) throws IOException {
+//        ByteArrayInputStream bis = new ByteArrayInputStream(pptData);
+//        HSLFSlideShow slideShow = new HSLFSlideShow(bis);
+//
+//        Slide[] slides = slideShow.getSlides();
+//        Slide firstSlide = slides[0];
+//
+//        BufferedImage image = new BufferedImage(960, 720, BufferedImage.TYPE_INT_RGB);
+//        Graphics2D graphics = image.createGraphics();
+//        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+//        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+//        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+//
+//        firstSlide.draw(graphics);
+//
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        ImageIO.write(image, "jpg", bos);
+//
+//        return bos.toByteArray();
+//    }
 }
