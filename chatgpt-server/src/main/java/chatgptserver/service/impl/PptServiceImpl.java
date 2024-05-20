@@ -12,10 +12,7 @@ import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptCoverResponseDTO;
 import chatgptserver.bean.dto.XunFeiXingHuo.pptCreate.PptOutlineResponse;
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.dto.ppt.PptColorListResponse;
-import chatgptserver.bean.po.FolderPO;
-import chatgptserver.bean.po.PptColorPO;
-import chatgptserver.bean.po.PptPO;
-import chatgptserver.bean.po.UserPO;
+import chatgptserver.bean.po.*;
 import chatgptserver.dao.PptMapper;
 import chatgptserver.enums.GPTConstants;
 import chatgptserver.service.MessageService;
@@ -550,4 +547,86 @@ public class PptServiceImpl implements PptService {
 
         return JsonResult.success();
     }
+
+    @Override
+    public JsonResult pptComment(CommentPO request) {
+        log.info("PptServiceImpl pptComment request:[{}]", request);
+        if (request.getUserCode() == null || "".equals(request.getUserCode())) {
+            log.info("PptServiceImpl pptComment 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        int n = pptMapper.pptComment(request);
+        String commentCode = "comment_" + request.getId();
+        pptMapper.updateCommentCode(request.getId(), commentCode);
+        pptMapper.pptCommentAmountAdd(request.getPptCode());
+
+        return JsonResult.success("评论成功");
+    }
+
+    @Override
+    public JsonResult pptReply(ReplyPO request) {
+        log.info("PptServiceImpl pptReply request:[{}]", request);
+        if (request.getUserCode() == null || "".equals(request.getUserCode())) {
+            log.info("PptServiceImpl pptReply 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        int n = pptMapper.pptReply(request);
+        String replyCode = "reply_" + request.getId();
+        pptMapper.updateReplyCode(request.getId(), replyCode);
+        pptMapper.pptReplyAmountAdd(request.getCommentCode());
+        pptMapper.pptCommentAmountAdd(request.getPptCode());
+
+        return JsonResult.success("回复成功");
+    }
+
+    @Override
+    public JsonResult pptCommentList(String userCode, String pptCode, int page, int size) {
+        log.info("PptServiceImpl pptCommentList userCode:[{}], pptCode:[{}], page:[{}], size:[{}]", userCode, pptCode, page, size);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptCommentList 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        int startIndex = (page - 1) * size;
+        List<CommentPO> commentPOList = pptMapper.pptCommentList(pptCode, startIndex, size);
+        int total = pptMapper.commentTotal(pptCode);
+        List<CommentAO> list = new ArrayList<>();
+        for(CommentPO commentPO : commentPOList) {
+            UserPO userPO = userService.getUserByCode(commentPO.getUserCode());
+            CommentAO commentAO = ConvertMapping.commentPO2CommentAO(commentPO);
+            if (userPO != null) {
+                commentAO.setUsername(userPO.getUsername());
+                commentAO.setHeadshot(userPO.getHeadshot());
+            }
+            list.add(commentAO);
+        }
+        CommentResponseAO response = new CommentResponseAO(total, list);
+
+        return JsonResult.success(response);
+    }
+
+    @Override
+    public JsonResult pptReplyList(String userCode, String commentCode, int page, int size) {
+        log.info("PptServiceImpl pptReplyList userCode:[{}], pptCode:[{}], page:[{}], size:[{}]", userCode, commentCode, page, size);
+        if (userCode == null || "".equals(userCode)) {
+            log.info("PptServiceImpl pptReplyList 请先登录");
+            return JsonResult.error(500, "请先登录");
+        }
+        int startIndex = (page - 1) * size;
+        List<ReplyPO> relyList = pptMapper.relyList(commentCode, startIndex, size);
+        int total = pptMapper.replyTotal(commentCode);
+        List<ReplyAO> list = new ArrayList<>();
+        for(ReplyPO replyPO : relyList) {
+            UserPO userPO = userService.getUserByCode(replyPO.getUserCode());
+            ReplyAO replyAO = ConvertMapping.replyPO2ReplyAO(replyPO);
+            if (userPO != null) {
+                replyAO.setUsername(userPO.getUsername());
+                replyAO.setHeadshot(userPO.getHeadshot());
+            }
+            list.add(replyAO);
+        }
+        ReplyResponseAO response = new ReplyResponseAO(total, list);
+
+        return JsonResult.success(response);
+    }
+
 }

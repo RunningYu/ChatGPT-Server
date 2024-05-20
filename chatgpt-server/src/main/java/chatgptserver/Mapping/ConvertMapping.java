@@ -1,9 +1,7 @@
 package chatgptserver.Mapping;
 
 import chatgptserver.bean.ao.*;
-import chatgptserver.bean.ao.ppt.FolderAO;
-import chatgptserver.bean.ao.ppt.PptAO;
-import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
+import chatgptserver.bean.ao.ppt.*;
 import chatgptserver.bean.dto.ppt.PptColor;
 import chatgptserver.bean.po.*;
 import chatgptserver.dao.UserMapper;
@@ -203,6 +201,7 @@ public class ConvertMapping {
         pptAO.setScore(pptPO.getScore());
         pptAO.setCollectAmount(pptPO.getCollectAmount());
         pptAO.setSeeAmount(pptPO.getSeeAmount());
+        pptAO.setCommentAmount(pptPO.getCommentAmount());
 
         return pptAO;
     }
@@ -220,5 +219,35 @@ public class ConvertMapping {
         folderAO.setIsDefault(folderPO.getIsDefault());
 
         return folderAO;
+    }
+
+    public static CommentAO commentPO2CommentAO(CommentPO commentPO) {
+        if (Objects.isNull(commentPO)) {
+            return null;
+        }
+        CommentAO commentAO = new CommentAO();
+        commentAO.setCommentCode(commentPO.getCommentCode());
+        commentAO.setUserCode(commentPO.getUserCode());
+        commentAO.setPptCode(commentPO.getPptCode());
+        commentAO.setContent(commentPO.getContent());
+        commentAO.setReplyAmount(commentPO.getReplyAmount());
+        commentAO.setCreateTime(commentPO.getCreateTime());
+
+        return commentAO;
+    }
+
+    public static ReplyAO replyPO2ReplyAO(ReplyPO replyPO) {
+        if (Objects.isNull(replyPO)) {
+            return null;
+        }
+        ReplyAO replyAO = new ReplyAO();
+        replyAO.setReplyCode(replyPO.getReplyCode());
+        replyAO.setCommentCode(replyPO.getCommentCode());
+        replyAO.setUserCode(replyPO.getUserCode());
+        replyAO.setPptCode(replyPO.getPptCode());
+        replyAO.setContent(replyPO.getContent());
+        replyAO.setCreateTime(replyPO.getCreateTime());
+
+        return replyAO;
     }
 }

@@ -20,6 +20,16 @@
         insert into tb_ppt_folder(user_code, folder, is_default) values (#{userCode}, #{folder}, #{isDefault})
     </insert>
 
+    <insert id="pptComment" parameterType="chatgptserver.bean.po.CommentPO" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_ppt_comment(ppt_code, user_code, content)
+        values(#{pptCode}, #{userCode}, #{content})
+    </insert>
+
+    <insert id="pptReply" parameterType="chatgptserver.bean.po.ReplyPO" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_ppt_reply(comment_code, ppt_code, user_code, content)
+        values (#{commentCode}, #{pptCode}, #{userCode}, #{content})
+    </insert>
+
     <update id="updatePptCodeById">
         update tb_ppt_info set ppt_code = #{pptCode} where id = #{id}
     </update>
@@ -50,6 +60,21 @@
         update tb_ppt_info set see_amount = see_amount + 1 where ppt_code = #{pptCode}
     </update>
 
+    <update id="updateCommentCode">
+        update tb_ppt_comment set comment_code = #{commentCode} where id = #{id}
+    </update>
+
+    <update id="pptCommentAmountAdd">
+        update tb_ppt_info set comment_amount = comment_amount + 1 where ppt_code = #{pptCode}
+    </update>
+
+    <update id="updateReplyCode">
+        update tb_ppt_reply set reply_code = #{replyCode} where id = #{id}
+    </update>
+
+    <update id="pptReplyAmountAdd">
+        update tb_ppt_comment set reply_amount = reply_amount + 1 where comment_code = #{commentCode}
+    </update>
 
     <delete id="pptDisCollect">
         delete from tb_ppt_collect where folder_code = #{folderCode} and user_code = #{userCode} and ppt_code = #{pptCode}
@@ -152,6 +177,22 @@
 
     <select id="getTotalScore" resultType="java.lang.Double">
         select total_score from tb_ppt_info where ppt_code = #{pptCode}
+    </select>
+
+    <select id="pptCommentList" resultType="chatgptserver.bean.po.CommentPO">
+        select * from tb_ppt_comment where ppt_code = #{pptCode} order by create_time DESC limit #{startIndex}, #{size}
+    </select>
+
+    <select id="commentTotal" resultType="java.lang.Integer">
+        select count(*) from tb_ppt_comment where ppt_code = #{pptCode}
+    </select>
+
+    <select id="relyList" resultType="chatgptserver.bean.po.ReplyPO">
+        select * from tb_ppt_reply where comment_code = #{commentCode} order by create_time DESC limit #{startIndex}, #{size}
+    </select>
+
+    <select id="replyTotal" resultType="java.lang.Integer">
+        select count(*) from tb_ppt_reply where comment_code = #{commentCode}
     </select>
 
 </mapper>

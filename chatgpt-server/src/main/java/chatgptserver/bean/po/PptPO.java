@@ -62,6 +62,9 @@ public class PptPO {
     @ApiModelProperty("浏览量")
     private Integer seeAmount;
 
+    @ApiModelProperty("评论量")
+    private Integer commentAmount;
+
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

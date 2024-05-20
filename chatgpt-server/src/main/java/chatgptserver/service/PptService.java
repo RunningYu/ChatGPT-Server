@@ -4,6 +4,8 @@ import chatgptserver.bean.ao.JsonResult;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
 import chatgptserver.bean.ao.ppt.PptScoreRequestAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
+import chatgptserver.bean.po.CommentPO;
+import chatgptserver.bean.po.ReplyPO;
 
 /**
  * @author : 其然乐衣Letitbe
@@ -44,4 +46,12 @@ public interface PptService {
     JsonResult pptSocring(String userCode, PptScoreRequestAO request);
 
     JsonResult pptSee(String pptCode);
+
+    JsonResult pptComment(CommentPO request);
+
+    JsonResult pptReply(ReplyPO request);
+
+    JsonResult pptCommentList(String userCode, String pptCode, int page, int size);
+
+    JsonResult pptReplyList(String userCode, String commentCode, int page, int size);
 }

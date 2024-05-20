@@ -5,6 +5,8 @@ import chatgptserver.bean.ao.QuestionRequestAO;
 import chatgptserver.bean.ao.ppt.PptCreateRequestAO;
 import chatgptserver.bean.ao.ppt.PptScoreRequestAO;
 import chatgptserver.bean.ao.ppt.PptUploadRequestAO;
+import chatgptserver.bean.po.CommentPO;
+import chatgptserver.bean.po.ReplyPO;
 import chatgptserver.service.PptService;
 import chatgptserver.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -216,5 +218,58 @@ public class PptController {
 
         return response;
     }
+
+    @ApiOperation("评论")
+    @PostMapping("/ppt/comment")
+    public JsonResult pptComment(HttpServletRequest httpServletRequest,
+                                 @RequestBody CommentPO request) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptComment request:[{}], token:[{}]", request, token);
+        String userCode = userService.getUserCodeByToken(token);
+        request.setUserCode(userCode);
+        JsonResult response = pptService.pptComment(request);
+
+        return response;
+    }
+
+    @ApiOperation("回复")
+    @PostMapping("/ppt/reply")
+    public JsonResult pptReply(HttpServletRequest httpServletRequest,
+                                 @RequestBody ReplyPO request) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptReply request:[{}], token:[{}]", request, token);
+        String userCode = userService.getUserCodeByToken(token);
+        request.setUserCode(userCode);
+        JsonResult response = pptService.pptReply(request);
+
+        return response;
+    }
+
+    @ApiOperation("评论列表")
+    @GetMapping("/ppt/comment/list")
+    public JsonResult pptCommentList(HttpServletRequest httpServletRequest,
+                                     @RequestParam("pptCode") String pptCode,
+                                     @RequestParam("page") int page, @RequestParam("size") int size) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptCommentList pptCode:[{}], page:[{}], size:[{}], token:[{}]", pptCode, page, size, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptCommentList(userCode, pptCode, page, size);
+
+        return response;
+    }
+
+    @ApiOperation("回复列表")
+    @GetMapping("/ppt/reply/list")
+    public JsonResult pptReplyList(HttpServletRequest httpServletRequest,
+                                   @RequestParam("commentCode") String commentCode,
+                                   @RequestParam("page") int page, @RequestParam("size") int size) {
+        String token = httpServletRequest.getHeader("token");
+        log.info("PptController pptReplyList commentCode:[{}], page:[{}], size:[{}], token:[{}]", commentCode, page, size, token);
+        String userCode = userService.getUserCodeByToken(token);
+        JsonResult response = pptService.pptReplyList(userCode, commentCode, page, size);
+
+        return response;
+    }
+
 
 }

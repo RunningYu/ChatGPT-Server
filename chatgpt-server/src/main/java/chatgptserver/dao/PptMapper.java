@@ -1,9 +1,7 @@
 package chatgptserver.dao;
 
 import chatgptserver.bean.dto.ppt.PptColor;
-import chatgptserver.bean.po.FolderPO;
-import chatgptserver.bean.po.PptColorPO;
-import chatgptserver.bean.po.PptPO;
+import chatgptserver.bean.po.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -80,4 +78,24 @@ public interface PptMapper {
     void updateScore(@Param("pptCode") String pptCode, @Param("score") double score, @Param("totalScore") double totalScore);
 
     void pptSeeAmountAdd(@Param("pptCode") String pptCode);
+
+    int pptComment(CommentPO request);
+
+    void updateCommentCode(@Param("id") Integer id, @Param("commentCode") String commentCode);
+
+    void pptCommentAmountAdd(String pptCode);
+
+    int pptReply(ReplyPO request);
+
+    void updateReplyCode(@Param("id") Integer id, @Param("replyCode") String replyCode);
+
+    void pptReplyAmountAdd(String commentCode);
+
+    List<CommentPO> pptCommentList(@Param("pptCode") String pptCode, @Param("startIndex") int startIndex, @Param("size") int size);
+
+    int commentTotal(@Param("pptCode") String pptCode);
+
+    List<ReplyPO> relyList(@Param("commentCode") String commentCode, @Param("startIndex") int startIndex, @Param("size") int size);
+
+    int replyTotal(@Param("commentCode") String commentCode);
 }
