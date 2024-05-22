@@ -24,8 +24,11 @@ public class PptAO {
     @ApiModelProperty("用户code")
     private String userCode;
 
-    @ApiModelProperty("用户c用户名称ode")
+    @ApiModelProperty("用户名称")
     private String username;
+
+    @ApiModelProperty("头像")
+    private String headshot;
 
     @ApiModelProperty("一级分类")
     private String firstKind;
@@ -59,6 +62,12 @@ public class PptAO {
 
     @ApiModelProperty("评论量")
     private Integer commentAmount;
+
+    @ApiModelProperty("是否是自己的")
+    private Boolean enableScore;
+
+    @ApiModelProperty("是否评论过了")
+    private Boolean haveScored;
 
     @ApiModelProperty("创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

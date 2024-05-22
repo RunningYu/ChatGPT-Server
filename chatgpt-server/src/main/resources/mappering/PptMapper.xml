@@ -30,6 +30,10 @@
         values (#{commentCode}, #{pptCode}, #{userCode}, #{content})
     </insert>
 
+    <insert id="scoreRecord">
+        insert into tb_ppt_score_record(user_code, ppt_code) values (#{userCode}, #{pptCode})
+    </insert>
+
     <update id="updatePptCodeById">
         update tb_ppt_info set ppt_code = #{pptCode} where id = #{id}
     </update>
@@ -193,6 +197,14 @@
 
     <select id="replyTotal" resultType="java.lang.Integer">
         select count(*) from tb_ppt_reply where comment_code = #{commentCode}
+    </select>
+
+    <select id="hasScored" resultType="java.lang.Integer">
+        select count(*) from tb_ppt_score_record where user_code = #{userCode} and ppt_code = #{pptCode}
+    </select>
+
+    <select id="pptInfoByPptCode" resultType="chatgptserver.bean.po.PptPO">
+        select * from tb_ppt_info where ppt_code = #{pptCode}
     </select>
 
 </mapper>

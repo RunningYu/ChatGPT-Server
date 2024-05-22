@@ -98,4 +98,10 @@ public interface PptMapper {
     List<ReplyPO> relyList(@Param("commentCode") String commentCode, @Param("startIndex") int startIndex, @Param("size") int size);
 
     int replyTotal(@Param("commentCode") String commentCode);
+
+    void scoreRecord(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+
+    int hasScored(@Param("userCode") String userCode, @Param("pptCode") String pptCode);
+
+    PptPO pptInfoByPptCode(String pptCode);
 }

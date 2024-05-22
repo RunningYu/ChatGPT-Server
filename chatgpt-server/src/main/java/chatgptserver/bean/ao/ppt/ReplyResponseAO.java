@@ -17,6 +17,8 @@ public class ReplyResponseAO {
 
     private Integer total;
 
+    private Boolean hasMore;
+
     private List<ReplyAO> list;
 
 }

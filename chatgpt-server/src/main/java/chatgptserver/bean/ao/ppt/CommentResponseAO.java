@@ -18,6 +18,8 @@ public class CommentResponseAO {
 
     private Integer total;
 
+    private Boolean hasMore;
+
     private List<CommentAO> list;
 
 }

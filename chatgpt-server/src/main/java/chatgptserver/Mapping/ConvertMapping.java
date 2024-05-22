@@ -10,6 +10,7 @@ import chatgptserver.utils.MinioUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 
@@ -231,7 +232,11 @@ public class ConvertMapping {
         commentAO.setPptCode(commentPO.getPptCode());
         commentAO.setContent(commentPO.getContent());
         commentAO.setReplyAmount(commentPO.getReplyAmount());
-        commentAO.setCreateTime(commentPO.getCreateTime());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = format.format(commentPO.getCreateTime());
+        String[] times = date.split(" ")[0].split("-");
+        String createTime = times[1] + "-" + times[2];
+        commentAO.setCreateTime(createTime);
 
         return commentAO;
     }
@@ -246,7 +251,11 @@ public class ConvertMapping {
         replyAO.setUserCode(replyPO.getUserCode());
         replyAO.setPptCode(replyPO.getPptCode());
         replyAO.setContent(replyPO.getContent());
-        replyAO.setCreateTime(replyPO.getCreateTime());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = format.format(replyPO.getCreateTime());//注意这里返回的是string类型
+        String[] times = date.split(" ")[0].split("-");
+        String createTime = times[1] + "-" + times[2];
+        replyAO.setCreateTime(createTime);
 
         return replyAO;
     }

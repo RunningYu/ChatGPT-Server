@@ -30,9 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -353,9 +355,13 @@ public class PptServiceImpl implements PptService {
         List<PptAO> pptAOList = new ArrayList<>();
         for (PptPO pptPO : pptPOList) {
             PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);
-            UserPO userPO = userService.getUserByCode(userCode);
+            pptAO.setEnableScore(pptPO.getUserCode().equals(userCode) ? false : true);
+            int hasScored = pptMapper.hasScored(userCode, pptPO.getPptCode());
+            pptAO.setHaveScored(hasScored == 0 ? false : true);
+            UserPO userPO = userService.getUserByCode(pptPO.getUserCode());
             if (userPO != null) {
                 pptAO.setUsername(userPO.getUsername());
+                pptAO.setHeadshot(userPO.getHeadshot());
             }
             Integer isCollected = pptMapper.isCollected(userCode, pptPO.getPptCode());
             pptAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
@@ -403,6 +409,14 @@ public class PptServiceImpl implements PptService {
         List<PptAO> pptAOList = new ArrayList<>();
         for (PptPO pptPO : list) {
             PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);
+            pptAO.setEnableScore(pptPO.getUserCode().equals(userCode) ? false : true);
+            int hasScored = pptMapper.hasScored(userCode, pptPO.getPptCode());
+            pptAO.setHaveScored(hasScored == 0 ? false : true);
+            UserPO userPO = userService.getUserByCode(pptPO.getUserCode());
+            if (userPO != null) {
+                pptAO.setUsername(userPO.getUsername());
+                pptAO.setHeadshot(userPO.getHeadshot());
+            }
             pptAO.setIsCollected(true);
             pptAOList.add(pptAO);
         }
@@ -496,9 +510,13 @@ public class PptServiceImpl implements PptService {
         List<PptAO> pptAOList = new ArrayList<>();
         for (PptPO pptPO : list) {
             PptAO pptAO = ConvertMapping.pptPO2PptAO(pptPO);
+            pptAO.setEnableScore(pptPO.getUserCode().equals(userCode) ? false : true);
+            int hasScored = pptMapper.hasScored(userCode, pptPO.getPptCode());
+            pptAO.setHaveScored(hasScored == 0 ? false : true);
             UserPO userPO = userService.getUserByCode(userCode);
             if (userPO != null) {
                 pptAO.setUsername(userPO.getUsername());
+                pptAO.setHeadshot(userPO.getHeadshot());
             }
             Integer isCollected = pptMapper.isCollected(userCode, pptPO.getPptCode());
             pptAO.setIsCollected((isCollected == null || isCollected == 0) ? false : true);
@@ -528,6 +546,16 @@ public class PptServiceImpl implements PptService {
             log.info("PptServiceImpl pptCollectFolderList 请先登录");
             return JsonResult.error(500, "请先登录");
         }
+        int hasScored = pptMapper.hasScored(userCode, request.getPptCode());
+        if (hasScored != 0) {
+            log.info("PptServiceImpl pptCollectFolderList 不可重复或修改评分");
+            return JsonResult.error(500, "不可重复或修改评分");
+        }
+        PptPO pptPO = pptMapper.pptInfoByPptCode(request.getPptCode());
+        if (pptPO != null && userCode.equals(pptPO.getUserCode())) {
+            log.info("PptServiceImpl pptCollectFolderList 不可给自己评分");
+            return JsonResult.error(500, "不可给自己评分");
+        }
         double totalScore = pptMapper.getTotalScore(request.getPptCode());
         log.info("PptServiceImpl pptSocring before totalScore:[{}]", totalScore);
         totalScore += request.getScore1() + request.getScore2() + request.getScore3();
@@ -536,6 +564,7 @@ public class PptServiceImpl implements PptService {
         score = (score % (int)score < 0.5) ? (int)score : ((int)score + 0.5);
         log.info("PptServiceImpl pptSocring score:[{}]", score);
         pptMapper.updateScore(request.getPptCode(), score, totalScore);
+        pptMapper.scoreRecord(userCode, request.getPptCode());
 
         return JsonResult.success("评分成功");
     }
@@ -559,8 +588,24 @@ public class PptServiceImpl implements PptService {
         String commentCode = "comment_" + request.getId();
         pptMapper.updateCommentCode(request.getId(), commentCode);
         pptMapper.pptCommentAmountAdd(request.getPptCode());
+        CommentAO commentAO = new CommentAO();
+        commentAO.setCommentCode(commentCode);
+        commentAO.setPptCode(request.getPptCode());
+        commentAO.setUserCode(request.getUserCode());
+        UserPO userPO = userService.getUserByCode(request.getUserCode());
+        if (userPO != null) {
+            commentAO.setUsername(userPO.getUsername());
+            commentAO.setHeadshot(userPO.getHeadshot());
+        }
+        commentAO.setContent(request.getContent());
+        commentAO.setReplyAmount(0);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = format.format(new Date());
+        String[] times = date.split(" ")[0].split("-");
+        String createTime = times[1] + "-" + times[2];
+        commentAO.setCreateTime(createTime);
 
-        return JsonResult.success("评论成功");
+        return JsonResult.success(commentAO);
     }
 
     @Override
@@ -576,7 +621,24 @@ public class PptServiceImpl implements PptService {
         pptMapper.pptReplyAmountAdd(request.getCommentCode());
         pptMapper.pptCommentAmountAdd(request.getPptCode());
 
-        return JsonResult.success("回复成功");
+        ReplyAO replyAO = new ReplyAO();
+        replyAO.setReplyCode(replyCode);
+        replyAO.setCommentCode(request.getCommentCode());
+        replyAO.setPptCode(request.getPptCode());
+        replyAO.setUserCode(request.getUserCode());
+        UserPO userPO = userService.getUserByCode(request.getUserCode());
+        if (userPO != null) {
+            replyAO.setUsername(userPO.getUsername());
+            replyAO.setHeadshot(userPO.getHeadshot());
+        }
+        replyAO.setContent(request.getContent());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = format.format(new Date());
+        String[] times = date.split(" ")[0].split("-");
+        String createTime = times[1] + "-" + times[2];
+        replyAO.setCreateTime(createTime);
+
+        return JsonResult.success(replyAO);
     }
 
     @Override
@@ -589,6 +651,7 @@ public class PptServiceImpl implements PptService {
         int startIndex = (page - 1) * size;
         List<CommentPO> commentPOList = pptMapper.pptCommentList(pptCode, startIndex, size);
         int total = pptMapper.commentTotal(pptCode);
+        boolean hasMore = (startIndex + size) < total ? true : false;
         List<CommentAO> list = new ArrayList<>();
         for(CommentPO commentPO : commentPOList) {
             UserPO userPO = userService.getUserByCode(commentPO.getUserCode());
@@ -599,7 +662,7 @@ public class PptServiceImpl implements PptService {
             }
             list.add(commentAO);
         }
-        CommentResponseAO response = new CommentResponseAO(total, list);
+        CommentResponseAO response = new CommentResponseAO(total, hasMore, list);
 
         return JsonResult.success(response);
     }
@@ -614,6 +677,7 @@ public class PptServiceImpl implements PptService {
         int startIndex = (page - 1) * size;
         List<ReplyPO> relyList = pptMapper.relyList(commentCode, startIndex, size);
         int total = pptMapper.replyTotal(commentCode);
+        boolean hasMore = (startIndex + size) < total ? true : false;
         List<ReplyAO> list = new ArrayList<>();
         for(ReplyPO replyPO : relyList) {
             UserPO userPO = userService.getUserByCode(replyPO.getUserCode());
@@ -624,7 +688,7 @@ public class PptServiceImpl implements PptService {
             }
             list.add(replyAO);
         }
-        ReplyResponseAO response = new ReplyResponseAO(total, list);
+        ReplyResponseAO response = new ReplyResponseAO(total, hasMore, list);
 
         return JsonResult.success(response);
     }

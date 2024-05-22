@@ -270,23 +270,23 @@ public class XunFeiServiceImpl implements XunFeiService {
             // 利用sid查询PPT生成进度
             int progress = 0;
             ProgressResponse progressResponse;
-            while (progress < 100) {
-                // 再次检查是否要取消生成
-                if (StorageUtils.stopRequestMap.containsKey(cid)) {
-                    StorageUtils.stopRequestMap.remove(cid);
-
-                    return JsonResult.success();
-                }
-                String progressResult = client.checkProgress(appId, ts, signature, response.getData().getSid());
-                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
-                progress = progressResponse.getData().getProcess();
-                System.out.println("-->" + progressResult);
-
-                if (progress < 100) {
-                    Thread.sleep(5000);
-                }
-            }
-
+//            while (progress < 100) {
+//                // 再次检查是否要取消生成
+//                if (StorageUtils.stopRequestMap.containsKey(cid)) {
+//                    StorageUtils.stopRequestMap.remove(cid);
+//
+//                    return JsonResult.success();
+//                }
+//                String progressResult = client.checkProgress(appId, ts, signature, response.getData().getSid());
+//                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
+//                progress = progressResponse.getData().getProcess();
+//                System.out.println("-->" + progressResult);
+//
+//                if (progress < 100) {
+//                    Thread.sleep(5000);
+//                }
+//            }
+//
             // 大纲生成
             String outlineQuery = query;
             String outlineResp = client.createOutline(appId, ts, signature,outlineQuery);
@@ -298,39 +298,39 @@ public class XunFeiServiceImpl implements XunFeiService {
             outLineStr = PptUtils.buildOutLineMD(outline);
             System.out.println("生成的大纲如下：");
             log.info("XunFeiServiceImpl xfPptCreate outline:[{}]", outline);
-//            log.info("XunFeiServiceImpl xfPptCreate Outline:[{}]", outlineResponse.getData().getOutline());
+            log.info("XunFeiServiceImpl xfPptCreate Outline:[{}]", outlineResponse.getData().getOutline());
             System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-
-            // 基于sid和大纲生成ppt
-            String sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            log.info("XunFeiServiceImpl xfPptCreate sidResp1:[{}]", sidResp);
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            CreateResponse sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
-            sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
-            System.out.println(sidResp);
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-            log.info("XunFeiServiceImpl xfPptCreate sidResp2:[{}]", sidResp);
-            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
-
-            sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
-            // 利用sid查询PPT生成进度
-            progress = 0;
-            while (progress < 100) {
-                // 再次检查是否要取消生成
-                if (StorageUtils.stopRequestMap.containsKey(cid)) {
-                    StorageUtils.stopRequestMap.remove(cid);
-
-                    return JsonResult.success();
-                }
-                String progressResult = client.checkProgress(appId, ts, signature, sidResponse.getData().getSid());
-                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
-                progress = progressResponse.getData().getProcess();
-                System.out.println("-->" + progressResult);
-                if (progress < 100) {
-                    Thread.sleep(5000);
-                }
-            }
+//
+//            // 基于sid和大纲生成ppt
+//            String sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
+//            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+//            log.info("XunFeiServiceImpl xfPptCreate sidResp1:[{}]", sidResp);
+//            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+//            CreateResponse sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
+//            sidResp = client.createPptBySid(appId, ts, signature, outlineResponse.getData().getSid());
+//            System.out.println(sidResp);
+//            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+//            log.info("XunFeiServiceImpl xfPptCreate sidResp2:[{}]", sidResp);
+//            System.out.println("————————————————————————————————————————————————————————————————————————————————————————————————");
+//
+//            sidResponse = JSON.parseObject(sidResp, CreateResponse.class);
+//            // 利用sid查询PPT生成进度
+//            progress = 0;
+//            while (progress < 100) {
+//                // 再次检查是否要取消生成
+//                if (StorageUtils.stopRequestMap.containsKey(cid)) {
+//                    StorageUtils.stopRequestMap.remove(cid);
+//
+//                    return JsonResult.success();
+//                }
+//                String progressResult = client.checkProgress(appId, ts, signature, sidResponse.getData().getSid());
+//                progressResponse = JSON.parseObject(progressResult, ProgressResponse.class);
+//                progress = progressResponse.getData().getProcess();
+//                System.out.println("-->" + progressResult);
+//                if (progress < 100) {
+//                    Thread.sleep(5000);
+//                }
+//            }
             // 再次检查是否要取消生成
             if (StorageUtils.stopRequestMap.containsKey(cid)) {
                 StorageUtils.stopRequestMap.remove(cid);
